@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Time Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        body {
+            font-family: "Poppins", sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            transition: background 0.3s;
+        }
+
+        .dark-mode {
+            background: #121212;
+            color: #fff;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            width: 220px;
+            background: #fff;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+        }
+
+        .dark-mode .sidebar {
+            background: #1e1e1e;
+            color: #fff;
+            border: 1px solid #444;
+        }
+
+        .sidebar h4 {
+            margin-bottom: 1rem;
+        }
+
+        .sidebar a {
+            display: block;
+            font-size: 16px;
+            color: #333;
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-bottom: 8px;
+        }
+
+        .dark-mode .sidebar a {
+            color: #fff;
+        }
+
+        .sidebar a:hover {
+            background: #e9ecef;
+        }
+
+        .dark-mode .sidebar a:hover {
+            background: #333;
+        }
+
+        .content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .view-toggle button {
+            margin-right: 5px;
+        }
+
+        .row-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        .timeline-container {
+            flex: 2;
+            position: relative;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 2px solid #ccc;
+            padding-left: 100px;
+            min-height: 600px;
+        }
+
+        .dark-mode .timeline-container {
+            background: #1f1f1f;
+            border: 1px solid #444;
+        }
+
+        .hour-label {
+            position: absolute;
+            left: 0;
+            width: 90px;
+            font-size: 14px;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding: 5px;
+            text-align: right;
+        }
+
+        .dark-mode .hour-label {
+            color: #bbb;
+            border-top: 1px solid #444;
+        }
+
+        .timeline-hour {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            border-top: 1px solid #eee;
+        }
+
+        .dark-mode .timeline-hour {
+            border-top: 1px solid #444;
+        }
+
+        .entry {
+            position: absolute;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #fff;
+            padding: 5px 8px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .entry.focus {
+            background: #2eb85c;
+        }
+
+        .entry.distraction {
+            background: #e55353;
+        }
+
+        .entry.singleColor {
+            background: #6c757d;
+        }
+
+        .summary-panel {
+            flex: 1;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            min-height: 600px;
+        }
+
+        .dark-mode .summary-panel {
+            background: #1f1f1f;
+            border: 1px solid #444;
+        }
+
+        .summary-panel h5 {
+            margin-bottom: 10px;
+        }
+
+        .summary-item {
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h4><i class="bi bi-speedometer2"></i> Dashboard</h4>
+        <a href="#" onclick="showPage('timeline')">🕒 Timeline</a>
+        <a href="#" onclick="showPage('settings')" data-bs-toggle="modal" data-bs-target="#settingsModal">⚙️
+            Settings</a>
+        <a href="#" onclick="showPage('about')" data-bs-toggle="modal" data-bs-target="#aboutModal">ℹ️ About</a>
+    </div>
+    <div class="content">
+        <div class="top-bar mb-2">
+            <h2 id="appTitle">Time Tracker <span>⏳</span></h2>
+            <div>
+                <button id="toggleTracking" class="btn btn-success btn-sm">Start Tracking</button>
+            </div>
+        </div>
+        <div class="d-flex align-items-center mb-2">
+            <div class="view-toggle me-3">
+                <button id="dayViewBtn" class="btn btn-outline-primary btn-sm">Day</button>
+                <button id="weekViewBtn" class="btn btn-outline-primary btn-sm">Week</button>
+                <button id="monthViewBtn" class="btn btn-outline-primary btn-sm">Month</button>
+            </div>
+            <div id="dayNav" class="d-flex align-items-center">
+                <button id="prevDay" class="btn btn-outline-primary btn-sm me-2">← Previous Day</button>
+                <button id="todayBtn" class="btn btn-outline-primary btn-sm me-2">Today</button>
+                <button id="nextDay" class="btn btn-outline-primary btn-sm">Next Day →</button>
+                <h5 class="ms-3 mb-0" id="currentDateLabel"></h5>
+            </div>
+        </div>
+        <p class="text-muted">
+            Press <code>CTRL + ,</code> to Zoom In | Press <code>CTRL + .</code> to Zoom Out
+        </p>
+        <div class="row-layout">
+            <div id="timeline" class="timeline-container"></div>
+            <div class="summary-panel">
+                <h5>Work Day Summary</h5>
+                <div id="donutChart" style="max-width: 250px; margin-bottom:20px;"></div>
+                <div class="summary-item">Focused: <span id="focusedTime">0h 0m</span></div>
+                <div class="summary-item">Distracted: <span id="distractedTime">0h 0m</span></div>
+                <hr />
+                <h5>Most Used</h5>
+                <ul id="mostUsedList" class="list-unstyled"></ul>
+                <hr />
+                <h5>Top Distractions</h5>
+                <ul id="topDistractionsList" class="list-unstyled"></ul>
+            </div>
+        </div>
+    </div>
+    <!-- Settings Modal -->
+    <div class="modal fade" id="settingsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Settings ⚙️</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label>Timeline Increments (min):</label>
+                        <select id="timelineIncrements" class="form-select form-select-sm">
+                            <option value="15">15</option>
+                            <option value="30">30</option>
+                        </select>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="darkModeCheck">
+                        <label class="form-check-label" for="darkModeCheck">Dark Mode</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="useEmojisCheck">
+                        <label class="form-check-label" for="useEmojisCheck">Use Emojis in UI</label>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" id="colorCodedEventsCheck">
+                        <label class="form-check-label" for="colorCodedEventsCheck">Color-Coded Events</label>
+                    </div>
+                    <div class="mb-3">
+                        <label>Default View:</label>
+                        <select id="defaultViewSelect" class="form-select form-select-sm">
+                            <option value="day">Day</option>
+                            <option value="week">Week</option>
+                            <option value="month">Month</option>
+                        </select>
+                    </div>
+                    <button id="saveSettingsBtn" class="btn btn-primary btn-sm">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">About ℹ️</h5>
+                </div>
+                <div class="modal-body">
+                    <p>Professional Electron Time Tracker with automatic app icon extraction (using IconExtractor),
+                        segment detail popups, and advanced settings.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Segment Details Modal -->
+    <div class="modal fade" id="segmentDetailsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Segment Details</h5>
+                </div>
+                <div class="modal-body">
+                    <p id="segmentDetailsContent"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="toast-container" id="toastContainer"></div>
+    <script src="renderer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showPage(page) { console.log("Show page:", page); }
+        $('#toggleTheme').click(() => { $('body').toggleClass('dark-mode'); });
+        $(function () { $('[data-bs-toggle="tooltip"]').tooltip(); });
+    </script>
+</body>
+
+</html>

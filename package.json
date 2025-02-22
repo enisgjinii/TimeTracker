@@ -1,0 +1,18 @@
+{
+  "name": "window-activity-tracker",
+  "version": "1.0.0",
+  "description": "Track active windows and save to JSON",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "type": "module",
+  "dependencies": {
+    "electron": "^29.0.1",
+    "electron-store": "^8.1.0",
+    "get-app-icon": "^1.0.1",
+    "get-windows": "^9.2.0",
+    "icon-extractor": "^1.0.3",
+    "jquery": "^3.7.1"
+  }
+}
