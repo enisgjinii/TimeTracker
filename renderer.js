@@ -13,12 +13,27 @@ let zoomLevel = 1.0;
 let viewMode = "day";
 let currentDate = new Date();
 currentDate.setHours(0, 0, 0, 0);
+
+// Advanced settings: add default categories and app classifications if not set
 let userSettings = {
   timelineIncrements: 15,
   darkMode: false,
   useEmojis: true,
   colorCodedEvents: true,
-  defaultView: "day"
+  defaultView: "day",
+  // manually defined categories (used for grouping apps)
+  categories: ["Work", "Entertainment", "Productivity", "Social"],
+  // mapping from app name to category (can be edited manually)
+  appClassifications: {
+    "Visual Studio Code": "Work",
+    "Electron": "Productivity",
+    "Calculator": "Work",
+    "Search": "Work",
+    "Zen Browser": "Entertainment",
+    "YouTube": "Entertainment",
+    "Discord": "Social",
+    "Facebook": "Social"
+  }
 };
 
 const $timeline = $('#timeline');
@@ -43,10 +58,84 @@ function getCDNIconForAppName(appName) {
     "Zen Browser": "https://img.icons8.com/color/48/000000/internet.png",
     "Search": "https://img.icons8.com/color/48/000000/search.png",
     "Calculator": "https://img.icons8.com/color/48/000000/calculator.png"
-    // Add more mappings as needed
+    // add more mappings as needed
   };
   return iconMapping[appName] || "https://img.icons8.com/color/48/000000/app.png";
 }
+
+// Advanced categorization logic
+
+// Returns the category for an app name from the classification mapping
+function getCategoryForApp(appName) {
+  if (userSettings.appClassifications && userSettings.appClassifications[appName]) {
+    return userSettings.appClassifications[appName];
+  }
+  return "";
+}
+
+// Populate the categories list in settings modal
+function populateCategories() {
+  $('#categoriesList').empty();
+  if (!userSettings.categories) {
+    userSettings.categories = [];
+  }
+  userSettings.categories.forEach((cat, index) => {
+    $('#categoriesList').append(`<div class="d-flex align-items-center mb-1">
+      <span class="badge bg-secondary me-2">${cat}</span>
+      <button class="btn btn-sm btn-outline-danger remove-category" data-index="${index}">&times;</button>
+    </div>`);
+  });
+}
+
+// Populate the app classifications list in settings modal
+function populateAppClassifications() {
+  $('#appClassificationsList').empty();
+  if (!userSettings.appClassifications) {
+    userSettings.appClassifications = {};
+  }
+  for (let app in userSettings.appClassifications) {
+    let cat = userSettings.appClassifications[app];
+    $('#appClassificationsList').append(`<div class="list-group-item d-flex justify-content-between align-items-center">
+      <span>${app} &rarr; <em>${cat}</em></span>
+      <button class="btn btn-sm btn-outline-danger remove-classification" data-app="${app}">&times;</button>
+    </div>`);
+  }
+}
+
+// Event handlers for removing/adding categories and classifications
+$(document).on('click', '.remove-category', function () {
+  let index = $(this).data('index');
+  userSettings.categories.splice(index, 1);
+  populateCategories();
+});
+$('#addCategoryBtn').click(function () {
+  let newCat = prompt("Enter new category:");
+  if (newCat) {
+    if (!userSettings.categories) {
+      userSettings.categories = [];
+    }
+    userSettings.categories.push(newCat);
+    populateCategories();
+  }
+});
+$(document).on('click', '.remove-classification', function () {
+  let app = $(this).data('app');
+  delete userSettings.appClassifications[app];
+  populateAppClassifications();
+});
+$('#addClassificationBtn').click(function () {
+  let appName = prompt("Enter app name for classification:");
+  if (appName) {
+    let newCat = prompt("Enter category for " + appName + ":");
+    if (newCat) {
+      if (!userSettings.appClassifications) {
+        userSettings.appClassifications = {};
+      }
+      userSettings.appClassifications[appName] = newCat;
+      populateAppClassifications();
+    }
+  }
+});
 
 // SETTINGS FUNCTIONS
 function loadSettings() {
@@ -77,6 +166,8 @@ function initSettingsUI() {
   $('#useEmojisCheck').prop('checked', userSettings.useEmojis);
   $('#colorCodedEventsCheck').prop('checked', userSettings.colorCodedEvents);
   $('#defaultViewSelect').val(userSettings.defaultView);
+  populateCategories();
+  populateAppClassifications();
 }
 $('#saveSettingsBtn').click(() => {
   userSettings.timelineIncrements = parseInt($('#timelineIncrements').val());
@@ -250,7 +341,7 @@ async function renderDayView() {
 
   // Define fixed hour segments (24 hours)
   const hoursInDay = 24;
-  const hourHeight = 40 * zoomLevel; // each hour is 40px (adjustable)
+  const hourHeight = 40 * zoomLevel; // each hour is 40px
   const totalHeight = hoursInDay * hourHeight;
   $timeline.css({ height: totalHeight + 'px', position: 'relative' });
 
@@ -290,12 +381,14 @@ async function renderDayView() {
     let leftOffset = 100 + (ev.lane * laneWidth);
     let blockWidth = laneWidth - 5;
     let titleText = userSettings.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
-    // Use CDN icon based on owner name or event title
+    // Determine category from classification mapping
     const appName = (ev.details && ev.details.owner && ev.details.owner.name) || ev.title;
+    const category = getCategoryForApp(appName);
     const iconUrl = getCDNIconForAppName(appName);
+    let badgeHtml = category ? `<span class="badge bg-info me-1">${category}</span>` : "";
     let iconHtml = `<img class="app-icon" src="${iconUrl}" style="width:16px; height:16px; margin-right:4px; vertical-align:middle;">`;
     let entryHtml = `<div class="entry ${colorClass}" style="top:${topOffset}px; left:${leftOffset}px; width:${blockWidth}px; height:${blockHeight}px;" data-event='${JSON.stringify(ev)}'>
-                        ${iconHtml}${titleText} (${minutes} min)
+                        ${iconHtml}${badgeHtml}${titleText} (${minutes} min)
                      </div>`;
     let $entry = $(entryHtml);
     $entry.click(function () { showSegmentDetails($(this).data("event")); });
@@ -304,15 +397,55 @@ async function renderDayView() {
   return dayEvents;
 }
 
-function isDistracting(title) {
-  let t = title.toLowerCase();
-  return t.includes("youtube") || t.includes("discord") || t.includes("facebook");
+// Render calendar view for week or month using FullCalendar
+function renderCalendarView(viewType) {
+  $timeline.show().empty();
+  $timeline.css({ height: 'auto' });
+  let calendarEl = document.createElement('div');
+  calendarEl.id = 'calendar';
+  $timeline.append(calendarEl);
+
+  // Convert events to FullCalendar events
+  let calendarEvents = events.map(ev => {
+    return {
+      title: ev.title,
+      start: new Date(ev.start).toISOString(),
+      end: new Date(ev.end).toISOString(),
+      extendedProps: ev.details
+    };
+  });
+  if (currentSegment) {
+    calendarEvents.push({
+      title: currentSegment.title,
+      start: new Date(currentSegment.start).toISOString(),
+      end: new Date(currentSegment.end).toISOString(),
+      extendedProps: currentSegment.details
+    });
+  }
+
+  // Initialize FullCalendar – ensure FullCalendar's CSS/JS is loaded in index.html!
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: viewType === 'week' ? 'timeGridWeek' : 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,timeGridDay'
+    },
+    events: calendarEvents,
+    eventDidMount: function (info) {
+      // Optionally, set event styling based on category
+      let cat = getCategoryForApp(info.event.title);
+      if (cat) {
+        // Example: change background color for events with a category
+        info.el.style.backgroundColor = "#2563eb";
+      }
+    }
+  });
+  calendar.render();
 }
 
-// Render summary: update most used and distractions with icons;
-// Only update the donut chart when tracking is off.
+// Render summary: update most used and distractions with icons; only update chart when not tracking.
 function renderSummary(evList, startMs, endMs) {
-  // Update chart only if not tracking (to avoid continuous redraw)
   if (!tracking) {
     if (document.querySelector("#donutChart").innerHTML !== "") {
       document.querySelector("#donutChart").innerHTML = "";
@@ -326,7 +459,10 @@ function renderSummary(evList, startMs, endMs) {
     let dur = e - s;
     if (dur < 60000) return;
     usageMap[ev.title] = (usageMap[ev.title] || 0) + dur;
-    if (isDistracting(ev.title)) totalDistracted += dur; else totalFocused += dur;
+    if (ev.title.toLowerCase().includes("youtube") || ev.title.toLowerCase().includes("discord") || ev.title.toLowerCase().includes("facebook"))
+      totalDistracted += dur;
+    else
+      totalFocused += dur;
   });
 
   if (!tracking) {
@@ -354,7 +490,7 @@ function renderSummary(evList, startMs, endMs) {
     $mostUsedList.append(`<li><img src="${iconUrl}" alt="${app}" style="width:16px; height:16px; margin-right:4px;">${app} - ${mm} min</li>`);
   });
   $topDistractionsList.empty();
-  let distractors = usageArray.filter(([app, _]) => isDistracting(app));
+  let distractors = usageArray.filter(([app, _]) => app.toLowerCase().includes("youtube") || app.toLowerCase().includes("discord") || app.toLowerCase().includes("facebook"));
   distractors.slice(0, 5).forEach(([app, ms]) => {
     let mm = Math.round(ms / 60000);
     const iconUrl = getCDNIconForAppName(app);
@@ -362,7 +498,7 @@ function renderSummary(evList, startMs, endMs) {
   });
 }
 
-// Week and Month range functions remain unchanged
+// Week and Month range functions
 function getWeekRange() {
   let now = new Date();
   let dayOfWeek = now.getDay();
@@ -381,7 +517,7 @@ function getMonthRange() {
   return [first.getTime(), last.getTime()];
 }
 
-// Render main view based on viewMode
+// Render main view based on viewMode; for week and month views, use full calendar
 async function renderView() {
   loadSegmentsFromCSV();
   if (viewMode === "day") {
@@ -392,22 +528,12 @@ async function renderView() {
     renderSummary(dayEv, ds.getTime(), de.getTime());
   } else if (viewMode === "week") {
     $('#dayNav').hide();
-    $timeline.hide();
     $currentDateLabel.text("This Week");
-    let [startMs, endMs] = getWeekRange();
-    let allEv = [...events];
-    if (currentSegment) allEv.push(currentSegment);
-    let wEv = allEv.filter(ev => ev.end >= startMs && ev.start <= endMs);
-    renderSummary(wEv, startMs, endMs);
+    renderCalendarView('week');
   } else if (viewMode === "month") {
     $('#dayNav').hide();
-    $timeline.hide();
     $currentDateLabel.text("This Month");
-    let [startMs, endMs] = getMonthRange();
-    let allEv = [...events];
-    if (currentSegment) allEv.push(currentSegment);
-    let mEv = allEv.filter(ev => ev.end >= startMs && ev.start <= endMs);
-    renderSummary(mEv, startMs, endMs);
+    renderCalendarView('month');
   }
 }
 

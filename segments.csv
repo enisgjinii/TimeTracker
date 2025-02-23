@@ -190,3 +190,5 @@
 "Search",1740313201573,1740313201573,262720,-1360,282,800,750,"SearchHost.exe",16940,"","C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\SearchHost.exe","",113147904
 "Quick settings",1740313202576,1740313202576,133026,1440,0,480,1020,"ShellHost",18336,"","C:\Windows\System32\ShellHost.exe","",110325760
 "Search",1740313203585,1740313203585,262720,-1360,282,800,750,"SearchHost.exe",16940,"","C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\SearchHost.exe","",148377600
+"Time Tracker",1740315260882,1740315269962,2689122,-1928,-8,1936,1048,"Electron",4856,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",99942400
+"renderer.js - TimeTracker - Visual Studio Code",1740315270966,1740315270966,263162,-9,-9,1938,1038,"Visual Studio Code",8496,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",142581760
