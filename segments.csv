@@ -1,27 +1,192 @@
-Time Tracker,1740183974701,1740183975700
-renderer.js - TimeTracker - Visual Studio Code,1740183976703,1740183976703
-segments.csv - TimeTracker - Visual Studio Code,1740183977712,1740184577712
-Time Tracker,1740184577712,1740185177712
-segments.csv - TimeTracker - Visual Studio Code,1740185177712,1740185377712
-renderer.js - TimeTracker - Visual Studio Code,1740185377712,1740185677712
-Time Tracker,1740185677712,1740185977712
-Electron Window Tracker — Zen Browser,1740185977712,1740186577712
-Time Tracker,1740186577712,1740186877712
-System tray overflow window.,1740186877712,1740187177712
-PC Manager,1740187177712,1740188377712
-Time Tracker,1740187753675,1740187765742
-Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge,1740187766744,1740187768759
-Time Tracker,1740187769761,1740187771762
-Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge,1740187772763,1740187786829
-Time Tracker,1740187787844,1740187787844
-Task Switching,1740187788844,1740187788844
-Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge,1740187789847,1740187789847
-file-icon-extractor - npm and 5 more pages - Personal - Microsoft​ Edge,1740187790860,1740187791861
-Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge,1740187792872,1740187795895
-Chat with Code | Repo Assistant for Githu b - TimeTracker Repo Analysis and 5 more pages - Personal - Microsoft​ Edge,1740187796901,1740187812012
-Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge,1740187813021,1740187822077
-renderer.js - TimeTracker - Visual Studio Code,1740187823078,1740187823078
-main.js - TimeTracker - Visual Studio Code,1740187824091,1740187826113
-Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge,1740187827113,1740187876510
-main.js - TimeTracker - Visual Studio Code,1740187877526,1740187880542
-renderer.js - TimeTracker - Visual Studio Code,1740187881546,1740187882546
+"Time Tracker",1740183974701,1740183975700
+"renderer.js - TimeTracker - Visual Studio Code",1740183976703,1740183976703
+"segments.csv - TimeTracker - Visual Studio Code",1740183977712,1740184577712
+"Time Tracker",1740184577712,1740185177712
+"segments.csv - TimeTracker - Visual Studio Code",1740185177712,1740185377712
+"renderer.js - TimeTracker - Visual Studio Code",1740185377712,1740185677712
+"Time Tracker",1740185677712,1740185977712
+"Electron Window Tracker — Zen Browser",1740185977712,1740186577712
+"Time Tracker",1740186577712,1740186877712
+"System tray overflow window.",1740186877712,1740187177712
+"PC Manager",1740187177712,1740188377712
+"Time Tracker",1740187753675,1740187765742
+"Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge",1740187766744,1740187768759
+"Time Tracker",1740187769761,1740187771762
+"Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge",1740187772763,1740187786829
+"Time Tracker",1740187787844,1740187787844
+"Task Switching",1740187788844,1740187788844
+"Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge",1740187789847,1740187789847
+"file-icon-extractor - npm and 5 more pages - Personal - Microsoft​ Edge",1740187790860,1740187791861
+"Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge",1740187792872,1740187795895
+"Chat with Code | Repo Assistant for Githu b - TimeTracker Repo Analysis and 5 more pages - Personal - Microsoft​ Edge",1740187796901,1740187812012
+"Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge",1740187813021,1740187822077
+"renderer.js - TimeTracker - Visual Studio Code",1740187823078,1740187823078
+"main.js - TimeTracker - Visual Studio Code",1740187824091,1740187826113
+"Icon extraction issue fix and 5 more pages - Personal - Microsoft​ Edge",1740187827113,1740187876510
+"main.js - TimeTracker - Visual Studio Code",1740187877526,1740187880542
+"renderer.js - TimeTracker - Visual Studio Code",1740187881546,1740187882546
+"Time Tracker",1740308696563,1740308697563,788360,-1928,-8,1936,1048,"Electron",17588,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",93982720
+"segments.csv - TimeTracker - Visual Studio Code",1740308698564,1740308704596,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",157921280
+"Time Tracker",1740308705599,1740308705599,788360,-1928,-8,1936,1048,"Electron",17588,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",95744000
+"Extract window details CSV — Zen Browser",1740308706607,1740308708619,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",319229952
+"Time Tracker",1740308709618,1740308718644,788360,-1928,-8,1936,1048,"Electron",17588,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",95875072
+"segments.csv - TimeTracker - Visual Studio Code",1740308719658,1740308724678,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",159948800
+"Time Tracker",1740308725679,1740308742738,788360,-1928,-8,1936,1048,"Electron",17588,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",92831744
+"Search",1740308743745,1740308745756,262720,460,82,1000,938,"SearchHost.exe",16940,"","C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\SearchHost.exe","",287744000
+"Calculator",1740308746768,1740308810081,1705924,50,0,1298,1010,"Calculator",13672,"","C:\Program Files\WindowsApps\microsoft.windowscalculator_11.2411.1.0_x64__8wekyb3d8bbwe\CalculatorApp.exe","",47808512
+"Time Tracker",1740308811088,1740308814098,788360,-1928,-8,1936,1048,"Electron",17588,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",93773824
+"Calculator",1740308815109,1740308815109,1705924,50,0,1298,1010,"Calculator",13672,"","C:\Program Files\WindowsApps\microsoft.windowscalculator_11.2411.1.0_x64__8wekyb3d8bbwe\CalculatorApp.exe","",46247936
+"Time Tracker",1740308816112,1740308833178,788360,-1928,-8,1936,1048,"Electron",17588,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",95928320
+"segments.csv - TimeTracker - Visual Studio Code",1740308834179,1740308834179,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",157880320
+"renderer.js - TimeTracker - Visual Studio Code",1740308835196,1740308838196,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",160808960
+"Time Tracker",1740308839195,1740308843214,788360,-1928,-8,1936,1048,"Electron",17588,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",95940608
+"Time Tracker",1740309320592,1740309321592,132340,-1928,-8,1936,1048,"Electron",19552,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",94339072
+"segments.csv - TimeTracker - Visual Studio Code",1740309322602,1740309324613,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",47013888
+"Time Tracker",1740309325616,1740309340727,132340,-1928,-8,1936,1048,"Electron",19552,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",95379456
+"index.html - TimeTracker - Visual Studio Code",1740309341743,1740309344756,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",50782208
+"renderer.js - TimeTracker - Visual Studio Code",1740309345764,1740309357800,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",53833728
+"index.html - TimeTracker - Visual Studio Code",1740309358807,1740309363833,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",51900416
+"Time Tracker",1740309372898,1740309384983,132340,-1928,-8,1936,1048,"Electron",19552,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",95346688
+"Time Tracker",1740309404092,1740309408123,132340,-1928,-8,1936,1048,"Electron",19552,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",96096256
+"index.html - TimeTracker - Visual Studio Code",1740309409131,1740309411156,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",55099392
+"Time Tracker",1740309412167,1740309436321,132340,-1928,-8,1936,1048,"Electron",19552,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",97427456
+"index.html - TimeTracker - Visual Studio Code",1740309437322,1740309437322,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",62795776
+"Extract window details CSV — Zen Browser",1740309438337,1740309438337,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",169775104
+"WhatsApp — Zen Browser",1740309439353,1740309439353,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",175669248
+"(1) live in the Concrete Forest (China - YouTube — Zen Browser",1740309440357,1740309442368,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",179433472
+"(1) YouTube — Zen Browser",1740309443370,1740309445384,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",184733696
+"(1) live in the Concrete Forest (China - YouTube — Zen Browser",1740309446384,1740309448391,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",194777088
+"Extract window details CSV — Zen Browser",1740309449400,1740309449400,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",197455872
+"Todoist — Zen Browser",1740309450411,1740309450411,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",207278080
+"index.html - TimeTracker - Visual Studio Code",1740309451421,1740309452423,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",62361600
+"Today – Todoist — Zen Browser",1740309453436,1740309454443,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",219414528
+"Time Tracker",1740309719333,1740309722341,132340,-1928,-8,1936,1048,"Electron",19552,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",100089856
+"index.html - TimeTracker - Visual Studio Code",1740309723356,1740309730403,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",66002944
+"Time Tracker",1740309761414,1740309782556,5572420,-1928,-8,1936,1048,"Electron",26220,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",97374208
+"index.html - TimeTracker - Visual Studio Code",1740309783566,1740309784569,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",68128768
+"Polished Swiss-Style Sidebar and Navbar Design - Claude — Zen Browser",1740309785585,1740309788611,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",279543808
+"Claude — Zen Browser",1740309789611,1740309802713,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",282525696
+"Wallet by BudgetBakers — Zen Browser",1740309803718,1740309868101,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",285421568
+"index.html - TimeTracker - Visual Studio Code",1740309869103,1740309870106,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",68812800
+"Enhance Time Tracker UI - Claude — Zen Browser",1740309871110,1740309883166,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",287854592
+"index.html - TimeTracker - Visual Studio Code",1740309884173,1740309885185,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",71344128
+"Enhance Time Tracker UI - Claude — Zen Browser",1740309886199,1740309913328,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",291053568
+"Time Tracker",1740309930449,1740309944552,5572420,-1928,-8,1936,1048,"Electron",26220,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",96694272
+"Enhance Time Tracker UI - Claude — Zen Browser",1740309945556,1740311672329,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",296747008
+"index.html - TimeTracker - Visual Studio Code",1740311673338,1740311675360,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",69423104
+"Time Tracker",1740311688465,1740311689480,5572420,-1928,-8,1936,1048,"Electron",26220,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",106405888
+"Enhance Time Tracker UI - Claude — Zen Browser",1740311690492,1740311705595,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",345960448
+"WhatsApp — Zen Browser",1740311706595,1740311709612,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",348598272
+"Wallet by BudgetBakers — Zen Browser",1740311710627,1740311711629,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",352571392
+"Enhance Time Tracker UI - Claude — Zen Browser",1740311712629,1740311712629,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",353075200
+"Instagram — Zen Browser",1740311713630,1740311713630,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",355328000
+"WhatsApp — Zen Browser",1740311714640,1740311714640,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",361934848
+"Instagram — Zen Browser",1740311715656,1740311715656,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",366460928
+"WhatsApp — Zen Browser",1740311716663,1740311717679,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",369602560
+"Zen Browser",1740311718687,1740311718687,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",379830272
+"Instagram — Zen Browser",1740311719698,1740311725737,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",388702208
+"Home / X — Zen Browser",1740311726736,1740311875739,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",416645120
+"Extract window details CSV — Zen Browser",1740311876746,1740311876746,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",473550848
+"ChatGPT — Zen Browser",1740311877752,1740311877752,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",480845824
+"(1) WhatsApp — Zen Browser",1740311878756,1740311878756,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",485814272
+"WhatsApp — Zen Browser",1740311879766,1740311948196,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",490512384
+"Extract window details CSV — Zen Browser",1740311949198,1740311950205,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",344215552
+"Enhance Time Tracker UI - Claude — Zen Browser",1740311951216,1740311952217,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",346206208
+"Time Tracker",1740312484878,1740312512056,5572420,-1928,-8,1936,1048,"Electron",26220,"","C:\Users\egjin\Desktop\TimeTracker\node_modules\electron\dist\electron.exe","",107659264
+"Extract window details CSV — Zen Browser",1740312513071,1740312513071,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",339390464
+"index.html - TimeTracker - Visual Studio Code",1740312514078,1740312530200,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",81313792
+"WhatsApp — Zen Browser",1740312531206,1740312535244,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",338837504
+"(1) Chill Background Music [chill lofi beats] - YouTube — Zen Browser",1740312536244,1740312537248,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",338681856
+"Home / X — Zen Browser",1740312538249,1740312584518,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",340529152
+"kali linux download - Google Search — Zen Browser",1740312585528,1740312586542,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",359501824
+"Get Kali | Kali Linux — Zen Browser",1740312587551,1740312592597,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",368357376
+"Opening kali-linux-2024.4-installer-amd64.iso",1740312593601,1740312593601,12847050,-1185,411,450,307,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",374161408
+"Get Kali | Kali Linux — Zen Browser",1740312594610,1740312594610,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",376496128
+"Opening kali-linux-2024.4-installer-amd64.iso.torrent",1740312595618,1740312596631,20645640,-1185,411,450,329,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",379478016
+"Get Kali | Kali Linux — Zen Browser",1740312597645,1740312600677,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",380534784
+"utorrent download - Google Search — Zen Browser",1740312601689,1740312601689,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",360374272
+"Download µTorrent (uTorrent) Clients for Windows — Zen Browser",1740312602701,1740312607741,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",363597824
+"Thank you for Downloading µTorrent (uTorrent) — Zen Browser",1740312608755,1740312609763,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",356605952
+"Opening utorrent_installer.exe",1740312610774,1740312611785,7079438,-1185,411,450,209,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",357302272
+"Thank you for Downloading µTorrent (uTorrent) — Zen Browser",1740312612796,1740312613796,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",357232640
+"Downloads - File Explorer",1740312614811,1740312615819,7145202,1,1,1918,1018,"Windows Explorer",27324,"","C:\Windows\explorer.exe","",165515264
+"Window Dialog",1740312616834,1740312616834,1836606,960,510,0,0,"Windows Explorer",27324,"","C:\Windows\explorer.exe","",214241280
+"Downloads - File Explorer",1740312617843,1740312617843,7145202,1,1,1918,1018,"Windows Explorer",27324,"","C:\Windows\explorer.exe","",214732800
+"uTorrent Classic ",1740312619865,1740312631979,395378,514,162,893,697,"u Torrent Classic",1856,"","C:\Users\egjin\Downloads\utorrent_installer.exe","",17842176
+"WhatsApp — Zen Browser",1740312632992,1740312632992,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",357613568
+"(1) YouTube — Zen Browser",1740312633997,1740312636019,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",357396480
+"uTorrent Classic ",1740312637032,1740312638033,395378,514,162,893,697,"u Torrent Classic",1856,"","C:\Users\egjin\Downloads\utorrent_installer.exe","",34955264
+"(1) YouTube — Zen Browser",1740312639045,1740312639045,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",362123264
+"(1) Chill Background Music [chill lofi beats] - YouTube — Zen Browser",1740312640048,1740312640048,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",362360832
+"(1) RINA - QIKA - YouTube — Zen Browser",1740312641060,1740312646092,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",363720704
+"",1740312647098,1740312647098,66024,0,0,0,0,"Windows Explorer",27324,"","C:\Windows\explorer.exe","",234074112
+"μTorrent 3.6  (build 47178) [32-bit]",1740312648107,1740312651137,526522,-1025,0,1280,720,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",50294784
+"(1) RINA - QIKA - YouTube — Zen Browser",1740312652146,1740312653152,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",363565056
+"μTorrent 3.6  (build 47178) [32-bit]",1740312654166,1740312654166,526522,-1765,170,1280,720,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",50376704
+"about:blank#blocked",1740312655176,1740312656191,592292,13,0,1333,1020,"Microsoft Edge WebView2",25144,"","C:\Program Files (x86)\Microsoft\EdgeWebView\Application\133.0.3065.82\msedgewebview2.exe","",154869760
+"μTorrent 3.6  (build 47178) [32-bit]",1740312657194,1740312658196,526522,-1765,170,1280,720,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",51068928
+"(1) RINA - QIKA - YouTube — Zen Browser",1740312659200,1740312660208,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",364580864
+"μTorrent",1740312661215,1740312661215,264802,721,360,458,221,"µTorrent",9364,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",25985024
+"(1) RINA - QIKA - YouTube — Zen Browser",1740312662224,1740312666267,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",365297664
+"Your µTorrent Software is Up to Date - Brave",1740312667281,1740312824803,199048,-9,-9,1938,1038,"Brave Browser",22000,"","C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe","",288878592
+"μTorrent 3.6  (build 47178) [32-bit]",1740312825813,1740312827821,526522,-1765,170,1280,720,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",53878784
+"Select a .torrent to open",1740312828824,1740312830844,1050480,-1757,221,664,510,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",61030400
+"kali-linux-2024.4-installer-amd64.iso - Add New Torrent",1740312831846,1740312831846,789074,-1643,260,1036,540,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",77070336
+"μTorrent 3.6  (build 47178) [32-bit]",1740312832850,1740312842899,526522,-1765,170,1280,720,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",77504512
+"Your µTorrent Software is Up to Date - Brave",1740312843912,1740312844920,199048,-9,-9,1938,1038,"Brave Browser",22000,"","C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe","",267575296
+"WhatsApp — Zen Browser",1740312845935,1740312845935,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",352710656
+"(1) RINA - QIKA - YouTube — Zen Browser",1740312846936,1740312850970,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",354684928
+"(1) YouTube — Zen Browser",1740312851973,1740312875151,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",356679680
+"(1) RINA - QIKA - YouTube — Zen Browser",1740312876158,1740312876158,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",378167296
+"Quick settings",1740312877163,1740312879173,133026,1440,0,480,1020,"ShellHost",18336,"","C:\Windows\System32\ShellHost.exe","",77692928
+"(1) Next-Gen Car Factory: Innovation in a World of Mayhem! - YouTube — Zen Browser",1740312880178,1740312898335,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",367071232
+"(1) YouTube — Zen Browser",1740312899336,1740312901354,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",362778624
+"(1) Next-Gen Car Factory: Innovation in a World of Mayhem! - YouTube — Zen Browser",1740312902355,1740312902355,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",364466176
+"(1) He Wasn't Fooling Anyone - YouTube — Zen Browser",1740312903370,1740312903370,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",364412928
+"Extract window details CSV — Zen Browser",1740312904385,1740312914464,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",364838912
+"Zotimi - Monitorimi i Premtimeve Zgjedhore në Kosovë — Zen Browser",1740312915475,1740312943704,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",364539904
+"Facebook — Zen Browser",1740312944712,1740312945727,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",400826368
+"get-windows - npm — Zen Browser",1740312946734,1740312946734,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",391208960
+"Extract window details CSV — Zen Browser",1740312947739,1740312949754,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",391438336
+"(1) He Wasn't Fooling Anyone - YouTube — Zen Browser",1740312950766,1740312951775,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",389517312
+"Your µTorrent Software is Up to Date - Brave",1740312952780,1740312952780,199048,-9,-9,1938,1038,"Brave Browser",22000,"","C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe","",268083200
+"He Wasn't Fooling Anyone - YouTube — Zen Browser",1740312953792,1740312954801,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",392372224
+"μTorrent 3.6  (build 47178) [32-bit]",1740312955811,1740312964861,526522,-32000,-32000,199,34,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",81600512
+"index.html - TimeTracker - Visual Studio Code",1740312965867,1740312967889,263894,-9,-9,1938,1038,"Visual Studio Code",9696,"","C:\Users\egjin\AppData\Local\Programs\Microsoft VS Code\Code.exe","",82300928
+"New Tab — Zen Browser",1740312968897,1740312968897,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",394850304
+"(1) He Wasn't Fooling Anyone - YouTube — Zen Browser",1740312969905,1740312969905,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",396054528
+"(15) Discord | #5-web-shërbimet-web-api’s | UBT cse — Zen Browser",1740312970910,1740312970910,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",397488128
+"(1) He Wasn't Fooling Anyone - YouTube — Zen Browser",1740312971917,1740312973922,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",398602240
+"Zen Browser",1740312974934,1740312974934,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",411312128
+"New Tab — Zen Browser",1740312975947,1740312975947,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",410980352
+"Zen Browser",1740312976953,1740312976953,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",414408704
+"(15) Discord | #5-web-shërbimet-web-api’s | UBT cse — Zen Browser",1740312977954,1740312977954,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",414760960
+"Zen Browser",1740312978966,1740312979970,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",415150080
+"Instagram — Zen Browser",1740312980976,1740313014249,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",413896704
+"Page couldn't load • Instagram — Zen Browser",1740313015265,1740313015265,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",385781760
+"Server Not Found — Zen Browser",1740313016274,1740313018277,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",385495040
+"Quick settings",1740313019292,1740313019292,133026,1440,0,480,1020,"ShellHost",18336,"","C:\Windows\System32\ShellHost.exe","",110813184
+"Server Not Found — Zen Browser",1740313020304,1740313020304,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",386920448
+"WhatsApp — Zen Browser",1740313021312,1740313021312,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",386228224
+"Server Not Found — Zen Browser",1740313022312,1740313023314,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",386682880
+"μTorrent 3.6  (build 47178) [32-bit]",1740313024323,1740313170357,526522,-1928,-8,1936,1048,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",79134720
+"Server Not Found — Zen Browser",1740313171372,1740313173377,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",384933888
+"Extract window details CSV — Zen Browser",1740313174379,1740313175385,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",387313664
+"μTorrent 3.6  (build 47178) [32-bit]",1740313176389,1740313178409,526522,-1928,-8,1936,1048,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",79675392
+"",1740313179414,1740313180417,132570,-1920,1032,1920,48,"Windows Explorer",27324,"","C:\Windows\explorer.exe","",215007232
+"Extract window details CSV — Zen Browser",1740313181430,1740313182442,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",387592192
+"Zen Browser",1740313183457,1740313185476,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",394665984
+"System tray overflow window.",1740313186478,1740313186478,197810,1545,877,293,143,"Windows Explorer",27324,"","C:\Windows\explorer.exe","",215212032
+"μTorrent 3.6  (build 47178) [32-bit]",1740313187490,1740313187490,526522,-1928,-8,1936,1048,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",79388672
+"μTorrent",1740313188493,1740313189500,11142960,-1152,414,368,141,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",79699968
+"μTorrent 3.6  (build 47178) [32-bit]",1740313190507,1740313190507,526522,-1928,-8,1936,1048,"µTorrent",16844,"","C:\Users\egjin\AppData\Roaming\utorrent\uTorrent.exe","",78999552
+"Server Not Found — Zen Browser",1740313191515,1740313191515,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",393904128
+"Zen Browser",1740313192517,1740313192517,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",394027008
+"WhatsApp — Zen Browser",1740313193532,1740313194534,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",393056256
+"Server Not Found — Zen Browser",1740313195534,1740313196534,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",393617408
+"Enhance Time Tracker UI - Claude — Zen Browser",1740313197537,1740313197537,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",393842688
+"Server Not Found — Zen Browser",1740313198543,1740313198543,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",394719232
+"Enhance Time Tracker UI - Claude — Zen Browser",1740313199553,1740313200566,262320,-1928,-8,1936,1048,"Zen Browser",1872,"","C:\Program Files\Zen Browser\zen.exe","",394313728
+"Search",1740313201573,1740313201573,262720,-1360,282,800,750,"SearchHost.exe",16940,"","C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\SearchHost.exe","",113147904
+"Quick settings",1740313202576,1740313202576,133026,1440,0,480,1020,"ShellHost",18336,"","C:\Windows\System32\ShellHost.exe","",110325760
+"Search",1740313203585,1740313203585,262720,-1360,282,800,750,"SearchHost.exe",16940,"","C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\SearchHost.exe","",148377600

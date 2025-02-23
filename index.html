@@ -7,206 +7,334 @@
     <title>Time Tracker</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <style>
         body {
-            font-family: "Poppins", sans-serif;
-            background: #f8f9fa;
-            color: #333;
+            font-family: "Open Sans", sans-serif;
+            background: #f8fafc;
+            color: #0f172a;
             margin: 0;
             padding: 0;
-            transition: background 0.3s;
         }
 
         .dark-mode {
-            background: #121212;
-            color: #fff;
+            background: #0f172a;
+            color: #f8fafc;
         }
 
         .sidebar {
             position: fixed;
             top: 15px;
             left: 15px;
-            width: 220px;
-            background: #fff;
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 240px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
             z-index: 999;
+            height: calc(100vh - 30px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .dark-mode .sidebar {
-            background: #1e1e1e;
-            color: #fff;
-            border: 1px solid #444;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar h4 {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: #2563eb;
+            padding: 0 0.5rem;
         }
 
         .sidebar a {
-            display: block;
-            font-size: 16px;
-            color: #333;
-            padding: 10px;
-            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            color: #64748b;
+            padding: 0.875rem 1rem;
+            border-radius: 12px;
             text-decoration: none;
-            margin-bottom: 8px;
-        }
-
-        .dark-mode .sidebar a {
-            color: #fff;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
         }
 
         .sidebar a:hover {
-            background: #e9ecef;
+            background: #f1f5f9;
+            color: #2563eb;
+            transform: translateX(8px);
+        }
+
+        .dark-mode .sidebar a {
+            color: #e2e8f0;
         }
 
         .dark-mode .sidebar a:hover {
-            background: #333;
+            background: #2d3748;
+            color: #ffffff;
         }
 
         .content {
-            margin-left: 260px;
-            padding: 20px;
+            margin-left: 280px;
+            padding: 1.5rem 2rem;
         }
 
         .top-bar {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 1.25rem;
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-mode .top-bar {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #appTitle {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2563eb;
+            margin: 0;
+        }
+
+        .view-toggle {
+            background: #f1f5f9;
+            padding: 0.25rem;
+            border-radius: 10px;
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .dark-mode .view-toggle {
+            background: #2d3748;
         }
 
         .view-toggle button {
-            margin-right: 5px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
 
-        .row-layout {
-            display: flex;
-            flex-direction: row;
-            gap: 20px;
+        .view-toggle button:hover {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .view-toggle button.active {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-mode .view-toggle button:hover,
+        .dark-mode .view-toggle button.active {
+            background: #1e293b;
+            color: #ffffff;
         }
 
         .timeline-container {
             flex: 2;
             position: relative;
             overflow-y: auto;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            border-left: 2px solid #ccc;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
             padding-left: 100px;
             min-height: 600px;
         }
 
         .dark-mode .timeline-container {
-            background: #1f1f1f;
-            border: 1px solid #444;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .hour-label {
             position: absolute;
             left: 0;
-            width: 90px;
-            font-size: 14px;
-            color: #666;
-            border-top: 1px solid #eee;
-            padding: 5px;
+            width: 80px;
+            font-size: 0.875rem;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            padding: 0.5rem;
             text-align: right;
+            font-weight: 500;
+        }
+
+        .hour-label:hover {
+            color: #2563eb;
         }
 
         .dark-mode .hour-label {
-            color: #bbb;
-            border-top: 1px solid #444;
-        }
-
-        .timeline-hour {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            border-top: 1px solid #eee;
-        }
-
-        .dark-mode .timeline-hour {
-            border-top: 1px solid #444;
+            color: #94a3b8;
+            border-top: 1px solid #2d3748;
         }
 
         .entry {
             position: absolute;
-            border-radius: 5px;
-            font-size: 14px;
+            border-radius: 8px;
+            font-size: 0.875rem;
             color: #fff;
-            padding: 5px 8px;
+            padding: 0.5rem 0.75rem;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
             cursor: pointer;
         }
 
+        .entry:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
         .entry.focus {
-            background: #2eb85c;
+            background: #2563eb;
         }
 
         .entry.distraction {
-            background: #e55353;
+            background: #dc2626;
         }
 
         .entry.singleColor {
-            background: #6c757d;
+            background: #6366f1;
         }
 
         .summary-panel {
             flex: 1;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 15px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
             min-height: 600px;
+            margin-left: 1.5rem;
         }
 
         .dark-mode .summary-panel {
-            background: #1f1f1f;
-            border: 1px solid #444;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .summary-panel h5 {
-            margin-bottom: 10px;
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1.25rem;
         }
 
         .summary-item {
-            font-size: 0.9rem;
-            margin-bottom: 5px;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .summary-item:hover {
+            background: #f1f5f9;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .dark-mode .summary-item {
+            background: #2d3748;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark-mode .summary-item:hover {
+            background: #374151;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .btn-success {
+            background: #2563eb;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background: #1d4ed8;
+        }
+
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .dark-mode .modal-content {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1.25rem;
+        }
+
+        .dark-mode .modal-header {
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
         }
 
         .toast-container {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 9999;
+            padding: 1rem;
+        }
+
+        .toast {
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .form-select,
+        .form-control {
+            border-radius: 8px;
         }
     </style>
 </head>
 
 <body>
     <div class="sidebar">
-        <h4><i class="bi bi-speedometer2"></i> Dashboard</h4>
+        <h4>📊 Dashboard</h4>
         <a href="#" onclick="showPage('timeline')">🕒 Timeline</a>
         <a href="#" onclick="showPage('settings')" data-bs-toggle="modal" data-bs-target="#settingsModal">⚙️
             Settings</a>
         <a href="#" onclick="showPage('about')" data-bs-toggle="modal" data-bs-target="#aboutModal">ℹ️ About</a>
     </div>
     <div class="content">
-        <div class="top-bar mb-2">
+        <div class="top-bar">
             <h2 id="appTitle">Time Tracker <span>⏳</span></h2>
             <div>
                 <button id="toggleTracking" class="btn btn-success btn-sm">Start Tracking</button>
             </div>
         </div>
-        <div class="d-flex align-items-center mb-2">
+        <div class="d-flex align-items-center mb-3">
             <div class="view-toggle me-3">
                 <button id="dayViewBtn" class="btn btn-outline-primary btn-sm">Day</button>
                 <button id="weekViewBtn" class="btn btn-outline-primary btn-sm">Week</button>
@@ -219,35 +347,37 @@
                 <h5 class="ms-3 mb-0" id="currentDateLabel"></h5>
             </div>
         </div>
-        <p class="text-muted">
-            Press <code>CTRL + ,</code> to Zoom In | Press <code>CTRL + .</code> to Zoom Out
-        </p>
-        <div class="row-layout">
+        <p class="text-muted">Press <kbd>CTRL + ,</kbd> to Zoom In | Press <kbd>CTRL + .</kbd> to Zoom Out</p>
+        <div class="row-layout d-flex">
             <div id="timeline" class="timeline-container"></div>
             <div class="summary-panel">
-                <h5>Work Day Summary</h5>
+                <h5>📊 Work Day Summary</h5>
                 <div id="donutChart" style="max-width: 250px; margin-bottom:20px;"></div>
-                <div class="summary-item">Focused: <span id="focusedTime">0h 0m</span></div>
-                <div class="summary-item">Distracted: <span id="distractedTime">0h 0m</span></div>
+                <div class="summary-item">
+                    <span class="me-2">🎯</span>Focused: <span id="focusedTime">0h 0m</span>
+                </div>
+                <div class="summary-item">
+                    <span class="me-2">⚠️</span>Distracted: <span id="distractedTime">0h 0m</span>
+                </div>
                 <hr />
-                <h5>Most Used</h5>
+                <h5>⭐ Most Used</h5>
                 <ul id="mostUsedList" class="list-unstyled"></ul>
                 <hr />
-                <h5>Top Distractions</h5>
+                <h5>📱 Top Distractions</h5>
                 <ul id="topDistractionsList" class="list-unstyled"></ul>
             </div>
         </div>
     </div>
-    <!-- Settings Modal -->
     <div class="modal fade" id="settingsModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Settings ⚙️</h5>
+                    <h5 class="modal-title">⚙️ Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label>Timeline Increments (min):</label>
+                        <label class="form-label">Timeline Increments (min):</label>
                         <select id="timelineIncrements" class="form-select form-select-sm">
                             <option value="15">15</option>
                             <option value="30">30</option>
@@ -255,18 +385,18 @@
                     </div>
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" id="darkModeCheck">
-                        <label class="form-check-label" for="darkModeCheck">Dark Mode</label>
+                        <label class="form-check-label" for="darkModeCheck">🌙 Dark Mode</label>
                     </div>
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" id="useEmojisCheck">
-                        <label class="form-check-label" for="useEmojisCheck">Use Emojis in UI</label>
+                        <label class="form-check-label" for="useEmojisCheck">😊 Use Emojis in UI</label>
                     </div>
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" id="colorCodedEventsCheck">
-                        <label class="form-check-label" for="colorCodedEventsCheck">Color-Coded Events</label>
+                        <label class="form-check-label" for="colorCodedEventsCheck">🎨 Color-Coded Events</label>
                     </div>
                     <div class="mb-3">
-                        <label>Default View:</label>
+                        <label class="form-label">Default View:</label>
                         <select id="defaultViewSelect" class="form-select form-select-sm">
                             <option value="day">Day</option>
                             <option value="week">Week</option>
@@ -278,26 +408,26 @@
             </div>
         </div>
     </div>
-    <!-- About Modal -->
     <div class="modal fade" id="aboutModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">About ℹ️</h5>
+                    <h5 class="modal-title">ℹ️ About</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Professional Electron Time Tracker with automatic app icon extraction (using IconExtractor),
-                        segment detail popups, and advanced settings.</p>
+                    <p>Professional Time Tracker with automatic app icon extraction, detailed segment popups, and
+                        advanced settings.</p>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Segment Details Modal -->
     <div class="modal fade" id="segmentDetailsModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Segment Details</h5>
+                    <h5 class="modal-title">📝 Segment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p id="segmentDetailsContent"></p>
@@ -309,9 +439,18 @@
     <script src="renderer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function showPage(page) { console.log("Show page:", page); }
-        $('#toggleTheme').click(() => { $('body').toggleClass('dark-mode'); });
-        $(function () { $('[data-bs-toggle="tooltip"]').tooltip(); });
+        function showPage(page) {
+            const element = document.querySelector('[onclick="showPage(\'' + page + '\')"]');
+            if (element) {
+                element.classList.remove('pulse');
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, { animation: false });
+            });
+        });
     </script>
 </body>
 
