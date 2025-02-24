@@ -3,5 +3,15 @@
   "darkMode": false,
   "useEmojis": true,
   "colorCodedEvents": true,
-  "defaultView": "day"
+  "defaultView": "day",
+  "categories": [],
+  "appClassifications": {
+    "Visual Studio Code": "Work",
+    "Electron": "Productivity",
+    "Search": "Work",
+    "Zen Browser": "Entertainment",
+    "YouTube": "Entertainment",
+    "Discord": "Social",
+    "Facebook": "Social"
+  }
 }

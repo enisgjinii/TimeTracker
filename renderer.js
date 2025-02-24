@@ -539,28 +539,110 @@ async function renderView() {
 
 // Show segment details in a modal with extra window info
 function showSegmentDetails(details) {
-  let startStr = new Date(details.start).toLocaleString();
-  let endStr = new Date(details.end).toLocaleString();
-  let duration = Math.round((details.end - details.start) / 60000);
+  const startStr = new Date(details.start).toLocaleString();
+  const endStr = new Date(details.end).toLocaleString();
+  const duration = Math.round((details.end - details.start) / 60000);
   let content = `<strong>Title:</strong> ${details.title}<br>
                  <strong>Start:</strong> ${startStr}<br>
                  <strong>End:</strong> ${endStr}<br>
                  <strong>Duration:</strong> ${duration} min`;
+
   if (details.details) {
-    const d = details.details;
+    const { details: d } = details;
+    const { bounds = {}, owner = {} } = d;
+
     content += `<hr>
                 <strong>Window ID:</strong> ${d.id || ''}<br>
-                <strong>Bounds:</strong> x: ${(d.bounds && d.bounds.x) || ''}, y: ${(d.bounds && d.bounds.y) || ''}, width: ${(d.bounds && d.bounds.width) || ''}, height: ${(d.bounds && d.bounds.height) || ''}<br>
-                <strong>Owner:</strong> ${(d.owner && d.owner.name) || ''} (PID: ${(d.owner && d.owner.processId) || ''})<br>
-                <strong>Bundle ID:</strong> ${(d.owner && d.owner.bundleId) || ''}<br>
-                <strong>Path:</strong> ${(d.owner && d.owner.path) || ''}<br>
+                <strong>Bounds:</strong> x: ${bounds.x || ''}, y: ${bounds.y || ''}, width: ${bounds.width || ''}, height: ${bounds.height || ''}<br>
+                <strong>Owner:</strong> ${owner.name || ''} (PID: ${owner.processId || ''})<br>
+                <strong>Bundle ID:</strong> ${owner.bundleId || ''}<br>
+                <strong>Path:</strong> ${owner.path || ''}<br>
                 <strong>URL:</strong> ${d.url || ''}<br>
                 <strong>Memory Usage:</strong> ${d.memoryUsage || ''}`;
   }
-  $("#segmentDetailsContent").html(content);
-  $("#segmentDetailsModal").modal("show");
+
+  const $segmentDetailsContent = $("#segmentDetailsContent");
+  if ($segmentDetailsContent.length) {
+    $segmentDetailsContent.html(content);
+  }
+
+  const $segmentDetailsModal = $("#segmentDetailsModal");
+  if ($segmentDetailsModal.length) {
+    $segmentDetailsModal.modal("show");
+  }
 }
 
+// Goals Management
+let userGoals = [];
+
+function initGoals() {
+  try {
+    const savedGoals = localStorage.getItem('timeTrackerGoals');
+    userGoals = savedGoals ? JSON.parse(savedGoals) : [];
+    updateGoalsDisplay();
+  } catch (e) {
+    console.error('Error loading goals:', e);
+  }
+}
+
+function updateGoalsDisplay() {
+  const $goalsList = $('.goals-list');
+  if (!$goalsList.length) return;
+  $goalsList.empty();
+
+  userGoals.forEach((goal, index) => {
+    const progress = calculateGoalProgress(goal);
+    const goalTypeSymbol = goal.type === 'focus' ? '🎯' : '⚠️';
+    const progressBarClass = goal.type === 'focus' ? 'bg-success' : 'bg-warning';
+
+    $goalsList.append(`
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span>${goalTypeSymbol} ${goal.description}</span>
+        <div class="progress" style="width: 60%">
+          <div class="progress-bar ${progressBarClass}" 
+               role="progressbar" 
+               style="width: ${progress}%"
+               aria-valuenow="${progress}" 
+               aria-valuemin="0" 
+               aria-valuemax="100">
+            ${progress}%
+          </div>
+        </div>
+      </div>
+    `);
+  });
+}
+
+function calculateGoalProgress(goal) {
+  const stats = getTimeStats();
+
+  switch (goal.type) {
+    case 'focus':
+      return Math.min(100, (stats.focusedHours / goal.target) * 100);
+    case 'reduce':
+      return Math.min(100, (1 - stats.distractedHours / goal.target) * 100);
+    default:
+      return 0;
+  }
+}
+
+// Save new goal
+$('#saveGoalBtn').click(() => {
+  const goal = {
+    type: $('#goalType').val(),
+    target: parseFloat($('#goalTarget').val()),
+    duration: $('#goalDuration').val(),
+    description: `${$('#goalType').val() === 'focus' ? 'Increase focus to' : 'Reduce distractions to'} ${$('#goalTarget').val()}h per ${$('#goalDuration').val()}`,
+    createdAt: Date.now()
+  };
+  
+  userGoals.push(goal);
+  localStorage.setItem('timeTrackerGoals', JSON.stringify(userGoals));
+  updateGoalsDisplay();
+  $('#goalsModal').modal('hide');
+});
+
+// Initialize goals on startup
 $(document).ready(async () => {
   loadSettings();
   initSettingsUI();
@@ -570,4 +652,185 @@ $(document).ready(async () => {
     viewMode = userSettings.defaultView;
   }
   await renderView();
+  initGoals();
 });
+
+// Update productivity score
+function updateProductivityScore() {
+  const stats = getTimeStats();
+  const totalTime = stats.focusedHours + stats.distractedHours;
+  const score = totalTime > 0 ? Math.round((stats.focusedHours / totalTime) * 100) : 0;
+  
+  $('.progress-ring').attr('data-progress', score);
+  $('.progress-ring').css('--progress', `${score * 3.6}deg`);
+}
+
+// Call this whenever events are updated
+function onEventsUpdated() {
+  updateGoalsDisplay();
+  updateProductivityScore();
+}
+
+const CategoryManager = {
+  categories: new Map([
+    ['productivity', ['code editor', 'terminal', 'document', 'email', 'meeting']],
+    ['development', ['visual studio', 'github', 'git', 'node', 'npm']],
+    ['communication', ['slack', 'teams', 'zoom', 'skype', 'discord']],
+    ['entertainment', ['youtube', 'netflix', 'spotify', 'game', 'social media']],
+    ['distraction', ['facebook', 'twitter', 'instagram', 'reddit', 'tiktok']]
+  ]),
+
+  classifyApp(appTitle, appPath) {
+    const titleLower = appTitle.toLowerCase();
+    const pathLower = (appPath || '').toLowerCase();
+
+    for (const [category, keywords] of this.categories) {
+      if (keywords.some(keyword => 
+        titleLower.includes(keyword) || pathLower.includes(keyword)
+      )) {
+        return category;
+      }
+    }
+    return 'uncategorized';
+  },
+
+  isProductiveApp(appTitle, appPath) {
+    const category = this.classifyApp(appTitle, appPath);
+    return ['productivity', 'development'].includes(category);
+  },
+
+  isDistractionApp(appTitle, appPath) {
+    const category = this.classifyApp(appTitle, appPath);
+    return ['entertainment', 'distraction'].includes(category);
+  }
+};
+
+const GoalManager = {
+  activeGoals: new Map(),
+  
+  initializeDefaultGoals() {
+    this.activeGoals.set('productivityDaily', {
+      type: 'focus',
+      target: 6, // 6 hours
+      period: 'daily',
+      description: 'Maintain 6 hours of productive work daily'
+    });
+
+    this.activeGoals.set('distractionLimit', {
+      type: 'reduce',
+      target: 1, // 1 hour
+      period: 'daily', 
+      description: 'Limit distractions to 1 hour per day'
+    });
+  },
+
+  calculateProgress(goalId) {
+    const goal = this.activeGoals.get(goalId);
+    if (!goal) return 0;
+
+    const stats = this.getTimeStats(goal.period);
+    
+    switch (goal.type) {
+      case 'focus':
+        return Math.min(100, (stats.focusedHours / goal.target) * 100);
+      case 'reduce':
+        return Math.min(100, (1 - (stats.distractedHours / goal.target)) * 100);
+      default:
+        return 0;
+    }
+  },
+
+  getTimeStats(period = 'daily') {
+    const now = Date.now();
+    const periodStart = this.getPeriodStart(period);
+    
+    const relevantEvents = events.filter(ev => 
+      ev.end >= periodStart && ev.start <= now
+    );
+
+    let focusedTime = 0;
+    let distractedTime = 0;
+
+    relevantEvents.forEach(ev => {
+      const duration = ev.end - ev.start;
+      if (CategoryManager.isProductiveApp(ev.title, ev.details?.owner?.path)) {
+        focusedTime += duration;
+      } else if (CategoryManager.isDistractionApp(ev.title, ev.details?.owner?.path)) {
+        distractedTime += duration;
+      }
+    });
+
+    return {
+      focusedHours: focusedTime / 3600000,
+      distractedHours: distractedTime / 3600000
+    };
+  },
+
+  getPeriodStart(period) {
+    const now = new Date();
+    switch (period) {
+      case 'daily':
+        return new Date(now).setHours(0, 0, 0, 0);
+      case 'weekly':
+        return new Date(now.setDate(now.getDate() - now.getDay())).setHours(0, 0, 0, 0);
+      case 'monthly':
+        return new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+      default:
+        return new Date(now).setHours(0, 0, 0, 0);
+    }
+  }
+};
+
+// Initialize goals on startup
+document.addEventListener('DOMContentLoaded', () => {
+  GoalManager.initializeDefaultGoals();
+  updateGoalsDisplay();
+});
+
+function updateGoalsDisplay() {
+  const $goalsList = $('.goals-list');
+  if (!$goalsList.length) return;
+  
+  $goalsList.empty();
+
+  GoalManager.activeGoals.forEach((goal, goalId) => {
+    const progress = GoalManager.calculateProgress(goalId);
+    const progressBarClass = goal.type === 'focus' ? 'bg-success' : 'bg-warning';
+
+    $goalsList.append(`
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <span>${goal.description}</span>
+        <div class="progress" style="width: 60%">
+          <div class="progress-bar ${progressBarClass}" 
+               role="progressbar" 
+               style="width: ${progress}%"
+               aria-valuenow="${progress}" 
+               aria-valuemin="0" 
+               aria-valuemax="100">
+            ${Math.round(progress)}%
+          </div>
+        </div>
+      </div>
+    `);
+  });
+
+  updateProductivityScore();
+}
+
+function updateProductivityScore() {
+  const stats = GoalManager.getTimeStats('daily');
+  const totalTime = stats.focusedHours + stats.distractedHours;
+  const score = totalTime > 0 
+    ? Math.round((stats.focusedHours / totalTime) * 100)
+    : 0;
+  
+  $('.progress-ring').attr('data-progress', score);
+  $('.progress-ring').css('--progress', `${score * 3.6}deg`);
+}
+
+// Update every minute while tracking
+if (tracking) {
+  setInterval(() => {
+    updateGoalsDisplay();
+  }, 60000);
+}

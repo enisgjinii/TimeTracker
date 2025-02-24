@@ -319,6 +319,116 @@
         .form-control {
             border-radius: 8px;
         }
+
+        /* Modern Glass Morphism Effects */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animated Progress Bars */
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(#2563eb var(--progress), #e2e8f0 0deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem auto;
+        }
+
+        .progress-ring::before {
+            content: attr(data-progress) '%';
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        /* Card Hover Effects */
+        .hover-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animated Icons */
+        .rotating-icon {
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Timeline Improvements */
+        .timeline-event {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1px;
+            height: 100%;
+            background: #e2e8f0;
+        }
+
+        .timeline-event::after {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 0;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #2563eb;
+        }
+
+        /* Category Tags */
+        .category-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .dark-mode .category-tag {
+            background: #334155;
+            color: #e2e8f0;
+        }
     </style>
 </head>
 
@@ -368,6 +478,38 @@
                 <hr />
                 <h5>📱 Top Distractions</h5>
                 <ul id="topDistractionsList" class="list-unstyled"></ul>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="glass-panel p-4 rounded-lg hover-card">
+                    <h5>📈 Productivity Score</h5>
+                    <div class="progress-ring" data-progress="75"></div>
+                    <p class="text-center text-muted">Your productivity is improving!</p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="glass-panel p-4 rounded-lg hover-card">
+                    <h5>🎯 Goals</h5>
+                    <div class="goals-list">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Reduce distractions</span>
+                            <div class="progress" style="width: 60%">
+                                <div class="progress-bar" role="progressbar" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Increase focus time</span>
+                            <div class="progress" style="width: 60%">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#goalsModal">
+                        Set New Goal
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -450,6 +592,41 @@
                 </div>
                 <div class="modal-body">
                     <p id="segmentDetailsContent"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="goalsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">🎯 Set New Goal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Goal Type</label>
+                        <select class="form-select" id="goalType">
+                            <option value="focus">Increase Focus Time</option>
+                            <option value="reduce">Reduce Distractions</option>
+                            <option value="apps">Limit Specific Apps</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Target (hours/day)</label>
+                        <input type="number" class="form-control" id="goalTarget" min="0" step="0.5">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Duration</label>
+                        <select class="form-select" id="goalDuration">
+                            <option value="day">Daily</option>
+                            <option value="week">Weekly</option>
+                            <option value="month">Monthly</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="saveGoalBtn">Save Goal</button>
                 </div>
             </div>
         </div>
