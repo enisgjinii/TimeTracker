@@ -1,7 +1,7 @@
 {
   "timelineIncrements": 30,
   "darkMode": false,
-  "useEmojis": true,
+  "useEmojis": false,
   "colorCodedEvents": true,
   "defaultView": "day",
   "categories": [],
