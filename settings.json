@@ -1,7 +1,8 @@
 {
   "timelineIncrements": 30,
-  "darkMode": false,
-  "useEmojis": false,
+  "darkMode": true,
+  "themeMode": "system",
+  "useEmojis": true,
   "colorCodedEvents": true,
   "defaultView": "day",
   "categories": [],
@@ -11,7 +12,6 @@
     "Search": "Work",
     "Zen Browser": "Entertainment",
     "YouTube": "Entertainment",
-    "Discord": "Social",
-    "Facebook": "Social"
+    "Discord": "Social"
   }
 }

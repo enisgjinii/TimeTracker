@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Time Tracker</title>
+    <title>Time Tracker Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap"
@@ -13,6 +13,9 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
         body {
@@ -20,7 +23,10 @@
             background: #f8fafc;
             color: #0f172a;
             margin: 0;
-            padding: 0;
+            padding: 10px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s, color 0.3s;
+            /* Smooth transition for theme changes */
         }
 
         .dark-mode {
@@ -28,79 +34,24 @@
             color: #f8fafc;
         }
 
-        .sidebar {
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            width: 240px;
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            z-index: 999;
-            height: calc(100vh - 30px);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .dark-mode .sidebar {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .sidebar h4 {
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-            font-size: 1.25rem;
-            color: #2563eb;
-            padding: 0 0.5rem;
-        }
-
-        .sidebar a {
-            display: flex;
-            align-items: center;
-            font-size: 0.95rem;
-            color: #64748b;
-            padding: 0.875rem 1rem;
-            border-radius: 12px;
-            text-decoration: none;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sidebar a:hover {
-            background: #f1f5f9;
-            color: #2563eb;
-            transform: translateX(8px);
-        }
-
-        .dark-mode .sidebar a {
-            color: #e2e8f0;
-        }
-
-        .dark-mode .sidebar a:hover {
-            background: #2d3748;
-            color: #ffffff;
-        }
+        /* Removed sidebar styles */
 
         .content {
-            margin-left: 280px;
-            padding: 1.5rem 2rem;
+            margin-left: auto;
+            padding: 1rem 1.5rem;
         }
 
         .top-bar {
             background: #ffffff;
-            border-radius: 16px;
-            padding: 1.25rem;
+            border-radius: 12px;
+            padding: 0.8rem 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-bottom: 1rem;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.04);
         }
 
         .dark-mode .top-bar {
@@ -109,7 +60,7 @@
         }
 
         #appTitle {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: #2563eb;
             margin: 0;
@@ -117,10 +68,10 @@
 
         .view-toggle {
             background: #f1f5f9;
-            padding: 0.25rem;
-            border-radius: 10px;
+            padding: 0.15rem;
+            border-radius: 8px;
             display: flex;
-            gap: 0.25rem;
+            gap: 0.15rem;
         }
 
         .dark-mode .view-toggle {
@@ -131,22 +82,22 @@
             border: none;
             background: transparent;
             color: #64748b;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
         .view-toggle button:hover {
             background: #ffffff;
             color: #2563eb;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
         }
 
         .view-toggle button.active {
             background: #ffffff;
             color: #2563eb;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
         }
 
         .dark-mode .view-toggle button:hover,
@@ -160,11 +111,11 @@
             position: relative;
             overflow-y: auto;
             background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            padding-left: 100px;
-            min-height: 600px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            padding-left: 80px;
+            min-height: 500px;
         }
 
         .dark-mode .timeline-container {
@@ -175,11 +126,11 @@
         .hour-label {
             position: absolute;
             left: 0;
-            width: 80px;
-            font-size: 0.875rem;
+            width: 65px;
+            font-size: 0.8rem;
             color: #64748b;
             border-top: 1px solid #e2e8f0;
-            padding: 0.5rem;
+            padding: 0.4rem;
             text-align: right;
             font-weight: 500;
         }
@@ -195,10 +146,10 @@
 
         .entry {
             position: absolute;
-            border-radius: 8px;
-            font-size: 0.875rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
             color: #fff;
-            padding: 0.5rem 0.75rem;
+            padding: 0.4rem 0.6rem;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -206,7 +157,7 @@
         }
 
         .entry:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
         }
 
         .entry.focus {
@@ -224,12 +175,12 @@
         .summary-panel {
             flex: 1;
             background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            padding: 1.5rem;
-            min-height: 600px;
-            margin-left: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 0, 0, 0.04);
+            padding: 1rem;
+            min-height: 500px;
+            margin-left: 1rem;
         }
 
         .dark-mode .summary-panel {
@@ -240,22 +191,22 @@
         .summary-panel h5 {
             color: #2563eb;
             font-weight: 600;
-            font-size: 1.1rem;
-            margin-bottom: 1.25rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
         }
 
         .summary-item {
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-            padding: 0.75rem;
+            font-size: 0.8rem;
+            margin-bottom: 0.8rem;
+            padding: 0.6rem;
             background: #f8fafc;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
         }
 
         .summary-item:hover {
             background: #f1f5f9;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
         }
 
         .dark-mode .summary-item {
@@ -268,9 +219,10 @@
         }
 
         .btn {
-            padding: 0.625rem 1.25rem;
-            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
             font-weight: 500;
+            font-size: 0.85rem;
         }
 
         .btn-success {
@@ -282,10 +234,41 @@
             background: #1d4ed8;
         }
 
-        .modal-content {
-            border-radius: 16px;
+        .btn-mode {
+            /* New style for mode buttons */
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
             border: none;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            background: #f1f5f9;
+            color: #64748b;
+            margin-left: 0.2rem;
+        }
+
+        .btn-mode:hover,
+        .btn-mode.active {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+
+        .dark-mode .btn-mode {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+
+        .dark-mode .btn-mode:hover,
+        .dark-mode .btn-mode.active {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
         }
 
         .dark-mode .modal-content {
@@ -295,7 +278,7 @@
 
         .modal-header {
             border-bottom: 1px solid #e2e8f0;
-            padding: 1.25rem;
+            padding: 1rem;
         }
 
         .dark-mode .modal-header {
@@ -303,213 +286,71 @@
         }
 
         .modal-body {
-            padding: 1.5rem;
-        }
-
-        .toast-container {
             padding: 1rem;
         }
 
+        .toast-container {
+            padding: 0.8rem;
+        }
+
         .toast {
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-radius: 10px;
+            box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.08), 0 1px 3px -1px rgba(0, 0, 0, 0.05);
         }
 
         .form-select,
         .form-control {
-            border-radius: 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
         }
 
-        /* Modern Glass Morphism Effects */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
-
-        .dark-mode .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Animated Progress Bars */
-        .progress-ring {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: conic-gradient(#2563eb var(--progress), #e2e8f0 0deg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 1rem auto;
-        }
-
-        .progress-ring::before {
-            content: attr(data-progress) '%';
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #2563eb;
-        }
-
-        /* Card Hover Effects */
-        .hover-card {
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .hover-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Animated Icons */
-        .rotating-icon {
-            animation: rotate 2s linear infinite;
-        }
-
-        @keyframes rotate {
-            from {
-                transform: rotate(0deg);
-            }
-
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Timeline Improvements */
-        .timeline-event {
-            position: relative;
-            padding-left: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .timeline-event::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 1px;
-            height: 100%;
-            background: #e2e8f0;
-        }
-
-        .timeline-event::after {
-            content: '';
-            position: absolute;
-            left: -5px;
-            top: 0;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #2563eb;
-        }
-
-        /* Category Tags */
-        .category-tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.25rem 0.75rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-right: 0.5rem;
-            background: #f1f5f9;
-            color: #475569;
-        }
-
-        .dark-mode .category-tag {
-            background: #334155;
-            color: #e2e8f0;
-        }
+        /* Removed Glass Morphism, Progress Ring, Card Hover, Animated Icons, Timeline & Category Tag styles */
+        /* Only keeping essential styles for Timeline and Summary */
     </style>
 </head>
 
 <body>
-    <div class="sidebar">
-        <h4>📊 Dashboard</h4>
-        <a href="#" onclick="showPage('timeline')">🕒 Timeline</a>
-        <a href="#" onclick="showPage('settings')" data-bs-toggle="modal" data-bs-target="#settingsModal">⚙️
-            Settings</a>
-        <a href="#" onclick="showPage('about')" data-bs-toggle="modal" data-bs-target="#aboutModal">ℹ️ About</a>
-    </div>
     <div class="content">
         <div class="top-bar">
-            <h2 id="appTitle">Time Tracker <span>⏳</span></h2>
+            <h2 id="appTitle">Dashboard <span>⏳</span></h2>
             <div>
                 <button id="toggleTracking" class="btn btn-success btn-sm">Start Tracking</button>
+                <div class="view-toggle" style="margin-left: 0.5rem; display: inline-flex;">
+                    <button id="lightModeBtn" class="btn-mode">Light</button>
+                    <button id="darkModeBtn" class="btn-mode">Dark</button>
+                    <button id="systemModeBtn" class="btn-mode active">System</button>
+                </div>
             </div>
         </div>
-        <div class="d-flex align-items-center mb-3">
-            <div class="view-toggle me-3">
-                <button id="dayViewBtn" class="btn btn-outline-primary btn-sm">Day</button>
-                <button id="weekViewBtn" class="btn btn-outline-primary btn-sm">Week</button>
-                <button id="monthViewBtn" class="btn btn-outline-primary btn-sm">Month</button>
+        <div class="d-flex align-items-center mb-2">
+            <div class="view-toggle me-2">
+                <button id="dayViewBtn" class="btn btn-outline-primary btn-sm active">Day</button>
             </div>
             <div id="dayNav" class="d-flex align-items-center">
-                <button id="prevDay" class="btn btn-outline-primary btn-sm me-2">← Previous Day</button>
-                <button id="todayBtn" class="btn btn-outline-primary btn-sm me-2">Today</button>
-                <button id="nextDay" class="btn btn-outline-primary btn-sm">Next Day →</button>
-                <h5 class="ms-3 mb-0" id="currentDateLabel"></h5>
+                <button id="prevDay" class="btn btn-outline-primary btn-sm me-1">← Prev</button>
+                <button id="todayBtn" class="btn btn-outline-primary btn-sm me-1">Today</button>
+                <button id="nextDay" class="btn btn-outline-primary btn-sm">Next →</button>
+                <h5 class="ms-2 mb-0" id="currentDateLabel"></h5>
             </div>
         </div>
-        <p class="text-muted">Press <kbd>CTRL + ,</kbd> to Zoom In | Press <kbd>CTRL + .</kbd> to Zoom Out</p>
+        <p class="text-muted small">Press <kbd>CTRL + ,</kbd> Zoom In | <kbd>CTRL + .</kbd> Zoom Out</p>
         <div class="row-layout d-flex">
             <div id="timeline" class="timeline-container"></div>
             <div class="summary-panel">
-                <h5>📊 Work Day Summary</h5>
-                <div id="donutChart" style="max-width: 250px; margin-bottom:20px;"></div>
+                <h5>📊 Summary</h5>
+                <div id="donutChart" style="max-width: 200px; margin-bottom:15px;"></div>
                 <div class="summary-item">
-                    <span class="me-2">🎯</span>Focused: <span id="focusedTime">0h 0m</span>
+                    <span class="me-1">🎯</span>Focused: <span id="focusedTime">0h 0m</span>
                 </div>
                 <div class="summary-item">
-                    <span class="me-2">⚠️</span>Distracted: <span id="distractedTime">0h 0m</span>
+                    <span class="me-1">⚠️</span>Distracted: <span id="distractedTime">0h 0m</span>
                 </div>
-                <hr />
+                <hr class="my-2" />
                 <h5>⭐ Most Used</h5>
                 <ul id="mostUsedList" class="list-unstyled"></ul>
-                <hr />
-                <h5>📱 Top Distractions</h5>
+                <hr class="my-2" />
+                <h5>📱 Distractions</h5>
                 <ul id="topDistractionsList" class="list-unstyled"></ul>
-            </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="glass-panel p-4 rounded-lg hover-card">
-                    <h5>📈 Productivity Score</h5>
-                    <div class="progress-ring" data-progress="75"></div>
-                    <p class="text-center text-muted">Your productivity is improving!</p>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="glass-panel p-4 rounded-lg hover-card">
-                    <h5>🎯 Goals</h5>
-                    <div class="goals-list">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Reduce distractions</span>
-                            <div class="progress" style="width: 60%">
-                                <div class="progress-bar" role="progressbar" style="width: 65%"></div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <span>Increase focus time</span>
-                            <div class="progress" style="width: 60%">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 80%"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <button class="btn btn-sm btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#goalsModal">
-                        Set New Goal
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -517,52 +358,49 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">⚙️ Settings</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title"><i class="fas fa-cog me-2"></i> Settings</h5>
+                    <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Timeline Increments (min):</label>
+                    <div class="mb-2">
+                        <label class="form-label small">Timeline Increments (min):</label>
                         <select id="timelineIncrements" class="form-select form-select-sm">
                             <option value="15">15</option>
                             <option value="30">30</option>
                         </select>
                     </div>
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="darkModeCheck">
-                        <label class="form-check-label" for="darkModeCheck">🌙 Dark Mode</label>
+                    <div class="form-check mb-1">
+                        <input class="form-check-input" type="checkbox" id="darkModeCheck" style="display: none;">
+                        <label class="form-check-label small" for="darkModeCheck" style="display: none;">🌙 Dark
+                            Mode</label>
                     </div>
-                    <div class="form-check mb-2">
+                    <div class="form-check mb-1">
                         <input class="form-check-input" type="checkbox" id="useEmojisCheck">
-                        <label class="form-check-label" for="useEmojisCheck">😊 Use Emojis in UI</label>
+                        <label class="form-check-label small" for="useEmojisCheck">😊 Emojis in UI</label>
                     </div>
-                    <div class="form-check mb-2">
+                    <div class="form-check mb-1">
                         <input class="form-check-input" type="checkbox" id="colorCodedEventsCheck">
-                        <label class="form-check-label" for="colorCodedEventsCheck">🎨 Color-Coded Events</label>
+                        <label class="form-check-label small" for="colorCodedEventsCheck">🎨 Color-Coded Events</label>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Default View:</label>
+                    <div class="mb-2">
+                        <label class="form-label small">Default View:</label>
                         <select id="defaultViewSelect" class="form-select form-select-sm">
                             <option value="day">Day</option>
                             <option value="week">Week</option>
                             <option value="month">Month</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">App Categories</label>
-                        <div id="categoriesList" class="mb-2">
-                            <!-- Categories will be dynamically populated here -->
-                        </div>
-                        <button id="addCategoryBtn" class="btn btn-sm btn-outline-primary">
-                            <i class="fas fa-plus"></i> Add Category
+                    <div class="mb-2">
+                        <label class="form-label small">App Categories</label>
+                        <div id="categoriesList" class="mb-1"> </div>
+                        <button id="addCategoryBtn" class="btn btn-sm btn-outline-primary btn-sm"> <i
+                                class="fas fa-plus"></i> Add Category
                         </button>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">App Classifications</label>
-                        <div id="appClassificationsList" class="list-group mb-2">
-                            <!-- App classifications will be dynamically populated here -->
-                        </div>
+                    <div class="mb-2">
+                        <label class="form-label small">App Classifications</label>
+                        <div id="appClassificationsList" class="list-group mb-1"> </div>
                     </div>
                     <button id="saveSettingsBtn" class="btn btn-primary btn-sm">Save Settings</button>
                 </div>
@@ -573,11 +411,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">ℹ️ About</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i> About</h5>
+                    <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Professional Time Tracker with automatic app icon extraction, detailed segment popups, and
+                    <p small>Professional Time Tracker with automatic app icon extraction, detailed segment popups, and
                         advanced settings.</p>
                 </div>
             </div>
@@ -587,11 +425,11 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">📝 Segment Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title"><i class="fas fa-clipboard-list me-2"></i> Segment Details</h5>
+                    <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p id="segmentDetailsContent"></p>
+                    <p id="segmentDetailsContent" class="small"></p>
                 </div>
             </div>
         </div>
@@ -600,25 +438,25 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">🎯 Set New Goal</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title"><i class="fas fa-bullseye me-2"></i> Set Goal</h5>
+                    <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Goal Type</label>
-                        <select class="form-select" id="goalType">
+                    <div class="mb-2">
+                        <label class="form-label small">Goal Type</label>
+                        <select class="form-select form-select-sm" id="goalType">
                             <option value="focus">Increase Focus Time</option>
                             <option value="reduce">Reduce Distractions</option>
                             <option value="apps">Limit Specific Apps</option>
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Target (hours/day)</label>
-                        <input type="number" class="form-control" id="goalTarget" min="0" step="0.5">
+                    <div class="mb-2">
+                        <label class="form-label small">Target (hours/day)</label>
+                        <input type="number" class="form-control form-control-sm" id="goalTarget" min="0" step="0.5">
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Duration</label>
-                        <select class="form-select" id="goalDuration">
+                    <div class="mb-2">
+                        <label class="form-label small">Duration</label>
+                        <select class="form-select form-select-sm" id="goalDuration">
                             <option value="day">Daily</option>
                             <option value="week">Weekly</option>
                             <option value="month">Monthly</option>
@@ -626,7 +464,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="saveGoalBtn">Save Goal</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="saveGoalBtn">Save Goal</button>
                 </div>
             </div>
         </div>
