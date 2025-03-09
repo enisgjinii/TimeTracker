@@ -2,11 +2,11 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>TimeTracker Pro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
         :root {
             --primary: #3a86ff;
@@ -372,45 +372,6 @@
             font-weight: 700;
         }
 
-        .export-dropdown {
-            position: relative;
-        }
-
-        .export-dropdown-menu {
-            position: absolute;
-            right: 0;
-            top: 100%;
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 0.5rem 0;
-            min-width: 150px;
-            z-index: 100;
-            display: none;
-        }
-
-        .export-dropdown-menu.show {
-            display: block;
-        }
-
-        .export-dropdown-item {
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .export-dropdown-item:hover {
-            background-color: rgba(0, 0, 0, 0.05);
-        }
-
-        body.dark-mode .export-dropdown-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
         .time-filter {
             display: flex;
             align-items: center;
@@ -603,26 +564,6 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--neutral);
-        }
-
-        .notification-badge {
-            position: relative;
-            display: inline-block;
-        }
-
-        .notification-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--distraction);
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .settings-panel {
@@ -888,6 +829,20 @@
         .legend-item:hover {
             opacity: 0.8;
         }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -899,26 +854,6 @@
                 <h2>⏱️ TimeTracker Pro</h2>
             </div>
             <div class="d-flex align-items-center gap-3">
-                <div class="dropdown export-dropdown">
-                    <button class="btn btn-outline-secondary btn-sm btn-toggle" id="exportDropdownBtn">
-                        <i class="fas fa-download me-1"></i> Export
-                    </button>
-                    <div class="export-dropdown-menu" id="exportDropdownMenu">
-                        <div class="export-dropdown-item" id="exportCsv">
-                            <i class="fas fa-file-csv"></i> Export as CSV
-                        </div>
-                        <div class="export-dropdown-item" id="exportPdf">
-                            <i class="fas fa-file-pdf"></i> Export as PDF
-                        </div>
-                        <div class="export-dropdown-item" id="exportJson">
-                            <i class="fas fa-file-code"></i> Export as JSON
-                        </div>
-                    </div>
-                </div>
-                <button id="notificationsBtn" class="btn btn-outline-secondary btn-sm btn-toggle notification-badge">
-                    <i class="fas fa-bell"></i>
-                    <span class="notification-count">2</span>
-                </button>
                 <button id="settingsBtn" class="btn btn-outline-secondary btn-sm btn-toggle">
                     <i class="fas fa-cog"></i>
                 </button>
@@ -964,7 +899,7 @@
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
-            <h5 id="currentDateLabel" class="mb-0">Date</h5>
+            <h5 id="currentDateLabel" class="mb-0"></h5>
             <button id="addEntryBtn" class="btn btn-sm btn-primary btn-toggle">
                 <i class="fas fa-plus me-1"></i> Add Entry
             </button>
@@ -1054,7 +989,7 @@
                                     <div><i class="fas fa-bed me-2"></i> Idle Time</div>
                                     <strong id="idleTime">0h 0m</strong>
                                 </div>
-                                <hr>
+                                <hr />
                                 <div class="stat-card d-flex justify-content-between">
                                     <div>Total Tracked Today</div>
                                     <strong id="totalTracked">0h 0m</strong>
@@ -1337,16 +1272,16 @@
                                         <div class="form-group mb-3">
                                             <label for="pomodoroTask" class="form-label">Current Task</label>
                                             <input type="text" class="form-control" id="pomodoroTask"
-                                                placeholder="What are you working on?">
+                                                placeholder="What are you working on?" />
                                         </div>
                                         <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" id="autoStartBreaksCheck">
+                                            <input class="form-check-input" type="checkbox" id="autoStartBreaksCheck" />
                                             <label class="form-check-label" for="autoStartBreaksCheck">Auto-start
                                                 breaks</label>
                                         </div>
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox"
-                                                id="autoStartPomodorosCheck">
+                                                id="autoStartPomodorosCheck" />
                                             <label class="form-check-label" for="autoStartPomodorosCheck">Auto-start
                                                 pomodoros</label>
                                         </div>
@@ -1544,7 +1479,7 @@
                     <div class="settings-description">Show emojis in the interface</div>
                 </div>
                 <label class="custom-switch">
-                    <input type="checkbox" id="useEmojisCheck" checked>
+                    <input type="checkbox" id="useEmojisCheck" checked />
                     <span class="switch-slider"></span>
                 </label>
             </div>
@@ -1581,7 +1516,7 @@
                     <div class="settings-description">Use different colors for different types of activities</div>
                 </div>
                 <label class="custom-switch">
-                    <input type="checkbox" id="colorCodedEventsCheck" checked>
+                    <input type="checkbox" id="colorCodedEventsCheck" checked />
                     <span class="switch-slider"></span>
                 </label>
             </div>
@@ -1646,43 +1581,6 @@
                 </select>
             </div>
         </div>
-        <div class="settings-section">
-            <h5>Notifications</h5>
-            <div class="settings-option">
-                <div>
-                    <div class="settings-label">Enable Notifications</div>
-                    <div class="settings-description">Show notifications when events occur</div>
-                </div>
-                <label class="custom-switch">
-                    <input type="checkbox" id="enableNotificationsCheck" checked>
-                    <span class="switch-slider"></span>
-                </label>
-            </div>
-            <div class="settings-option">
-                <div>
-                    <div class="settings-label">Sound Alerts</div>
-                    <div class="settings-description">Play sounds for notifications</div>
-                </div>
-                <label class="custom-switch">
-                    <input type="checkbox" id="soundAlertsCheck" checked>
-                    <span class="switch-slider"></span>
-                </label>
-            </div>
-        </div>
-        <div class="settings-section">
-            <h5>Data Management</h5>
-            <div class="d-grid gap-2">
-                <button class="btn btn-outline-primary btn-sm" id="exportAllDataBtn">
-                    <i class="fas fa-download me-2"></i> Export All Data
-                </button>
-                <button class="btn btn-outline-primary btn-sm" id="importDataBtn">
-                    <i class="fas fa-upload me-2"></i> Import Data
-                </button>
-                <button class="btn btn-outline-danger btn-sm" id="clearDataBtn">
-                    <i class="fas fa-trash-alt me-2"></i> Clear All Data
-                </button>
-            </div>
-        </div>
     </div>
     <div class="overlay" id="settingsOverlay"></div>
     <div class="modal fade" id="addEntryModal" tabindex="-1">
@@ -1696,22 +1594,23 @@
                     <form id="addEntryForm" class="add-entry-form">
                         <div class="mb-3">
                             <label for="entryTitle" class="form-label">Activity Title</label>
-                            <input type="text" class="form-control" id="entryTitle" placeholder="What were you doing?">
+                            <input type="text" class="form-control" id="entryTitle"
+                                placeholder="What were you doing?" />
                         </div>
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="entryDate" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="entryDate">
+                                <input type="date" class="form-control" id="entryDate" />
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="entryStartTime" class="form-label">Start Time</label>
-                                <input type="time" class="form-control" id="entryStartTime">
+                                <input type="time" class="form-control" id="entryStartTime" />
                             </div>
                             <div class="col">
                                 <label for="entryEndTime" class="form-label">End Time</label>
-                                <input type="time" class="form-control" id="entryEndTime">
+                                <input type="time" class="form-control" id="entryEndTime" />
                             </div>
                         </div>
                         <div class="mb-3">
@@ -1727,12 +1626,12 @@
                         <div class="mb-3">
                             <label for="entryApp" class="form-label">Application</label>
                             <input type="text" class="form-control" id="entryApp"
-                                placeholder="Application name (optional)">
+                                placeholder="Application name (optional)" />
                         </div>
                         <div class="mb-3">
                             <label for="entryTags" class="form-label">Tags</label>
                             <input type="text" class="form-control" id="entryTags"
-                                placeholder="Add tags separated by commas">
+                                placeholder="Add tags separated by commas" />
                             <div class="tag-list mt-2" id="selectedTags"></div>
                         </div>
                         <div class="mb-3">
@@ -1808,7 +1707,6 @@
                 autoStartBreaks: false,
                 autoStartPomodoros: false
             },
-            notifications: { enabled: true, sound: true },
             appClassifications: {
                 "Visual Studio Code": "Work",
                 "Electron": "Work",
@@ -1853,10 +1751,6 @@
             $("#shortBreakDurationSelect").val(ps.shortBreakDuration);
             $("#longBreakDurationSelect").val(ps.longBreakDuration);
             $("#longBreakIntervalSelect").val(ps.longBreakInterval);
-            $("#enableNotificationsCheck").prop("checked", usrSet.notifications.enabled);
-            $("#soundAlertsCheck").prop("checked", usrSet.notifications.sound);
-            $("#autoStartBreaksCheck").prop("checked", ps.autoStartBreaks);
-            $("#autoStartPomodorosCheck").prop("checked", ps.autoStartPomodoros);
         }
         function loadSegCSV() {
             evs = [];
@@ -2243,7 +2137,6 @@
             let ps = usrSet.pomodoroSettings;
             if (pomodoroState.mode === "focus") {
                 pomodoroState.completedPomodoros++;
-                showNotification("Pomodoro Complete", "Time for a break!");
                 if (ps.autoStartBreaks) {
                     if (pomodoroState.completedPomodoros % ps.longBreakInterval === 0) {
                         resetPomodoroMode("longBreak");
@@ -2259,27 +2152,12 @@
                     startPomodoro();
                 }
             } else {
-                showNotification("Break Complete", "Ready to focus?");
                 if (ps.autoStartPomodoros) {
                     resetPomodoroMode("focus");
                     $("#shortBreakBtn").removeClass("active");
                     $("#longBreakBtn").removeClass("active");
                     $("#focusSessionBtn").addClass("active");
                     startPomodoro();
-                }
-            }
-        }
-        function showNotification(title, message) {
-            if (!usrSet.notifications.enabled) return;
-            if (usrSet.notifications.sound) {
-                try { let audio = new Audio("notification.mp3"); audio.play(); } catch (e) { }
-            }
-            if ("Notification" in window) {
-                if (Notification.permission === "granted") new Notification(title, { body: message });
-                else if (Notification.permission !== "denied") {
-                    Notification.requestPermission().then(p => {
-                        if (p === "granted") new Notification(title, { body: message });
-                    });
                 }
             }
         }
@@ -2348,17 +2226,6 @@
                 $("#settingsPanel").removeClass("show");
                 $("#settingsOverlay").removeClass("show");
             });
-            $("#exportDropdownBtn").click(() => {
-                $("#exportDropdownMenu").toggleClass("show");
-            });
-            $("#exportCsv").click(() => handleExport("csv"));
-            $("#exportPdf").click(() => handleExport("pdf"));
-            $("#exportJson").click(() => handleExport("json"));
-            $(document).click(function (e) {
-                if (!$(e.target).closest("#exportDropdownBtn, #exportDropdownMenu").length) {
-                    $("#exportDropdownMenu").removeClass("show");
-                }
-            });
             $("#useEmojisCheck").change(function () { usrSet.useEmojis = this.checked; saveSet(); applySet(); });
             $("#colorCodedEventsCheck").change(function () { usrSet.colorCodedEvents = this.checked; saveSet(); applySet(); });
             $("#defaultViewSelect").change(function () { usrSet.defaultView = this.value; saveSet(); });
@@ -2379,10 +2246,6 @@
             $("#longBreakIntervalSelect").change(function () {
                 usrSet.pomodoroSettings.longBreakInterval = parseInt(this.value); saveSet();
             });
-            $("#enableNotificationsCheck").change(function () { usrSet.notifications.enabled = this.checked; saveSet(); });
-            $("#soundAlertsCheck").change(function () { usrSet.notifications.sound = this.checked; saveSet(); });
-            $("#autoStartBreaksCheck").change(function () { usrSet.pomodoroSettings.autoStartBreaks = this.checked; saveSet(); });
-            $("#autoStartPomodorosCheck").change(function () { usrSet.pomodoroSettings.autoStartPomodoros = this.checked; saveSet(); });
             $("#addEntryBtn").click(showAddEntryModal);
             $("#saveEntryBtn").click(saveEntry);
             $("#categoryFilter").change(() => { renderDayView(); });
@@ -2450,16 +2313,6 @@
             saveSegCSV();
             $("#addEntryModal").modal("hide");
             renderView();
-        }
-        function handleExport(format) {
-            let dateStr = new Date().toISOString().split("T")[0];
-            let filename;
-            switch (format) {
-                case "csv": filename = `timetracker_export_${dateStr}.csv`; alert(`Exporting data as CSV to ${filename}`); break;
-                case "pdf": filename = `timetracker_export_${dateStr}.pdf`; alert(`Exporting data as PDF to ${filename}`); break;
-                case "json": filename = `timetracker_export_${dateStr}.json`; alert(`Exporting data as JSON to ${filename}`); break;
-            }
-            $("#exportDropdownMenu").removeClass("show");
         }
         ipcRenderer.on("active-window-data", (e, data) => {
             if (!track) return;

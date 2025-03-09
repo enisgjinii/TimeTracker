@@ -15,10 +15,6 @@
     "autoStartBreaks": false,
     "autoStartPomodoros": false
   },
-  "notifications": {
-    "enabled": true,
-    "sound": true
-  },
   "appClassifications": {
     "Visual Studio Code": "Work",
     "Electron": "Productivity",
@@ -26,5 +22,9 @@
     "Zen Browser": "Entertainment",
     "YouTube": "Entertainment",
     "Discord": "Social"
+  },
+  "notifications": {
+    "enabled": true,
+    "sound": true
   }
 }
