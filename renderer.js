@@ -1,7 +1,6 @@
 const { ipcRenderer } = require('electron');
 const fs = require('fs');
 const path = require('path');
-const windowFetch = require('node-fetch'); // For server-side fetch
 window.$ = window.jQuery = require('jquery');
 
 const segmentsFile = path.join(__dirname, 'segments.csv');
@@ -42,55 +41,40 @@ const $distractedTime = $('#distractedTime');
 const $mostUsedList = $('#mostUsedList');
 const $topDistractionsList = $('#topDistractionsList');
 const $appTitle = $('#appTitle');
-const iconCache = {}; // Initialize icon cache
+let lastSegmentUpdateTime = 0;
 
 function removeQuotes(str) {
   return str.replace(/^"(.*)"$/, '$1');
 }
 
-async function getCDNIconForAppName(appName) {
-  if (iconCache[appName]) {
-    return iconCache[appName]; // Return from cache if available
+function getDeviconUrl(appName) {
+  const baseUrl = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons';
+  const deviconAppMap = {
+    'visual studio code': 'vscode',
+    'vs code': 'vscode'
+  };
+  let normalizedName = appName.toLowerCase().trim();
+  if (deviconAppMap[normalizedName]) {
+    normalizedName = deviconAppMap[normalizedName];
   }
-
-  const defaultIconURL = "https://img.icons8.com/color/48/000000/app.png"; // Default icon URL
-
-  try {
-    // Using Icons8 API (replace 'YOUR_API_KEY' with your actual Icons8 API key if needed, or use public search)
-    // For public search, we might use a simpler approach, or check Icons8's public image URLs.
-    // For now, using a direct search URL - might be rate-limited, consider official API if this becomes heavily used.
-    const searchTerm = encodeURIComponent(appName + " app icon");
-    const iconSearchURL = `https://img.icons8.com/color/48/search?term=${searchTerm}`;
-
-    const response = await windowFetch(iconSearchURL); // Using node-fetch
-    if (!response.ok) {
-      console.warn(`Icons8 API request failed for ${appName}, status: ${response.status}`);
-      iconCache[appName] = defaultIconURL; // Cache default icon on failure
-      return defaultIconURL;
-    }
-
-    // Icons8 search page doesn't directly return JSON, need to parse HTML (simplified approach - might need more robust parsing)
-    const text = await response.text();
-    // Look for the first img tag with class "icon-image" (inspect Icons8 search page to confirm)
-    const match = text.match(/<img[^>]*class="[^"]*icon-image[^"]*"[^>]*src="([^"]*)"/);
-    if (match && match[1]) {
-      const iconURL = match[1].startsWith('//') ? 'https:' + match[1] : match[1]; // Handle protocol-relative URLs
-      iconCache[appName] = iconURL; // Cache the found icon URL
-      return iconURL;
-    } else {
-      console.warn(`No icon found on Icons8 for ${appName}, using default icon.`);
-      iconCache[appName] = defaultIconURL; // Cache default icon if not found
-      return defaultIconURL;
-    }
-
-
-  } catch (error) {
-    console.error(`Error fetching icon for ${appName} from Icons8:`, error);
-    iconCache[appName] = defaultIconURL; // Cache default icon on error
-    return defaultIconURL; // Return default icon in case of error
-  }
+  return `${baseUrl}/${normalizedName}/${normalizedName}-original.svg`;
 }
 
+function createAppIconElement(appName) {
+  const img = document.createElement('img');
+  img.classList.add('app-icon');
+  img.alt = appName;
+  img.src = getDeviconUrl(appName);
+  img.onerror = function () {
+    if (this.src.indexOf("devicon") !== -1) {
+      this.src = `https://img.icons8.com/color/48/000000/${encodeURIComponent(appName)}.png`;
+    } else if (this.src.indexOf("icons8") !== -1) {
+      this.onerror = null;
+      this.src = 'images/default-icon.png';
+    }
+  };
+  return img;
+}
 
 function getCategoryForApp(appName) {
   if (userSettings.appClassifications && userSettings.appClassifications[appName]) {
@@ -168,7 +152,6 @@ function loadSettings() {
       Object.assign(userSettings, parsed);
     } catch (e) {
       console.error("Error reading settings file:", e);
-      showToast("Error reading settings: " + e.toString());
     }
   }
 }
@@ -177,7 +160,6 @@ function saveSettings() {
     fs.writeFileSync(settingsFile, JSON.stringify(userSettings, null, 2), 'utf8');
   } catch (e) {
     console.error("Error saving settings file:", e);
-    showToast("Error writing settings: " + e.toString());
   }
 }
 function applySettings() {
@@ -185,7 +167,6 @@ function applySettings() {
   $('#lightModeBtn').removeClass('active');
   $('#darkModeBtn').removeClass('active');
   $('#systemModeBtn').removeClass('active');
-
   if (userSettings.themeMode === 'dark') {
     $('body').addClass('dark-mode');
     $('#darkModeBtn').addClass('active');
@@ -194,8 +175,6 @@ function applySettings() {
   } else {
     $('#systemModeBtn').addClass('active');
   }
-
-
   if (!userSettings.useEmojis) $appTitle.html("Time Tracker");
   else $appTitle.html("Time Tracker <span>⏳</span>");
   viewMode = userSettings.defaultView;
@@ -208,7 +187,6 @@ function initSettingsUI() {
   $('#defaultViewSelect').val(userSettings.defaultView);
   populateCategories();
   populateAppClassifications();
-
   $('#lightModeBtn').removeClass('active');
   $('#darkModeBtn').removeClass('active');
   $('#systemModeBtn').removeClass('active');
@@ -241,14 +219,13 @@ function setThemeMode(mode) {
   applySettings();
 }
 
-
 $('#toggleTracking').click(() => {
   tracking = !tracking;
   $('#toggleTracking')
     .toggleClass('btn-success btn-danger')
     .text(tracking ? "Stop Tracking" : "Start Tracking");
   if (!tracking) {
-    renderView(); // Re-render view when tracking stops to finalize data
+    renderView();
   }
 });
 
@@ -256,54 +233,6 @@ $('#dayViewBtn').click(() => { viewMode = "day"; currentDate = new Date(); curre
 $('#prevDay').click(() => { currentDate.setDate(currentDate.getDate() - 1); renderView(); });
 $('#todayBtn').click(() => { currentDate = new Date(); currentDate.setHours(0, 0, 0, 0); renderView(); });
 $('#nextDay').click(() => { currentDate.setDate(currentDate.getDate() + 1); renderView(); });
-
-$(document).keydown((e) => {
-  if (e.ctrlKey && e.key === ',') {
-    zoomLevel = Math.min(10.0, zoomLevel + 0.2);
-    renderView();
-  } else if (e.ctrlKey && e.key === '.') {
-    zoomLevel = Math.max(0.1, zoomLevel - 0.2);
-    renderView();
-  }
-});
-
-let lastSegmentUpdateTime = 0; // To control segment update frequency during tracking
-
-ipcRenderer.on('active-window-data', (e, data) => {
-  if (!tracking) return;
-  let now = Date.now();
-  if (!currentSegment) {
-    currentSegment = { title: data.title, start: now, end: now, details: data };
-  } else {
-    if (currentSegment.title === data.title) {
-      currentSegment.end = now;
-    } else {
-      events.push(currentSegment);
-      currentSegment = { title: data.title, start: now, end: now, details: data };
-    }
-  }
-  saveSegmentsToCSV();
-
-  // Limit timeline re-render to prevent excessive updates - update every 5 seconds (5000ms) for timeline
-  const currentTime = Date.now();
-  if (currentTime - lastSegmentUpdateTime > 5000) {
-    renderDayView(); // Just re-render timeline, not full view
-    lastSegmentUpdateTime = currentTime;
-  }
-  renderSummaryForCurrentDay(); // Update summary more frequently if needed, or adjust interval
-});
-
-
-function showToast(msg) {
-  let toastId = "toast" + Date.now();
-  let html = `
-        <div id="${toastId}" class="toast show text-white bg-danger" style="min-width:200px; margin-bottom:10px;">
-            <div class="toast-body">${msg}</div>
-        </div>`;
-  $("#toastContainer").append(html);
-  setTimeout(() => { $("#" + toastId).remove(); }, 5000);
-}
-function isValidTimestamp(ts) { return !isNaN(ts) && ts > 0; }
 
 function loadSegmentsFromCSV() {
   events = [];
@@ -317,8 +246,7 @@ function loadSegmentsFromCSV() {
           let st = parseInt(parts[1]);
           let en = parseInt(parts[2]);
           if (isNaN(st) || isNaN(en)) {
-            console.warn("Skipping CSV line due to invalid timestamp:", line);
-            continue; // Skip line with invalid timestamp
+            continue;
           }
           let ev = { title, start: st, end: en };
           if (parts.length >= 14) {
@@ -345,7 +273,6 @@ function loadSegmentsFromCSV() {
       }
     } catch (e) {
       console.error("Error reading or parsing CSV file:", e);
-      showToast("Error reading session data. Check console for details.");
     }
   }
 }
@@ -382,10 +309,8 @@ function saveSegmentsToCSV() {
     fs.writeFileSync(segmentsFile, csvLines.join('\n'), 'utf8');
   } catch (e) {
     console.error("Error writing to CSV file:", e);
-    showToast("Error saving session data. Check console for details.");
   }
 }
-
 
 function assignLanes(evList) {
   let sorted = evList.slice().sort((a, b) => a.start - b.start);
@@ -408,6 +333,15 @@ function assignLanes(evList) {
   return { events: sorted, laneCount: lanes.length };
 }
 
+function extractAppName(title) {
+  if (title.indexOf(" - ") !== -1) {
+    let parts = title.split(" - ");
+    let candidate = parts[parts.length - 1].trim();
+    if (candidate.length > 3) return candidate;
+  }
+  return title;
+}
+
 async function renderDayView() {
   $timeline.show().empty();
   let dateStr = currentDate.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -417,12 +351,10 @@ async function renderDayView() {
   let dayEvents = [...events];
   if (currentSegment) dayEvents.push(currentSegment);
   dayEvents = dayEvents.filter(ev => ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime());
-
   const hoursInDay = 24;
   const hourHeight = 40 * zoomLevel;
   const totalHeight = hoursInDay * hourHeight;
   $timeline.css({ height: totalHeight + 'px', position: 'relative' });
-
   for (let hour = 0; hour < hoursInDay; hour++) {
     let topPos = hour * hourHeight;
     let labelStr = new Date(dayStart.getTime() + hour * 3600000).toLocaleTimeString([], { hour: '2-digit' });
@@ -430,18 +362,15 @@ async function renderDayView() {
     let lineHtml = `<div class="timeline-hour" style="top:${topPos}px; height: ${hourHeight}px;"></div>`;
     $timeline.append(labelHtml, lineHtml);
   }
-
   if (dayEvents.length === 0) {
     $timeline.append('<p class="text-muted m-3">No events for this date.</p>');
     return dayEvents;
   }
-
   let laneData = assignLanes(dayEvents);
   let laneCount = laneData.laneCount;
   let containerWidth = $timeline.width();
   let eventsAreaWidth = containerWidth - 100;
   let laneWidth = eventsAreaWidth / laneCount;
-
   for (let ev of dayEvents) {
     let evStartTime = Math.max(ev.start, dayStart.getTime());
     let evEndTime = Math.min(ev.end, dayEnd.getTime());
@@ -457,21 +386,27 @@ async function renderDayView() {
     let leftOffset = 100 + (ev.lane * laneWidth);
     let blockWidth = laneWidth - 5;
     let titleText = userSettings.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
-    const appName = (ev.details && ev.details.owner && ev.details.owner.name) || ev.title;
+    const appName = (ev.details && ev.details.owner && ev.details.owner.name) || extractAppName(ev.title);
     const category = getCategoryForApp(appName);
-    const iconUrl = await getCDNIconForAppName(appName); // Fetch icon here
+    const iconEl = createAppIconElement(appName);
     let badgeHtml = category ? `<span class="badge bg-info me-1">${category}</span>` : "";
-    let iconHtml = `<img class="app-icon" src="${iconUrl}" style="width:16px; height:16px; margin-right:4px; vertical-align:middle;">`;
-    let entryHtml = `<div class="entry ${colorClass}" style="top:${topOffset}px; left:${leftOffset}px; width:${blockWidth}px; height:${blockHeight}px;" data-event='${JSON.stringify(ev)}'>
-                            ${iconHtml}${badgeHtml}${titleText} (${minutes} min)
-                        </div>`;
-    let $entry = $(entryHtml);
-    $entry.click(function () { showSegmentDetails($(this).data("event")); });
-    $timeline.append($entry);
+    let wrapper = document.createElement('div');
+    wrapper.className = `entry ${colorClass}`;
+    wrapper.style.top = topOffset + 'px';
+    wrapper.style.left = leftOffset + 'px';
+    wrapper.style.width = blockWidth + 'px';
+    wrapper.style.height = blockHeight + 'px';
+    wrapper.setAttribute('data-event', JSON.stringify(ev));
+    wrapper.appendChild(iconEl);
+    let labelSpan = document.createElement('span');
+    labelSpan.style.marginLeft = '0.5rem';
+    labelSpan.innerHTML = `${badgeHtml}${titleText} (${minutes} min)`;
+    wrapper.appendChild(labelSpan);
+    wrapper.addEventListener('click', () => { showSegmentDetails(ev); });
+    $timeline.append(wrapper);
   }
   return dayEvents;
 }
-
 
 function renderSummaryForCurrentDay() {
   let dayStart = new Date(currentDate.getTime()); dayStart.setHours(0, 0, 0, 0);
@@ -479,7 +414,6 @@ function renderSummaryForCurrentDay() {
   const dayEvents = events.filter(ev => ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime());
   renderSummary(dayEvents, dayStart.getTime(), dayEnd.getTime());
 }
-
 
 function renderSummary(evList, startMs, endMs) {
   if (!tracking) {
@@ -494,13 +428,13 @@ function renderSummary(evList, startMs, endMs) {
     let e = Math.min(ev.end, endMs);
     let dur = e - s;
     if (dur < 60000) return;
-    usageMap[ev.title] = (usageMap[ev.title] || 0) + dur;
-    if (ev.title.toLowerCase().includes("youtube") || ev.title.toLowerCase().includes("discord") || ev.title.toLowerCase().includes("facebook"))
+    let app = (ev.details && ev.details.owner && ev.details.owner.name) || extractAppName(ev.title);
+    usageMap[app] = (usageMap[app] || 0) + dur;
+    if (app.toLowerCase().includes("youtube") || app.toLowerCase().includes("discord") || app.toLowerCase().includes("facebook"))
       totalDistracted += dur;
     else
       totalFocused += dur;
   });
-
   if (!tracking) {
     let donutChart = new ApexCharts(document.querySelector("#donutChart"), {
       chart: { type: 'donut', width: 250 },
@@ -510,37 +444,34 @@ function renderSummary(evList, startMs, endMs) {
     });
     donutChart.render();
   }
-
   let fH = Math.floor(totalFocused / 3600000);
   let fM = Math.floor((totalFocused % 3600000) / 60000);
   let dH = Math.floor(totalDistracted / 3600000);
   let dM = Math.floor((totalDistracted % 3600000) / 60000);
   $focusedTime.text(`${fH}h ${fM}m`);
   $distractedTime.text(`${dH}h ${dM}m`);
-
   let usageArray = Object.entries(usageMap).sort((a, b) => b[1] - a[1]);
   $mostUsedList.empty();
-  usageArray.slice(0, 5).forEach(async ([app, ms]) => { // Added async here
+  usageArray.slice(0, 5).forEach(async ([app, ms]) => {
     let mm = Math.round(ms / 60000);
-    const iconUrl = await getCDNIconForAppName(app); // Await icon fetch
+    const iconUrl = getDeviconUrl(app) || `https://img.icons8.com/color/48/000000/${encodeURIComponent(app)}.png`;
     $mostUsedList.append(`<li><img src="${iconUrl}" alt="${app}" style="width:16px; height:16px; margin-right:4px;">${app} - ${mm} min</li>`);
   });
   $topDistractionsList.empty();
   let distractors = usageArray.filter(([app, _]) => app.toLowerCase().includes("youtube") || app.toLowerCase().includes("discord") || app.toLowerCase().includes("facebook"));
-  distractors.slice(0, 5).forEach(async ([app, ms]) => { // Added async here
+  distractors.slice(0, 5).forEach(async ([app, ms]) => {
     let mm = Math.round(ms / 60000);
-    const iconUrl = await getCDNIconForAppName(app); // Await icon fetch
+    const iconUrl = getDeviconUrl(app) || `https://img.icons8.com/color/48/000000/${encodeURIComponent(app)}.png`;
     $topDistractionsList.append(`<li><img src="${iconUrl}" alt="${app}" style="width:16px; height:16px; margin-right:4px;">${app} - ${mm} min</li>`);
   });
 }
-
 
 async function renderView() {
   loadSegmentsFromCSV();
   if (viewMode === "day") {
     $('#dayNav').show();
-    let dayEv = await renderDayView();
-    renderSummaryForCurrentDay(); // Render summary for the current day
+    await renderDayView();
+    renderSummaryForCurrentDay();
   }
 }
 
@@ -552,11 +483,9 @@ function showSegmentDetails(details) {
                         <strong>Start:</strong> ${startStr}<br>
                         <strong>End:</strong> ${endStr}<br>
                         <strong>Duration:</strong> ${duration} min`;
-
   if (details.details) {
     const { details: d } = details;
     const { bounds = {}, owner = {} } = d;
-
     content += `<hr>
                         <strong>Window ID:</strong> ${d.id || ''}<br>
                         <strong>Bounds:</strong> x: ${bounds.x || ''}, y: ${bounds.y || ''}, width: ${bounds.width || ''}, height: ${bounds.height || ''}<br>
@@ -566,269 +495,45 @@ function showSegmentDetails(details) {
                         <strong>URL:</strong> ${d.url || ''}<br>
                         <strong>Memory Usage:</strong> ${d.memoryUsage || ''}`;
   }
-
-  const $segmentDetailsContent = $("#segmentDetailsContent");
-  if ($segmentDetailsContent.length) {
-    $segmentDetailsContent.html(content);
-  }
-
-  const $segmentDetailsModal = $("#segmentDetailsModal");
-  if ($segmentDetailsModal.length) {
-    $segmentDetailsModal.modal("show");
-  }
+  $("#segmentDetailsContent").html(content);
+  $("#segmentDetailsModal").modal("show");
 }
-
-
-let userGoals = [];
-
-function initGoals() {
-  try {
-    const savedGoals = localStorage.getItem('timeTrackerGoals');
-    userGoals = savedGoals ? JSON.parse(savedGoals) : [];
-    updateGoalsDisplay();
-  } catch (e) {
-    console.error('Error loading goals:', e);
-  }
-}
-
-function updateGoalsDisplay() {
-  const $goalsList = $('.goals-list');
-  if (!$goalsList.length) return;
-  $goalsList.empty();
-
-  userGoals.forEach((goal, index) => {
-    const progress = calculateGoalProgress(goal);
-    const goalTypeSymbol = goal.type === 'focus' ? '🎯' : '⚠️';
-    const progressBarClass = goal.type === 'focus' ? 'bg-success' : 'bg-warning';
-
-    $goalsList.append(`
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span>${goalTypeSymbol} ${goal.description}</span>
-                <div class="progress" style="width: 60%">
-                    <div class="progress-bar ${progressBarClass}"
-                            role="progressbar"
-                            style="width: ${progress}%"
-                            aria-valuenow="${progress}"
-                            aria-valuemin="0"
-                            aria-valuemax="100">
-                        ${progress}%
-                    </div>
-                </div>
-            </div>
-        `);
-  });
-}
-
-function calculateGoalProgress(goal) {
-  const stats = getTimeStats();
-
-  switch (goal.type) {
-    case 'focus':
-      return Math.min(100, (stats.focusedHours / goal.target) * 100);
-    case 'reduce':
-      return Math.min(100, (1 - stats.distractedHours / goal.target) * 100);
-    default:
-      return 0;
-  }
-}
-
-$('#saveGoalBtn').click(() => {
-  const goal = {
-    type: $('#goalType').val(),
-    target: parseFloat($('#goalTarget').val()),
-    duration: $('#goalDuration').val(),
-    description: `${$('#goalType').val() === 'focus' ? 'Increase focus to' : 'Reduce distractions to'} ${$('#goalTarget').val()}h per ${$('#goalDuration').val()}`,
-    createdAt: Date.now()
-  };
-
-  userGoals.push(goal);
-  localStorage.setItem('timeTrackerGoals', JSON.stringify(userGoals));
-  updateGoalsDisplay();
-  $('#goalsModal').modal('hide');
-});
 
 $(document).ready(async () => {
   loadSettings();
   initSettingsUI();
   applySettings();
-  await renderView(); // Initial render on load
-  initGoals();
-  renderSummaryForCurrentDay(); // Initial summary render
+  await renderView();
 });
 
-function updateProductivityScore() {
-  const stats = getTimeStats();
-  const totalTime = stats.focusedHours + stats.distractedHours;
-  const score = totalTime > 0 ? Math.round((stats.focusedHours / totalTime) * 100) : 0;
-
-  $('.progress-ring').attr('data-progress', score);
-  $('.progress-ring').css('--progress', `${score * 3.6}deg`);
-}
-
-function onEventsUpdated() {
-  updateGoalsDisplay();
-  updateProductivityScore();
-}
-
-const CategoryManager = {
-  categories: new Map([
-    ['productivity', ['code editor', 'terminal', 'document', 'email', 'meeting']],
-    ['development', ['visual studio', 'github', 'git', 'node', 'npm']],
-    ['communication', ['slack', 'teams', 'zoom', 'skype', 'discord']],
-    ['entertainment', ['youtube', 'netflix', 'spotify', 'game', 'social media']],
-    ['distraction', ['facebook', 'twitter', 'instagram', 'reddit', 'tiktok']]
-  ]),
-
-  classifyApp(appTitle, appPath) {
-    const titleLower = appTitle.toLowerCase();
-    const pathLower = (appPath || '').toLowerCase();
-
-    for (const [category, keywords] of this.categories) {
-      if (keywords.some(keyword =>
-        titleLower.includes(keyword) || pathLower.includes(keyword)
-      )) {
-        return category;
-      }
-    }
-    return 'uncategorized';
-  },
-
-  isProductiveApp(appTitle, appPath) {
-    const category = this.classifyApp(appTitle, appPath);
-    return ['productivity', 'development'].includes(category);
-  },
-
-  isDistractionApp(appTitle, appPath) {
-    const category = this.classifyApp(appTitle, appPath);
-    return ['entertainment', 'distraction'].includes(category);
-  }
-};
-
-const GoalManager = {
-  activeGoals: new Map(),
-
-  initializeDefaultGoals() {
-    this.activeGoals.set('productivityDaily', {
-      type: 'focus',
-      target: 6,
-      period: 'daily',
-      description: 'Maintain 6 hours of productive work daily'
-    });
-
-    this.activeGoals.set('distractionLimit', {
-      type: 'reduce',
-      target: 1,
-      period: 'daily',
-      description: 'Limit distractions to 1 hour per day'
-    });
-  },
-
-  calculateProgress(goalId) {
-    const goal = this.activeGoals.get(goalId);
-    if (!goal) return 0;
-
-    const stats = this.getTimeStats(goal.period);
-
-    switch (goal.type) {
-      case 'focus':
-        return Math.min(100, (stats.focusedHours / goal.target) * 100);
-      case 'reduce':
-        return Math.min(100, (1 - (stats.distractedHours / goal.target)) * 100);
-      default:
-        return 0;
-    }
-  },
-
-  getTimeStats(period = 'daily') {
-    const now = Date.now();
-    const periodStart = this.getPeriodStart(period);
-
-    const relevantEvents = events.filter(ev =>
-      ev.end >= periodStart && ev.start <= now
-    );
-
-    let focusedTime = 0;
-    let distractedTime = 0;
-
-    relevantEvents.forEach(ev => {
-      const duration = ev.end - ev.start;
-      if (CategoryManager.isProductiveApp(ev.title, ev.details?.owner?.path)) {
-        focusedTime += duration;
-      } else if (CategoryManager.isDistractionApp(ev.title, ev.details?.owner?.path)) {
-        distractedTime += duration;
-      }
-    });
-
-    return {
-      focusedHours: focusedTime / 3600000,
-      distractedHours: distractedTime / 3600000
-    };
-  },
-
-  getPeriodStart(period) {
-    const now = new Date();
-    switch (period) {
-      case 'daily':
-        return new Date(now).setHours(0, 0, 0, 0);
-      case 'weekly':
-        return new Date(now.setDate(now.getDate() - now.getDay())).setHours(0, 0, 0, 0);
-      case 'monthly':
-        return new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-      default:
-        return new Date(now).setHours(0, 0, 0, 0);
+ipcRenderer.on('active-window-data', (e, data) => {
+  if (!tracking) return;
+  let now = Date.now();
+  if (!currentSegment) {
+    currentSegment = { title: data.title, start: now, end: now, details: data };
+  } else {
+    if (currentSegment.title === data.title) {
+      currentSegment.end = now;
+    } else {
+      events.push(currentSegment);
+      currentSegment = { title: data.title, start: now, end: now, details: data };
     }
   }
-};
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  GoalManager.initializeDefaultGoals();
-  updateGoalsDisplay();
+  saveSegmentsToCSV();
+  const currentTime = Date.now();
+  if (currentTime - lastSegmentUpdateTime > 5000) {
+    renderDayView();
+    lastSegmentUpdateTime = currentTime;
+  }
+  renderSummaryForCurrentDay();
 });
 
-function updateGoalsDisplay() {
-  const $goalsList = $('.goals-list');
-  if (!$goalsList.length) return;
-
-  $goalsList.empty();
-
-  GoalManager.activeGoals.forEach((goal, goalId) => {
-    const progress = GoalManager.calculateProgress(goalId);
-    const progressBarClass = goal.type === 'focus' ? 'bg-success' : 'bg-warning';
-
-    $goalsList.append(`
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <span>${goal.description}</span>
-                <div class="progress" style="width: 60%">
-                    <div class="progress-bar ${progressBarClass}"
-                            role="progressbar"
-                            style="width: ${progress}%"
-                            aria-valuenow="${progress}"
-                            aria-valuemin="0"
-                            aria-valuemax="100">
-                        ${Math.round(progress)}%
-                    </div>
-                </div>
-            </div>
-        `);
-  });
-
-  updateProductivityScore();
-}
-
-function updateProductivityScore() {
-  const stats = GoalManager.getTimeStats('daily');
-  const totalTime = stats.focusedHours + stats.distractedHours;
-  const score = totalTime > 0
-    ? Math.round((stats.focusedHours / totalTime) * 100)
-    : 0;
-
-  $('.progress-ring').attr('data-progress', score);
-  $('.progress-ring').css('--progress', `${score * 3.6}deg`);
-}
-
-if (tracking) {
-  setInterval(() => {
-    updateGoalsDisplay();
-  }, 60000);
-}
+$(document).keydown((e) => {
+  if (e.ctrlKey && e.key === ',') {
+    zoomLevel = Math.min(10.0, zoomLevel + 0.2);
+    renderView();
+  } else if (e.ctrlKey && e.key === '.') {
+    zoomLevel = Math.max(0.1, zoomLevel - 0.2);
+    renderView();
+  }
+});
