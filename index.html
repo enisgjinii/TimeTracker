@@ -2,421 +2,1749 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Time Tracker Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap"
-        rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>TimeTracker Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #3a86ff;
+            --primary-hover: #2a75ee;
+            --secondary: #8338ec;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --focus: #4CAF50;
+            --focus-hover: #3d9c40;
+            --distraction: #F44336;
+            --distraction-hover: #e53935;
+            --neutral: #64748b;
+            --card-bg: #ffffff;
+            --border: rgba(0, 0, 0, 0.05);
+            --success: #00c853;
+            --warning: #ffd600;
+            --info: #2196F3;
+        }
+
         body {
-            font-family: "Open Sans", sans-serif;
-            background: #f8fafc;
-            color: #0f172a;
-            margin: 0;
-            padding: 10px;
-            font-size: 0.9rem;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
             transition: background-color 0.3s, color 0.3s;
-            /* Smooth transition for theme changes */
+            padding: 1rem;
         }
 
-        .dark-mode {
-            background: #0f172a;
-            color: #f8fafc;
+        body.dark-mode {
+            --card-bg: #242f3f;
+            --border: rgba(255, 255, 255, 0.1);
+            background-color: var(--dark);
+            color: var(--light);
         }
 
-        /* Removed sidebar styles */
-
-        .content {
-            margin-left: auto;
-            padding: 1rem 1.5rem;
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
         }
 
-        .top-bar {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 0.8rem 1rem;
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
             margin-bottom: 1rem;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .dark-mode .top-bar {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        #appTitle {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2563eb;
-            margin: 0;
-        }
-
-        .view-toggle {
-            background: #f1f5f9;
-            padding: 0.15rem;
-            border-radius: 8px;
-            display: flex;
-            gap: 0.15rem;
-        }
-
-        .dark-mode .view-toggle {
-            background: #2d3748;
-        }
-
-        .view-toggle button {
-            border: none;
-            background: transparent;
-            color: #64748b;
-            padding: 0.4rem 0.7rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .view-toggle button:hover {
-            background: #ffffff;
-            color: #2563eb;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-        }
-
-        .view-toggle button.active {
-            background: #ffffff;
-            color: #2563eb;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-        }
-
-        .dark-mode .view-toggle button:hover,
-        .dark-mode .view-toggle button.active {
-            background: #1e293b;
-            color: #ffffff;
+        .card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
         }
 
         .timeline-container {
-            flex: 2;
             position: relative;
+            height: 480px;
             overflow-y: auto;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            padding-left: 80px;
-            min-height: 500px;
+            padding-left: 70px;
+            scrollbar-width: thin;
         }
 
-        .dark-mode .timeline-container {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .timeline-container::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .hour-label {
+        .timeline-container::-webkit-scrollbar-thumb {
+            background-color: var(--neutral);
+            border-radius: 4px;
+        }
+
+        .timeline-container::-webkit-scrollbar-track {
+            background-color: var(--border);
+        }
+
+        .hour-marker {
             position: absolute;
             left: 0;
-            width: 65px;
+            width: 60px;
+            padding: 0.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--neutral);
             font-size: 0.8rem;
-            color: #64748b;
-            border-top: 1px solid #e2e8f0;
-            padding: 0.4rem;
             text-align: right;
-            font-weight: 500;
         }
 
-        .hour-label:hover {
-            color: #2563eb;
+        .current-time-marker {
+            position: absolute;
+            left: 70px;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary);
+            z-index: 10;
         }
 
-        .dark-mode .hour-label {
-            color: #94a3b8;
-            border-top: 1px solid #2d3748;
+        .current-time-label {
+            position: absolute;
+            left: 0;
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            border-radius: 3px;
+            transform: translateY(-50%);
         }
 
-        .entry {
+        .time-entry {
             position: absolute;
             border-radius: 6px;
-            font-size: 0.8rem;
-            color: #fff;
             padding: 0.4rem 0.6rem;
+            font-size: 0.8rem;
+            color: white;
             overflow: hidden;
-            white-space: nowrap;
             text-overflow: ellipsis;
+            white-space: nowrap;
             cursor: pointer;
+            transition: all 0.2s;
+            z-index: 5;
         }
 
-        .entry:hover {
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        .time-entry:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .entry.focus {
-            background: #2563eb;
+        .time-entry.focus {
+            background-color: var(--focus);
         }
 
-        .entry.distraction {
-            background: #dc2626;
+        .time-entry.focus:hover {
+            background-color: var(--focus-hover);
         }
 
-        .entry.singleColor {
-            background: #6366f1;
+        .time-entry.distraction {
+            background-color: var(--distraction);
         }
 
-        .summary-panel {
-            flex: 1;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(0, 0, 0, 0.04);
-            padding: 1rem;
-            min-height: 500px;
-            margin-left: 1rem;
+        .time-entry.distraction:hover {
+            background-color: var(--distraction-hover);
         }
 
-        .dark-mode .summary-panel {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .time-entry.meeting {
+            background-color: var(--secondary);
         }
 
-        .summary-panel h5 {
-            color: #2563eb;
-            font-weight: 600;
-            font-size: 1rem;
+        .time-entry.break {
+            background-color: var(--info);
+        }
+
+        .time-entry.idle {
+            background-color: #757575;
+        }
+
+        .time-entry.idle:hover {
+            background-color: #616161;
+        }
+
+        .btn-toggle {
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            padding: 0.4rem 1rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .view-tabs {
+            border-bottom: 1px solid var(--border);
             margin-bottom: 1rem;
         }
 
-        .summary-item {
-            font-size: 0.8rem;
-            margin-bottom: 0.8rem;
-            padding: 0.6rem;
-            background: #f8fafc;
+        .view-tabs .nav-link {
+            border: none;
+            color: var(--neutral);
+            position: relative;
+            padding: 0.7rem 1.5rem;
+            font-weight: 500;
+        }
+
+        .view-tabs .nav-link.active {
+            color: var(--primary);
+            background-color: transparent;
+        }
+
+        .view-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .stat-card {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
             border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.04);
+            background-color: rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
         }
 
-        .summary-item:hover {
-            background: #f1f5f9;
-            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
+        body.dark-mode .stat-card {
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
-        .dark-mode .summary-item {
-            background: #2d3748;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .stat-card:hover {
+            background-color: rgba(0, 0, 0, 0.04);
         }
 
-        .dark-mode .summary-item:hover {
-            background: #374151;
+        body.dark-mode .stat-card:hover {
+            background-color: rgba(255, 255, 255, 0.08);
         }
 
-        .btn {
+        .theme-toggle {
+            background: transparent;
+            border: none;
+            color: var(--neutral);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .theme-toggle:hover {
+            color: var(--primary);
+        }
+
+        .productivity-score {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .trend-up {
+            color: var(--focus);
+        }
+
+        .trend-down {
+            color: var(--distraction);
+        }
+
+        .pomodoro-container {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .timer-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 1rem 0;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        body.dark-mode .tag {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .tag:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .goal-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 1rem;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.02);
+            transition: all 0.2s;
+        }
+
+        body.dark-mode .goal-card {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .goal-card:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+
+        .goal-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .goal-content {
+            flex: 1;
+        }
+
+        .goal-progress {
+            width: 60px;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .export-dropdown {
+            position: relative;
+        }
+
+        .export-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 0;
+            min-width: 150px;
+            z-index: 100;
+            display: none;
+        }
+
+        .export-dropdown-menu.show {
+            display: block;
+        }
+
+        .export-dropdown-item {
             padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-weight: 500;
-            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .btn-success {
-            background: #2563eb;
-            border: none;
+        .export-dropdown-item:hover {
+            background-color: rgba(0, 0, 0, 0.05);
         }
 
-        .btn-success:hover {
-            background: #1d4ed8;
+        body.dark-mode .export-dropdown-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
-        .btn-mode {
-            /* New style for mode buttons */
-            padding: 0.4rem 0.7rem;
+        .time-filter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .time-filter select {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background-color: var(--card-bg);
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        body.dark-mode .time-filter select {
+            color: var(--light);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: transform 0.2s;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .stats-label {
+            color: var(--neutral);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .timeline-container {
+                height: 400px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--dark);
+            color: #fff;
+            text-align: center;
             border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
             font-size: 0.8rem;
-            font-weight: 500;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .btn-tracking-active {
+            animation: pulse 1.5s infinite;
+            background-color: var(--distraction);
+            border-color: var(--distraction);
+        }
+
+        .custom-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .custom-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--neutral);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .switch-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.switch-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked+.switch-slider:before {
+            transform: translateX(26px);
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background-color: var(--card-bg);
+            width: 100%;
+            color: var(--dark);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        body.dark-mode .search-input {
+            color: var(--light);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--neutral);
+        }
+
+        .notification-badge {
+            position: relative;
+            display: inline-block;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--distraction);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background-color: var(--card-bg);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: right 0.3s;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        .settings-panel.show {
+            right: 0;
+        }
+
+        .settings-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: transparent;
             border: none;
-            background: #f1f5f9;
-            color: #64748b;
-            margin-left: 0.2rem;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--dark);
         }
 
-        .btn-mode:hover,
-        .btn-mode.active {
-            background: #ffffff;
-            color: #2563eb;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        body.dark-mode .settings-close {
+            color: var(--light);
         }
 
-        .dark-mode .btn-mode {
-            background: #2d3748;
-            color: #e2e8f0;
+        .settings-section {
+            margin-bottom: 2rem;
         }
 
-        .dark-mode .btn-mode:hover,
-        .dark-mode .btn-mode.active {
-            background: #1e293b;
-            color: #ffffff;
+        .settings-section h5 {
+            position: relative;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
         }
 
+        .settings-section h5::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary);
+        }
+
+        .settings-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .settings-label {
+            font-weight: 500;
+        }
+
+        .settings-description {
+            color: var(--neutral);
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .add-entry-form {
+            margin-top: 1rem;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .tag-item {
+            background-color: rgba(58, 134, 255, 0.1);
+            color: var(--primary);
+            padding: 0.2rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .tag-item:hover {
+            background-color: rgba(58, 134, 255, 0.2);
+        }
+
+        .tag-remove {
+            color: var(--primary);
+            font-size: 0.7rem;
+        }
+
+        .week-view {
+            display: grid;
+            grid-template-columns: 50px repeat(7, 1fr);
+            gap: 5px;
+            overflow-x: auto;
+        }
+
+        .week-header {
+            display: grid;
+            grid-template-columns: 50px repeat(7, 1fr);
+            gap: 5px;
+            text-align: center;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .week-hour {
+            grid-column: 1;
+            text-align: right;
+            color: var(--neutral);
+            font-size: 0.8rem;
+            padding-right: 0.5rem;
+        }
+
+        .week-day-col {
+            display: flex;
+            flex-direction: column;
+            min-height: 480px;
+            position: relative;
+        }
+
+        .current-day {
+            background-color: rgba(58, 134, 255, 0.05);
+            border-radius: 4px;
+        }
 
         .modal-content {
-            border-radius: 12px;
             border: none;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
-        }
-
-        .dark-mode .modal-content {
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
         }
 
         .modal-header {
-            border-bottom: 1px solid #e2e8f0;
-            padding: 1rem;
+            border-bottom-color: var(--border);
         }
 
-        .dark-mode .modal-header {
-            border-bottom: 1px solid #2d3748;
+        .modal-footer {
+            border-top-color: var(--border);
         }
 
-        .modal-body {
-            padding: 1rem;
+        .step-navigation {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
         }
 
-        .toast-container {
-            padding: 0.8rem;
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--neutral);
+            margin: 0 5px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .toast {
-            border-radius: 10px;
-            box-shadow: 0 3px 5px -1px rgba(0, 0, 0, 0.08), 0 1px 3px -1px rgba(0, 0, 0, 0.05);
+        .step-dot.active {
+            background-color: var(--primary);
+            transform: scale(1.2);
         }
 
-        .form-select,
-        .form-control {
-            border-radius: 6px;
-            font-size: 0.85rem;
+        .category-pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 5px;
         }
 
-        /* Removed Glass Morphism, Progress Ring, Card Hover, Animated Icons, Timeline & Category Tag styles */
-        /* Only keeping essential styles for Timeline and Summary */
+        .category-work {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--focus);
+        }
+
+        .category-meeting {
+            background-color: rgba(131, 56, 236, 0.1);
+            color: var(--secondary);
+        }
+
+        .category-break {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: var(--info);
+        }
+
+        .category-distraction {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--distraction);
+        }
+
+        .category-legend {
+            display: flex;
+            gap: 15px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .legend-color-box {
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+        }
+
+        .legend-focus {
+            background-color: var(--focus);
+        }
+
+        .legend-meeting {
+            background-color: var(--secondary);
+        }
+
+        .legend-break {
+            background-color: var(--info);
+        }
+
+        .legend-distraction {
+            background-color: var(--distraction);
+        }
+
+        .legend-idle {
+            background-color: #757575;
+        }
+
+        .legend-item:hover {
+            opacity: 0.8;
+        }
     </style>
 </head>
 
 <body>
-    <div class="content">
-        <div class="top-bar">
-            <h2 id="appTitle">Dashboard <span>⏳</span></h2>
-            <div>
-                <button id="toggleTracking" class="btn btn-success btn-sm">Start Tracking</button>
-                <div class="view-toggle" style="margin-left: 0.5rem; display: inline-flex;">
-                    <button id="lightModeBtn" class="btn-mode">Light</button>
-                    <button id="darkModeBtn" class="btn-mode">Dark</button>
-                    <button id="systemModeBtn" class="btn-mode active">System</button>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h2>⏱️ TimeTracker Pro</h2>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="dropdown export-dropdown">
+                    <button class="btn btn-outline-secondary btn-sm btn-toggle" id="exportDropdownBtn">
+                        <i class="fas fa-download me-1"></i> Export
+                    </button>
+                    <div class="export-dropdown-menu" id="exportDropdownMenu">
+                        <div class="export-dropdown-item" id="exportCsv">
+                            <i class="fas fa-file-csv"></i> Export as CSV
+                        </div>
+                        <div class="export-dropdown-item" id="exportPdf">
+                            <i class="fas fa-file-pdf"></i> Export as PDF
+                        </div>
+                        <div class="export-dropdown-item" id="exportJson">
+                            <i class="fas fa-file-code"></i> Export as JSON
+                        </div>
+                    </div>
                 </div>
+                <button id="notificationsBtn" class="btn btn-outline-secondary btn-sm btn-toggle notification-badge">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count">2</span>
+                </button>
+                <button id="settingsBtn" class="btn btn-outline-secondary btn-sm btn-toggle">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="toggleTracking" class="btn btn-primary btn-toggle">
+                    <i class="fas fa-play me-1"></i> Start Tracking
+                </button>
+                <button id="themeToggle" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
         </div>
-        <div class="d-flex align-items-center mb-2">
-            <div class="view-toggle me-2">
-                <button id="dayViewBtn" class="btn btn-outline-primary btn-sm active">Day</button>
-            </div>
-            <div id="dayNav" class="d-flex align-items-center">
-                <button id="prevDay" class="btn btn-outline-primary btn-sm me-1">← Prev</button>
-                <button id="todayBtn" class="btn btn-outline-primary btn-sm me-1">Today</button>
-                <button id="nextDay" class="btn btn-outline-primary btn-sm">Next →</button>
-                <h5 class="ms-2 mb-0" id="currentDateLabel"></h5>
-            </div>
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search activities, apps, or categories...">
         </div>
-        <p class="text-muted small">Press <kbd>CTRL + ,</kbd> Zoom In | <kbd>CTRL + .</kbd> Zoom Out</p>
-        <div class="row-layout d-flex">
-            <div id="timeline" class="timeline-container"></div>
-            <div class="summary-panel">
-                <h5>📊 Summary</h5>
-                <div id="donutChart" style="max-width: 200px; margin-bottom:15px;"></div>
-                <div class="summary-item">
-                    <span class="me-1">🎯</span>Focused: <span id="focusedTime">0h 0m</span>
+        <ul class="nav nav-pills view-tabs mb-3">
+            <li class="nav-item">
+                <a class="nav-link active" id="dayViewTab" data-bs-toggle="pill" href="#dayView">Day</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="weekViewTab" data-bs-toggle="pill" href="#weekView">Week</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="monthViewTab" data-bs-toggle="pill" href="#monthView">Month</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="statsViewTab" data-bs-toggle="pill" href="#statsView">Statistics</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="pomodoroViewTab" data-bs-toggle="pill" href="#pomodoroView">Pomodoro</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="goalsViewTab" data-bs-toggle="pill" href="#goalsView">Goals</a>
+            </li>
+        </ul>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="btn-group">
+                <button id="prevDay" class="btn btn-sm btn-outline-secondary btn-toggle">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button id="todayBtn" class="btn btn-sm btn-outline-secondary btn-toggle">Today</button>
+                <button id="nextDay" class="btn btn-sm btn-outline-secondary btn-toggle">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <h5 id="currentDateLabel" class="mb-0">Date</h5>
+            <button id="addEntryBtn" class="btn btn-sm btn-primary btn-toggle">
+                <i class="fas fa-plus me-1"></i> Add Entry
+            </button>
+        </div>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="dayView">
+                <div class="category-legend">
+                    <div class="legend-item" data-category="focus">
+                        <div class="legend-color-box legend-focus"></div> Focus
+                    </div>
+                    <div class="legend-item" data-category="meeting">
+                        <div class="legend-color-box legend-meeting"></div> Meeting
+                    </div>
+                    <div class="legend-item" data-category="break">
+                        <div class="legend-color-box legend-break"></div> Break
+                    </div>
+                    <div class="legend-item" data-category="distraction">
+                        <div class="legend-color-box legend-distraction"></div> Distraction
+                    </div>
+                    <div class="legend-item" data-category="idle">
+                        <div class="legend-color-box legend-idle"></div> Idle
+                    </div>
                 </div>
-                <div class="summary-item">
-                    <span class="me-1">⚠️</span>Distracted: <span id="distractedTime">0h 0m</span>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Timeline</h5>
+                                <div class="time-filter">
+                                    <label class="mb-0 me-2">Filter:</label>
+                                    <select id="categoryFilter" class="form-select form-select-sm">
+                                        <option value="all">All Categories</option>
+                                        <option value="focus">Focused Work</option>
+                                        <option value="meeting">Meetings</option>
+                                        <option value="break">Breaks</option>
+                                        <option value="distraction">Distractions</option>
+                                        <option value="idle">Idle</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body p-0">
+                                <div id="timeline" class="timeline-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="card mb-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Today's Focus</h5>
+                                <div class="tooltip">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span class="tooltip-text">Your productivity score for today</span>
+                                </div>
+                            </div>
+                            <div class="card-body text-center">
+                                <div id="productivityChart" style="height: 200px; margin: 0 auto;"></div>
+                                <div class="mt-2">
+                                    <div class="productivity-score">78<small>%</small></div>
+                                    <div class="trend-indicator trend-up">
+                                        <i class="fas fa-arrow-up"></i> 5% from yesterday
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div><i class="fas fa-bullseye text-success me-2"></i> Focus Time</div>
+                                    <strong id="focusedTime">0h 0m</strong>
+                                </div>
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div><i class="fas fa-users text-info me-2"></i> Meeting Time</div>
+                                    <strong id="meetingTime">0h 0m</strong>
+                                </div>
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div><i class="fas fa-coffee text-primary me-2"></i> Break Time</div>
+                                    <strong id="breakTime">0h 0m</strong>
+                                </div>
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div><i class="fas fa-exclamation-triangle text-danger me-2"></i> Distractions</div>
+                                    <strong id="distractedTime">0h 0m</strong>
+                                </div>
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div><i class="fas fa-bed me-2"></i> Idle Time</div>
+                                    <strong id="idleTime">0h 0m</strong>
+                                </div>
+                                <hr>
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div>Total Tracked Today</div>
+                                    <strong id="totalTracked">0h 0m</strong>
+                                </div>
+                                <h6 class="mt-4 mb-3">Top Applications</h6>
+                                <ul id="mostUsedList" class="list-unstyled"></ul>
+                                <h6 class="mt-4 mb-3">Top Distractions</h6>
+                                <ul id="topDistractionsList" class="list-unstyled"></ul>
+                                <div class="mt-4">
+                                    <h6 class="mb-3">Tags</h6>
+                                    <div class="tag-list">
+                                        <div class="tag-item">
+                                            Project X <span class="tag-remove"><i class="fas fa-times"></i></span>
+                                        </div>
+                                        <div class="tag-item">
+                                            Frontend <span class="tag-remove"><i class="fas fa-times"></i></span>
+                                        </div>
+                                        <div class="tag-item">
+                                            Bug fixing <span class="tag-remove"><i class="fas fa-times"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <hr class="my-2" />
-                <h5>⭐ Most Used</h5>
-                <ul id="mostUsedList" class="list-unstyled"></ul>
-                <hr class="my-2" />
-                <h5>📱 Distractions</h5>
-                <ul id="topDistractionsList" class="list-unstyled"></ul>
+            </div>
+            <div class="tab-pane fade" id="weekView">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Weekly Overview</h5>
+                        <div class="time-filter">
+                            <label class="mb-0 me-2">View by:</label>
+                            <select id="weekViewType" class="form-select form-select-sm">
+                                <option value="activities">Activities</option>
+                                <option value="categories">Categories</option>
+                                <option value="applications">Applications</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="week-header">
+                            <div></div>
+                            <div>Mon</div>
+                            <div>Tue</div>
+                            <div>Wed</div>
+                            <div>Thu</div>
+                            <div>Fri</div>
+                            <div>Sat</div>
+                            <div>Sun</div>
+                        </div>
+                        <div class="week-view"></div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Weekly Activity Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="weeklyDistributionChart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Week Summary</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div>Total Tracked</div>
+                                    <strong>32h 15m</strong>
+                                </div>
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div>Focus Time</div>
+                                    <strong>23h 40m</strong>
+                                </div>
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div>Meeting Time</div>
+                                    <strong>5h 30m</strong>
+                                </div>
+                                <div class="stat-card d-flex justify-content-between">
+                                    <div>Distractions</div>
+                                    <strong>3h 05m</strong>
+                                </div>
+                                <div class="mt-4">
+                                    <h6>Most Productive Day</h6>
+                                    <p class="fs-5 fw-bold">Wednesday <span class="text-success">92%</span></p>
+                                </div>
+                                <div class="mt-3">
+                                    <h6>Least Productive Day</h6>
+                                    <p class="fs-5 fw-bold">Monday <span class="text-danger">64%</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="monthView">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Monthly Progress</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="monthlyProgressChart" style="height: 300px;"></div>
+                    </div>
+                </div>
+                <div class="dashboard-grid mt-4">
+                    <div class="stats-card">
+                        <div class="stats-label">Total Hours</div>
+                        <div class="stats-value">128.5</div>
+                        <div class="trend-indicator trend-up">
+                            <i class="fas fa-arrow-up"></i> 12% from last month
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-label">Avg. Daily Hours</div>
+                        <div class="stats-value">6.4</div>
+                        <div class="trend-indicator trend-up">
+                            <i class="fas fa-arrow-up"></i> 8% from last month
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-label">Focus Ratio</div>
+                        <div class="stats-value">73%</div>
+                        <div class="trend-indicator trend-down">
+                            <i class="fas fa-arrow-down"></i> 3% from last month
+                        </div>
+                    </div>
+                    <div class="stats-card">
+                        <div class="stats-label">Distraction Time</div>
+                        <div class="stats-value">18.2h</div>
+                        <div class="trend-indicator trend-down">
+                            <i class="fas fa-arrow-down"></i> 5% from last month
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Top Categories</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="monthCategoriesChart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Daily Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="monthDailyDistributionChart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Focus Heatmap</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="monthlyHeatmap" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="statsView">
+                <div class="time-filter mb-4">
+                    <label class="mb-0 me-2">Time Period:</label>
+                    <select id="statsPeriod" class="form-select form-select-sm">
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="quarter">Last 3 Months</option>
+                        <option value="year">This Year</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
+                <div class="dashboard-grid">
+                    <div class="stats-card">
+                        <i class="fas fa-clock text-primary fs-4 mb-2"></i>
+                        <div class="stats-label">Total Tracked</div>
+                        <div class="stats-value">42.5h</div>
+                    </div>
+                    <div class="stats-card">
+                        <i class="fas fa-bullseye text-success fs-4 mb-2"></i>
+                        <div class="stats-label">Focus Time</div>
+                        <div class="stats-value">32.2h</div>
+                    </div>
+                    <div class="stats-card">
+                        <i class="fas fa-users text-info fs-4 mb-2"></i>
+                        <div class="stats-label">Meeting Time</div>
+                        <div class="stats-value">5.8h</div>
+                    </div>
+                    <div class="stats-card">
+                        <i class="fas fa-exclamation-triangle text-danger fs-4 mb-2"></i>
+                        <div class="stats-label">Distraction Time</div>
+                        <div class="stats-value">4.5h</div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Time Distribution Trends</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="timeDistributionChart" style="height: 350px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Category Breakdown</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="categoryBreakdownChart" style="height: 350px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Most Used Applications</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="appUsageChart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Productivity by Hour</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="hourlyProductivityChart" style="height: 300px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="pomodoroView">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Pomodoro Timer</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="pomodoro-container">
+                                    <div class="timer-display" id="pomodoroTimer">25:00</div>
+                                    <div class="timer-controls">
+                                        <button id="startPomodoroBtn" class="btn btn-primary btn-toggle">
+                                            <i class="fas fa-play me-1"></i> Start
+                                        </button>
+                                        <button id="pausePomodoroBtn" class="btn btn-secondary btn-toggle" disabled>
+                                            <i class="fas fa-pause me-1"></i> Pause
+                                        </button>
+                                        <button id="resetPomodoroBtn" class="btn btn-outline-secondary btn-toggle">
+                                            <i class="fas fa-redo me-1"></i> Reset
+                                        </button>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h6>Session Type</h6>
+                                        <div class="btn-group w-100 mb-3">
+                                            <button id="focusSessionBtn" class="btn btn-outline-primary active">Focus
+                                                (25m)</button>
+                                            <button id="shortBreakBtn" class="btn btn-outline-primary">Short Break
+                                                (5m)</button>
+                                            <button id="longBreakBtn" class="btn btn-outline-primary">Long Break
+                                                (15m)</button>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="pomodoroTask" class="form-label">Current Task</label>
+                                            <input type="text" class="form-control" id="pomodoroTask"
+                                                placeholder="What are you working on?">
+                                        </div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="autoStartBreaksCheck">
+                                            <label class="form-check-label" for="autoStartBreaksCheck">Auto-start
+                                                breaks</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                id="autoStartPomodorosCheck">
+                                            <label class="form-check-label" for="autoStartPomodorosCheck">Auto-start
+                                                pomodoros</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Pomodoro Statistics</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="dashboard-grid">
+                                    <div class="stats-card">
+                                        <div class="stats-label">Today's Pomodoros</div>
+                                        <div class="stats-value">5</div>
+                                    </div>
+                                    <div class="stats-card">
+                                        <div class="stats-label">This Week</div>
+                                        <div class="stats-value">23</div>
+                                    </div>
+                                    <div class="stats-card">
+                                        <div class="stats-label">Focus Time</div>
+                                        <div class="stats-value">2h 5m</div>
+                                    </div>
+                                    <div class="stats-card">
+                                        <div class="stats-label">Completion Rate</div>
+                                        <div class="stats-value">87%</div>
+                                    </div>
+                                </div>
+                                <div id="pomodoroHistoryChart" class="mt-4" style="height: 200px;"></div>
+                                <h6 class="mt-4">Today's Completed Sessions</h6>
+                                <ul class="list-group mt-2">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="badge bg-primary me-2">Focus</span>
+                                            Code Refactoring
+                                        </div>
+                                        <span>25m</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="badge bg-info me-2">Break</span>
+                                            Short Break
+                                        </div>
+                                        <span>5m</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="badge bg-primary me-2">Focus</span>
+                                            API Integration
+                                        </div>
+                                        <span>25m</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="goalsView">
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Current Goals</h5>
+                                <button class="btn btn-sm btn-primary btn-toggle" id="addGoalBtn">
+                                    <i class="fas fa-plus me-1"></i> New Goal
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="goal-card">
+                                    <div class="goal-icon">
+                                        <i class="fas fa-laptop-code"></i>
+                                    </div>
+                                    <div class="goal-content">
+                                        <h6>Daily Focus Time</h6>
+                                        <p class="mb-1">4 hours of focused work daily</p>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: 75%;"
+                                                aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="goal-progress">75%</div>
+                                </div>
+                                <div class="goal-card">
+                                    <div class="goal-icon">
+                                        <i class="fas fa-ban"></i>
+                                    </div>
+                                    <div class="goal-content">
+                                        <h6>Reduce Distractions</h6>
+                                        <p class="mb-1">Less than 1 hour of distractions daily</p>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 50%;"
+                                                aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="goal-progress">50%</div>
+                                </div>
+                                <div class="goal-card">
+                                    <div class="goal-icon">
+                                        <i class="fas fa-project-diagram"></i>
+                                    </div>
+                                    <div class="goal-content">
+                                        <h6>Project X Completion</h6>
+                                        <p class="mb-1">20 hours of work on Project X this week</p>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-primary" role="progressbar" style="width: 35%;"
+                                                aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="goal-progress">35%</div>
+                                </div>
+                                <div class="goal-card">
+                                    <div class="goal-icon">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="goal-content">
+                                        <h6>Learning Time</h6>
+                                        <p class="mb-1">5 hours of learning activities weekly</p>
+                                        <div class="progress">
+                                            <div class="progress-bar bg-info" role="progressbar" style="width: 90%;"
+                                                aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="goal-progress">90%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Goal Progress</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="goalProgressChart" style="height: 250px;"></div>
+                                <div class="mt-4">
+                                    <h6 class="mb-3">Stats</h6>
+                                    <div class="stat-card d-flex justify-content-between">
+                                        <div>Active Goals</div>
+                                        <strong>4</strong>
+                                    </div>
+                                    <div class="stat-card d-flex justify-content-between">
+                                        <div>Completed Goals</div>
+                                        <strong>12</strong>
+                                    </div>
+                                    <div class="stat-card d-flex justify-content-between">
+                                        <div>Current Streak</div>
+                                        <strong>7 days</strong>
+                                    </div>
+                                    <div class="stat-card d-flex justify-content-between">
+                                        <div>Completion Rate</div>
+                                        <strong>82%</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Goal History</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="goalHistoryChart" style="height: 300px;"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="settingsModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-cog me-2"></i> Settings</h5>
-                    <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="settings-panel" id="settingsPanel">
+        <h4>Settings</h4>
+        <button class="settings-close" id="closeSettings">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="settings-section">
+            <h5>Appearance</h5>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Theme</div>
+                    <div class="settings-description">Choose between light and dark theme</div>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-2">
-                        <label class="form-label small">Timeline Increments (min):</label>
-                        <select id="timelineIncrements" class="form-select form-select-sm">
-                            <option value="15">15</option>
-                            <option value="30">30</option>
-                        </select>
-                    </div>
-                    <div class="form-check mb-1">
-                        <input class="form-check-input" type="checkbox" id="darkModeCheck" style="display: none;">
-                        <label class="form-check-label small" for="darkModeCheck" style="display: none;">🌙 Dark
-                            Mode</label>
-                    </div>
-                    <div class="form-check mb-1">
-                        <input class="form-check-input" type="checkbox" id="useEmojisCheck">
-                        <label class="form-check-label small" for="useEmojisCheck">😊 Emojis in UI</label>
-                    </div>
-                    <div class="form-check mb-1">
-                        <input class="form-check-input" type="checkbox" id="colorCodedEventsCheck">
-                        <label class="form-check-label small" for="colorCodedEventsCheck">🎨 Color-Coded Events</label>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label small">Default View:</label>
-                        <select id="defaultViewSelect" class="form-select form-select-sm">
-                            <option value="day">Day</option>
-                            <option value="week">Week</option>
-                            <option value="month">Month</option>
-                        </select>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label small">App Categories</label>
-                        <div id="categoriesList" class="mb-1"> </div>
-                        <button id="addCategoryBtn" class="btn btn-sm btn-outline-primary btn-sm"> <i
-                                class="fas fa-plus"></i> Add Category
-                        </button>
-                    </div>
-
-                    <div class="mb-2">
-                        <label class="form-label small">App Classifications</label>
-                        <div id="appClassificationsList" class="list-group mb-1"> </div>
-                    </div>
-                    <button id="saveSettingsBtn" class="btn btn-primary btn-sm">Save Settings</button>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" id="lightThemeBtn">Light</button>
+                    <button class="btn btn-outline-primary" id="darkThemeBtn">Dark</button>
+                    <button class="btn btn-outline-primary active" id="systemThemeBtn">System</button>
                 </div>
+            </div>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Use Emojis</div>
+                    <div class="settings-description">Show emojis in the interface</div>
+                </div>
+                <label class="custom-switch">
+                    <input type="checkbox" id="useEmojisCheck" checked>
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h5>Timeline</h5>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Default View</div>
+                    <div class="settings-description">Choose the default view when opening the app</div>
+                </div>
+                <select class="form-select form-select-sm" id="defaultViewSelect">
+                    <option value="day">Day</option>
+                    <option value="week">Week</option>
+                    <option value="month">Month</option>
+                    <option value="stats">Statistics</option>
+                </select>
+            </div>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Timeline Increments (minutes)</div>
+                    <div class="settings-description">Precision of time tracking</div>
+                </div>
+                <select class="form-select form-select-sm" id="timelineIncrementsSelect">
+                    <option value="5">5 minutes</option>
+                    <option value="10">10 minutes</option>
+                    <option value="15" selected>15 minutes</option>
+                    <option value="30">30 minutes</option>
+                </select>
+            </div>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Color Coded Events</div>
+                    <div class="settings-description">Use different colors for different types of activities</div>
+                </div>
+                <label class="custom-switch">
+                    <input type="checkbox" id="colorCodedEventsCheck" checked>
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Idle Detection (minutes)</div>
+                    <div class="settings-description">Auto-create an Idle entry if no window changes for this long</div>
+                </div>
+                <select class="form-select form-select-sm" id="idleThresholdSelect">
+                    <option value="0">Off</option>
+                    <option value="3">3 minutes</option>
+                    <option value="5" selected>5 minutes</option>
+                    <option value="10">10 minutes</option>
+                </select>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h5>Pomodoro</h5>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Focus Duration (minutes)</div>
+                </div>
+                <select class="form-select form-select-sm" id="focusDurationSelect">
+                    <option value="15">15 minutes</option>
+                    <option value="25" selected>25 minutes</option>
+                    <option value="30">30 minutes</option>
+                    <option value="45">45 minutes</option>
+                    <option value="60">60 minutes</option>
+                </select>
+            </div>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Short Break Duration (minutes)</div>
+                </div>
+                <select class="form-select form-select-sm" id="shortBreakDurationSelect">
+                    <option value="3">3 minutes</option>
+                    <option value="5" selected>5 minutes</option>
+                    <option value="10">10 minutes</option>
+                </select>
+            </div>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Long Break Duration (minutes)</div>
+                </div>
+                <select class="form-select form-select-sm" id="longBreakDurationSelect">
+                    <option value="10">10 minutes</option>
+                    <option value="15" selected>15 minutes</option>
+                    <option value="20">20 minutes</option>
+                    <option value="30">30 minutes</option>
+                </select>
+            </div>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Long Break Interval</div>
+                    <div class="settings-description">Number of pomodoros before a long break</div>
+                </div>
+                <select class="form-select form-select-sm" id="longBreakIntervalSelect">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4" selected>4</option>
+                    <option value="5">5</option>
+                </select>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h5>Notifications</h5>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Enable Notifications</div>
+                    <div class="settings-description">Show notifications when events occur</div>
+                </div>
+                <label class="custom-switch">
+                    <input type="checkbox" id="enableNotificationsCheck" checked>
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+            <div class="settings-option">
+                <div>
+                    <div class="settings-label">Sound Alerts</div>
+                    <div class="settings-description">Play sounds for notifications</div>
+                </div>
+                <label class="custom-switch">
+                    <input type="checkbox" id="soundAlertsCheck" checked>
+                    <span class="switch-slider"></span>
+                </label>
+            </div>
+        </div>
+        <div class="settings-section">
+            <h5>Data Management</h5>
+            <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary btn-sm" id="exportAllDataBtn">
+                    <i class="fas fa-download me-2"></i> Export All Data
+                </button>
+                <button class="btn btn-outline-primary btn-sm" id="importDataBtn">
+                    <i class="fas fa-upload me-2"></i> Import Data
+                </button>
+                <button class="btn btn-outline-danger btn-sm" id="clearDataBtn">
+                    <i class="fas fa-trash-alt me-2"></i> Clear All Data
+                </button>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="aboutModal" tabindex="-1">
+    <div class="overlay" id="settingsOverlay"></div>
+    <div class="modal fade" id="addEntryModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-info-circle me-2"></i> About</h5>
-                    <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Add Time Entry</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p small>Professional Time Tracker with automatic app icon extraction, detailed segment popups, and
-                        advanced settings.</p>
+                    <form id="addEntryForm" class="add-entry-form">
+                        <div class="mb-3">
+                            <label for="entryTitle" class="form-label">Activity Title</label>
+                            <input type="text" class="form-control" id="entryTitle" placeholder="What were you doing?">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="entryDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="entryDate">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="entryStartTime" class="form-label">Start Time</label>
+                                <input type="time" class="form-control" id="entryStartTime">
+                            </div>
+                            <div class="col">
+                                <label for="entryEndTime" class="form-label">End Time</label>
+                                <input type="time" class="form-control" id="entryEndTime">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryCategory" class="form-label">Category</label>
+                            <select class="form-select" id="entryCategory">
+                                <option value="focus">Focused Work</option>
+                                <option value="meeting">Meeting</option>
+                                <option value="break">Break</option>
+                                <option value="distraction">Distraction</option>
+                                <option value="idle">Idle</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryApp" class="form-label">Application</label>
+                            <input type="text" class="form-control" id="entryApp"
+                                placeholder="Application name (optional)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryTags" class="form-label">Tags</label>
+                            <input type="text" class="form-control" id="entryTags"
+                                placeholder="Add tags separated by commas">
+                            <div class="tag-list mt-2" id="selectedTags"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryNotes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="entryNotes" rows="3"
+                                placeholder="Any additional notes"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveEntryBtn">Save Entry</button>
                 </div>
             </div>
         </div>
@@ -425,65 +1753,734 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-clipboard-list me-2"></i> Segment Details</h5>
-                    <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title">Entry Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p id="segmentDetailsContent" class="small"></p>
+                    <p id="segmentDetailsContent">Entry details will appear here.</p>
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="editEntryBtn">
+                            <i class="fas fa-edit me-1"></i> Edit Entry
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="deleteEntryBtn">
+                            <i class="fas fa-trash-alt me-1"></i> Delete
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <div class="modal fade" id="goalsModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-bullseye me-2"></i> Set Goal</h5>
-                    <button type="button" class="btn-close btn-sm" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-2">
-                        <label class="form-label small">Goal Type</label>
-                        <select class="form-select form-select-sm" id="goalType">
-                            <option value="focus">Increase Focus Time</option>
-                            <option value="reduce">Reduce Distractions</option>
-                            <option value="apps">Limit Specific Apps</option>
-                        </select>
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label small">Target (hours/day)</label>
-                        <input type="number" class="form-control form-control-sm" id="goalTarget" min="0" step="0.5">
-                    </div>
-                    <div class="mb-2">
-                        <label class="form-label small">Duration</label>
-                        <select class="form-select form-select-sm" id="goalDuration">
-                            <option value="day">Daily</option>
-                            <option value="week">Weekly</option>
-                            <option value="month">Monthly</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary btn-sm" id="saveGoalBtn">Save Goal</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="toast-container" id="toastContainer"></div>
-    <script src="renderer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
-        function showPage(page) {
-            const element = document.querySelector('[onclick="showPage(\'' + page + '\')"]');
-            if (element) {
-                element.classList.remove('pulse');
+        const { ipcRenderer } = require('electron');
+        const fs = require('fs');
+        const path = require('path');
+        window.$ = window.jQuery = require('jquery');
+        const SEG_FILE = path.join(__dirname, 'segments.csv');
+        const SETTINGS_FILE = path.join(__dirname, 'settings.json');
+        let evs = [];
+        let curSeg = null;
+        let track = false;
+        let zoom = 1.0;
+        let view = "day";
+        let date = new Date();
+        date.setHours(0, 0, 0, 0);
+        let lastActiveWindowTime = Date.now();
+        let idleTimer = null;
+        let currentTimerInterval = null;
+        let pomodoroState = { minutes: 25, seconds: 0, isRunning: false, mode: 'focus', completedPomodoros: 0 };
+        let usrSet = {
+            timelineIncrements: 15,
+            darkMode: false,
+            themeMode: "system",
+            useEmojis: true,
+            colorCodedEvents: true,
+            defaultView: "day",
+            idleThreshold: 5,
+            categories: ["Work", "Meeting", "Break", "Distraction", "Idle"],
+            pomodoroSettings: {
+                focusDuration: 25,
+                shortBreakDuration: 5,
+                longBreakDuration: 15,
+                longBreakInterval: 4,
+                autoStartBreaks: false,
+                autoStartPomodoros: false
+            },
+            notifications: { enabled: true, sound: true },
+            appClassifications: {
+                "Visual Studio Code": "Work",
+                "Electron": "Work",
+                "YouTube": "Distraction",
+                "Discord": "Distraction",
+                "Facebook": "Distraction",
+                "Slack": "Meeting",
+                "Zoom": "Meeting",
+                "Teams": "Meeting"
+            }
+        };
+        let lastSegUpdate = 0;
+        function rmQuotes(str) { return str.replace(/^"(.*)"$/, '$1'); }
+        function loadSet() {
+            if (fs.existsSync(SETTINGS_FILE)) {
+                try { Object.assign(usrSet, JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8'))); } catch (e) { }
             }
         }
-        document.addEventListener('DOMContentLoaded', function () {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl, { animation: false });
+        function saveSet() {
+            try { fs.writeFileSync(SETTINGS_FILE, JSON.stringify(usrSet, null, 2), 'utf8'); } catch (e) { }
+        }
+        function applySet() {
+            $("body").removeClass("dark-mode");
+            $("#themeToggle").html("<i class='fas fa-moon'></i>");
+            if (usrSet.themeMode === "dark") {
+                $("body").addClass("dark-mode");
+                $("#themeToggle").html("<i class='fas fa-sun'></i>");
+            }
+            view = usrSet.defaultView;
+            renderView();
+            const ps = usrSet.pomodoroSettings;
+            pomodoroState.minutes = ps.focusDuration;
+            updatePomodoroDisplay();
+            $(".btn-group button").removeClass("active");
+            $("#" + usrSet.themeMode + "ThemeBtn").addClass("active");
+            $("#useEmojisCheck").prop("checked", usrSet.useEmojis);
+            $("#colorCodedEventsCheck").prop("checked", usrSet.colorCodedEvents);
+            $("#defaultViewSelect").val(usrSet.defaultView);
+            $("#timelineIncrementsSelect").val(usrSet.timelineIncrements);
+            $("#idleThresholdSelect").val(usrSet.idleThreshold);
+            $("#focusDurationSelect").val(ps.focusDuration);
+            $("#shortBreakDurationSelect").val(ps.shortBreakDuration);
+            $("#longBreakDurationSelect").val(ps.longBreakDuration);
+            $("#longBreakIntervalSelect").val(ps.longBreakInterval);
+            $("#enableNotificationsCheck").prop("checked", usrSet.notifications.enabled);
+            $("#soundAlertsCheck").prop("checked", usrSet.notifications.sound);
+            $("#autoStartBreaksCheck").prop("checked", ps.autoStartBreaks);
+            $("#autoStartPomodorosCheck").prop("checked", ps.autoStartPomodoros);
+        }
+        function loadSegCSV() {
+            evs = [];
+            if (fs.existsSync(SEG_FILE)) {
+                try {
+                    fs.readFileSync(SEG_FILE, 'utf8').trim().split('\n').forEach(line => {
+                        let parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                        if (parts.length >= 3) {
+                            let t = rmQuotes(parts[0]);
+                            let st = parseInt(parts[1]);
+                            let en = parseInt(parts[2]);
+                            if (isNaN(st) || isNaN(en)) return;
+                            let ev = { title: t, start: st, end: en };
+                            if (parts.length >= 14) {
+                                ev.details = {
+                                    id: parseInt(parts[3]),
+                                    bounds: { x: parseInt(parts[4]), y: parseInt(parts[5]), width: parseInt(parts[6]), height: parseInt(parts[7]) },
+                                    owner: { name: rmQuotes(parts[8]), processId: parseInt(parts[9]), bundleId: rmQuotes(parts[10]), path: rmQuotes(parts[11]) },
+                                    url: rmQuotes(parts[12]),
+                                    memoryUsage: parseInt(parts[13])
+                                };
+                            }
+                            if (parts.length >= 15) ev.category = rmQuotes(parts[14]);
+                            if (parts.length >= 16) ev.tags = rmQuotes(parts[15]).split(',').map(x => x.trim()).filter(x => x);
+                            evs.push(ev);
+                        }
+                    });
+                } catch (e) { }
+            }
+        }
+        function saveSegCSV() {
+            if (!evs.length) return;
+            let csvLines = evs.map(ev => {
+                let t = '"' + ev.title + '"';
+                let s = ev.start;
+                let e = ev.end;
+                let arr = [t, s, e];
+                if (ev.details && ev.details.id !== undefined) {
+                    let d = ev.details;
+                    let b = d.bounds || {};
+                    let o = d.owner || {};
+                    let x = b.x || "";
+                    let y = b.y || "";
+                    let w = b.width || "";
+                    let h = b.height || "";
+                    let on = '"' + (o.name || "") + '"';
+                    let pid = o.processId || "";
+                    let bid = '"' + (o.bundleId || "") + '"';
+                    let pth = '"' + (o.path || "") + '"';
+                    let url = '"' + (d.url || "") + '"';
+                    let mem = d.memoryUsage || "";
+                    arr = [...arr, d.id, x, y, w, h, on, pid, bid, pth, url, mem];
+                }
+                if (ev.category) arr.push('"' + ev.category + '"'); else arr.push('""');
+                if (ev.tags && ev.tags.length) arr.push('"' + ev.tags.join(',') + '"'); else arr.push('""');
+                return arr.join(',');
+            }).join('\n');
+            try { fs.writeFileSync(SEG_FILE, csvLines, 'utf8'); } catch (e) { }
+        }
+        function assignLanes(evList) {
+            let sorted = [...evList].sort((a, b) => a.start - b.start);
+            let lanes = [];
+            sorted.forEach(ev => {
+                let placed = false;
+                for (let i = 0; i < lanes.length; i++) {
+                    if (lanes[i][lanes[i].length - 1].end <= ev.start) {
+                        lanes[i].push(ev);
+                        ev.lane = i;
+                        placed = true;
+                        break;
+                    }
+                }
+                if (!placed) {
+                    lanes.push([ev]);
+                    ev.lane = lanes.length - 1;
+                }
             });
+            return { events: sorted, laneCount: lanes.length };
+        }
+        function extractAppName(title) {
+            if (title.includes(" - ")) {
+                let parts = title.split(" - ");
+                let cand = parts[parts.length - 1].trim();
+                if (cand.length > 3) return cand;
+            }
+            return title;
+        }
+        function getAppCat(appName) { return usrSet.appClassifications[appName] || ""; }
+        function getCategoryFromTitle(title) {
+            let appName = extractAppName(title);
+            let cat = getAppCat(appName);
+            if (cat === "Work") return "focus";
+            if (cat === "Meeting") return "meeting";
+            if (cat === "Distraction") return "distraction";
+            if (/(youtube|discord|facebook|twitter|instagram|reddit|tiktok)/i.test(title)) return "distraction";
+            if (/(meet|zoom|teams|skype|webex|hangout)/i.test(title)) return "meeting";
+            if (/(lunch|break|coffee|rest)/i.test(title)) return "break";
+            return "focus";
+        }
+        async function renderDayView() {
+            const $timeline = $("#timeline");
+            $timeline.show().empty();
+            $("#currentDateLabel").text(date.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }));
+            let dayStart = new Date(date.getTime()); dayStart.setHours(0, 0, 0, 0);
+            let dayEnd = new Date(date.getTime()); dayEnd.setHours(23, 59, 59, 999);
+            let dayEvents = [...evs];
+            if (curSeg) dayEvents.push(curSeg);
+            dayEvents = dayEvents.filter(ev => ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime());
+            let currentTime = new Date();
+            let isSameDay = currentTime.toDateString() === date.toDateString();
+            if (isSameDay) {
+                let hoursSinceMidnight = (currentTime - dayStart) / 3600000;
+                let topPosition = hoursSinceMidnight * 60 * zoom;
+                let timeLabel = currentTime.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+                let timeMarker = $(`<div class="current-time-marker" style="top:${topPosition}px;"><div class="current-time-label">${timeLabel}</div></div>`);
+                $timeline.append(timeMarker);
+            }
+            let hourHeight = 60 * zoom;
+            let totalHeight = 24 * hourHeight;
+            $timeline.css({ height: totalHeight + "px", position: "relative" });
+            for (let hour = 0; hour < 24; hour++) {
+                let topPos = hour * hourHeight;
+                let labelStr = new Date(dayStart.getTime() + hour * 3600000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+                $timeline.append(`<div class="hour-marker" style="top:${topPos}px;">${labelStr}</div>`);
+            }
+            if (!dayEvents.length) {
+                $timeline.append('<p class="text-muted m-3">No events for this date.</p>');
+                return dayEvents;
+            }
+            let laneData = assignLanes(dayEvents);
+            let laneCount = laneData.laneCount;
+            let eventsAreaWidth = $timeline.width() - 70;
+            let laneWidth = eventsAreaWidth / laneCount;
+            let categoryFilter = $("#categoryFilter").val();
+            dayEvents.forEach(ev => {
+                let evStartTime = Math.max(ev.start, dayStart.getTime());
+                let evEndTime = Math.min(ev.end, dayEnd.getTime());
+                let durationMs = evEndTime - evStartTime;
+                if (durationMs < 60000) return;
+                let topOffset = ((evStartTime - dayStart.getTime()) / 3600000) * hourHeight;
+                let blockHeight = (durationMs / 3600000) * hourHeight;
+                if (blockHeight < 5) blockHeight = 5;
+                let cat = ev.category || getCategoryFromTitle(ev.title);
+                if (categoryFilter !== "all" && cat !== categoryFilter) return;
+                let colorClass = usrSet.colorCodedEvents ? cat : "focus";
+                let minutes = Math.round(durationMs / 60000);
+                let leftOffset = 70 + (ev.lane * laneWidth);
+                let blockWidth = laneWidth - 5;
+                let entryTitle = usrSet.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, "");
+                let categoryText = "";
+                if (cat === "focus") categoryText = "Work"; else if (cat === "meeting") categoryText = "Meeting"; else if (cat === "break") categoryText = "Break"; else if (cat === "distraction") categoryText = "Distraction"; else if (cat === "idle") categoryText = "Idle";
+                let categoryPill = categoryText ? `<span class="category-pill category-${cat}">${categoryText}</span>` : "";
+                let tooltip = `Title: ${entryTitle}\nDuration: ${minutes} min\nCategory: ${categoryText}`;
+                let wrapper = $("<div/>", {
+                    class: `time-entry ${colorClass}`,
+                    css: { top: topOffset + "px", left: leftOffset + "px", width: blockWidth + "px", height: blockHeight + "px" },
+                    data: { event: JSON.stringify(ev) },
+                    html: `${categoryPill}${entryTitle} (${minutes} min)`,
+                    title: tooltip
+                });
+                wrapper.on("contextmenu", (e) => { e.preventDefault(); showSegDetails(ev); });
+                wrapper.click(() => showSegDetails(ev));
+                $timeline.append(wrapper[0]);
+            });
+            return dayEvents;
+        }
+        function renderDaySummary() {
+            let dayStart = new Date(date.getTime()); dayStart.setHours(0, 0, 0, 0);
+            let dayEnd = new Date(date.getTime()); dayEnd.setHours(23, 59, 59, 999);
+            let dayEvents = evs.filter(ev => ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime());
+            renderSum(dayEvents, dayStart.getTime(), dayEnd.getTime());
+        }
+        function renderSum(evList, startMs, endMs) {
+            let focusMs = 0, distractMs = 0, meetingMs = 0, breakMs = 0, idleMs = 0;
+            let usageMap = {};
+            evList.forEach(ev => {
+                let s = Math.max(ev.start, startMs);
+                let e = Math.min(ev.end, endMs);
+                let dur = e - s;
+                if (dur < 60000) return;
+                let app = ev.details && ev.details.owner && ev.details.owner.name ? ev.details.owner.name : extractAppName(ev.title);
+                usageMap[app] = (usageMap[app] || 0) + dur;
+                let cat = ev.category || getCategoryFromTitle(ev.title);
+                if (cat === "distraction") distractMs += dur;
+                else if (cat === "meeting") meetingMs += dur;
+                else if (cat === "break") breakMs += dur;
+                else if (cat === "idle") idleMs += dur;
+                else focusMs += dur;
+            });
+            function formatTime(ms) {
+                let h = Math.floor(ms / 3600000);
+                let m = Math.floor((ms % 3600000) / 60000);
+                return `${h}h ${m}m`;
+            }
+            $("#focusedTime").text(formatTime(focusMs));
+            $("#distractedTime").text(formatTime(distractMs));
+            $("#meetingTime").text(formatTime(meetingMs));
+            $("#breakTime").text(formatTime(breakMs));
+            $("#idleTime").text(formatTime(idleMs));
+            let totalTracked = focusMs + distractMs + meetingMs + breakMs + idleMs;
+            $("#totalTracked").text(formatTime(totalTracked));
+            function appendUsageList($list, usageArr) {
+                $list.empty();
+                usageArr.slice(0, 3).forEach(([app, ms]) => {
+                    $list.append(`<li class="stat-card d-flex justify-content-between"><div>${app}</div><strong>${formatTime(ms)}</strong></li>`);
+                });
+            }
+            let usageArr = Object.entries(usageMap).sort(([, a], [, b]) => b - a);
+            let focusUsage = usageArr.filter(([app]) => !(/youtube|discord|facebook/i.test(app)));
+            appendUsageList($("#mostUsedList"), focusUsage);
+            let distractors = usageArr.filter(([app]) => /youtube|discord|facebook/i.test(app));
+            appendUsageList($("#topDistractionsList"), distractors);
+        }
+        function renderProductivityChart() {
+            let options = {
+                series: [78],
+                chart: { height: 200, type: "radialBar", offsetY: -10 },
+                plotOptions: {
+                    radialBar: {
+                        startAngle: -135, endAngle: 135,
+                        hollow: { margin: 0, size: "70%" },
+                        track: { background: "#e7e7e7", strokeWidth: "97%", margin: 5, dropShadow: { enabled: false, top: 2, left: 0, blur: 4, opacity: 0.15 } },
+                        dataLabels: { name: { offsetY: -10, color: "#888", fontSize: "13px" }, value: { offsetY: 5, color: "#111", fontSize: "30px", show: false } }
+                    }
+                },
+                fill: { type: "gradient", gradient: { shade: "dark", type: "horizontal", gradientToColors: ["#4CAF50"], stops: [0, 100] } },
+                stroke: { lineCap: "round" },
+                labels: ["Progress"]
+            };
+            new ApexCharts(document.querySelector("#productivityChart"), options).render();
+        }
+        function renderWeekView() {
+            $(".week-view").empty();
+        }
+        async function renderView() {
+            loadSegCSV();
+            if (view === "day") {
+                await renderDayView();
+                renderDaySummary();
+                if ($("#productivityChart").length) renderProductivityChart();
+            } else if (view === "week") {
+                renderWeekView();
+            }
+        }
+        function showSegDetails(details) {
+            function fmtDate(d) { return new Date(d).toLocaleString(); }
+            let durMin = Math.round((details.end - details.start) / 60000);
+            let cat = details.category || getCategoryFromTitle(details.title);
+            let content = `<strong>Title:</strong> ${details.title}<br><strong>Category:</strong> ${cat}<br><strong>Start:</strong> ${fmtDate(details.start)}<br><strong>End:</strong> ${fmtDate(details.end)}<br><strong>Duration:</strong> ${durMin} min`;
+            if (details.tags && details.tags.length) content += `<br><strong>Tags:</strong> ${details.tags.join(", ")}`;
+            if (details.details) {
+                let d = details.details;
+                let b = d.bounds || {};
+                let o = d.owner || {};
+                content += `<hr><strong>Application:</strong> ${o.name || extractAppName(details.title)}<br><strong>Window ID:</strong> ${d.id || ""}<br><strong>Bounds:</strong> x: ${b.x || ""}, y: ${b.y || ""}, w: ${b.width || ""}, h: ${b.height || ""}<br><strong>Owner:</strong> ${o.name || ""} (PID: ${o.processId || ""})<br><strong>Bundle ID:</strong> ${o.bundleId || ""}<br><strong>Path:</strong> ${o.path || ""}<br><strong>URL:</strong> ${d.url || ""}<br><strong>Memory:</strong> ${d.memoryUsage || ""}`;
+            }
+            $("#segmentDetailsContent").html(content);
+            $("#segmentDetailsModal").modal("show");
+            $("#editEntryBtn").off("click").on("click", () => {
+                $("#segmentDetailsModal").modal("hide");
+                openEditModal(details);
+            });
+            $("#deleteEntryBtn").off("click").on("click", () => {
+                if (confirm("Are you sure you want to delete this entry?")) {
+                    evs = evs.filter(e => e !== details);
+                    saveSegCSV();
+                    $("#segmentDetailsModal").modal("hide");
+                    renderView();
+                }
+            });
+        }
+        function openEditModal(ev) {
+            $("#addEntryModal").modal("show");
+            let formDate = new Date(ev.start);
+            $("#entryTitle").val(ev.title);
+            $("#entryDate")[0].valueAsDate = formDate;
+            $("#entryStartTime").val(new Date(ev.start).toTimeString().slice(0, 5));
+            $("#entryEndTime").val(new Date(ev.end).toTimeString().slice(0, 5));
+            $("#entryCategory").val(ev.category || getCategoryFromTitle(ev.title));
+            $("#entryApp").val(ev.details && ev.details.owner && ev.details.owner.name ? ev.details.owner.name : "");
+            $("#entryTags").val(ev.tags ? ev.tags.join(", ") : "");
+            $("#saveEntryBtn").off("click").on("click", () => { updateEntry(ev); });
+        }
+        function updateEntry(ev) {
+            let title = $("#entryTitle").val();
+            let entryDate = $("#entryDate")[0].valueAsDate;
+            let startTimeStr = $("#entryStartTime").val();
+            let endTimeStr = $("#entryEndTime").val();
+            let category = $("#entryCategory").val();
+            let appName = $("#entryApp").val();
+            let tagsInput = $("#entryTags").val();
+            if (!title || !startTimeStr || !endTimeStr) {
+                alert("Please fill out required fields");
+                return;
+            }
+            let [sh, sm] = startTimeStr.split(":").map(Number);
+            let [eh, em] = endTimeStr.split(":").map(Number);
+            let startDate = new Date(entryDate); startDate.setHours(sh, sm, 0, 0);
+            let endDate = new Date(entryDate); endDate.setHours(eh, em, 0, 0);
+            if (startDate >= endDate) {
+                alert("End time must be after start time");
+                return;
+            }
+            ev.title = title;
+            ev.start = startDate.getTime();
+            ev.end = endDate.getTime();
+            ev.category = category;
+            ev.tags = tagsInput ? tagsInput.split(",").map(t => t.trim()) : [];
+            if (!ev.details) ev.details = {};
+            if (!ev.details.owner) ev.details.owner = {};
+            ev.details.owner.name = appName;
+            saveSegCSV();
+            $("#addEntryModal").modal("hide");
+            renderView();
+        }
+        function checkIdleTime() {
+            if (!usrSet.idleThreshold || usrSet.idleThreshold < 1) return;
+            let now = Date.now();
+            let diff = now - lastActiveWindowTime;
+            let thresholdMs = usrSet.idleThreshold * 60 * 1000;
+            if (diff >= thresholdMs && track) {
+                if (curSeg) {
+                    curSeg.category = getCategoryFromTitle(curSeg.title);
+                    evs.push(curSeg);
+                    curSeg = null;
+                }
+                if (!curSeg) {
+                    curSeg = { title: "Idle Time", start: now, end: now, category: "idle" };
+                }
+                saveSegCSV();
+                renderView();
+            }
+        }
+        function updatePomodoroDisplay() {
+            let m = pomodoroState.minutes.toString().padStart(2, "0");
+            let s = pomodoroState.seconds.toString().padStart(2, "0");
+            $("#pomodoroTimer").text(m + ":" + s);
+        }
+        function startPomodoro() {
+            if (pomodoroState.isRunning) return;
+            pomodoroState.isRunning = true;
+            $("#startPomodoroBtn").prop("disabled", true);
+            $("#pausePomodoroBtn").prop("disabled", false);
+            currentTimerInterval = setInterval(() => {
+                if (pomodoroState.seconds === 0) {
+                    if (pomodoroState.minutes === 0) {
+                        clearInterval(currentTimerInterval);
+                        pomodoroState.isRunning = false;
+                        pomodoroComplete();
+                        return;
+                    }
+                    pomodoroState.minutes--;
+                    pomodoroState.seconds = 59;
+                } else {
+                    pomodoroState.seconds--;
+                }
+                updatePomodoroDisplay();
+            }, 1000);
+        }
+        function pausePomodoro() {
+            clearInterval(currentTimerInterval);
+            pomodoroState.isRunning = false;
+            $("#startPomodoroBtn").prop("disabled", false);
+            $("#pausePomodoroBtn").prop("disabled", true);
+        }
+        function resetPomodoro() {
+            pausePomodoro();
+            resetPomodoroMode(pomodoroState.mode);
+        }
+        function resetPomodoroMode(mode) {
+            clearInterval(currentTimerInterval);
+            pomodoroState.isRunning = false;
+            pomodoroState.mode = mode;
+            let ps = usrSet.pomodoroSettings;
+            if (mode === "focus") pomodoroState.minutes = ps.focusDuration;
+            else if (mode === "shortBreak") pomodoroState.minutes = ps.shortBreakDuration;
+            else if (mode === "longBreak") pomodoroState.minutes = ps.longBreakDuration;
+            pomodoroState.seconds = 0;
+            updatePomodoroDisplay();
+            $("#startPomodoroBtn").prop("disabled", false);
+            $("#pausePomodoroBtn").prop("disabled", true);
+        }
+        function pomodoroComplete() {
+            let ps = usrSet.pomodoroSettings;
+            if (pomodoroState.mode === "focus") {
+                pomodoroState.completedPomodoros++;
+                showNotification("Pomodoro Complete", "Time for a break!");
+                if (ps.autoStartBreaks) {
+                    if (pomodoroState.completedPomodoros % ps.longBreakInterval === 0) {
+                        resetPomodoroMode("longBreak");
+                        $("#focusSessionBtn").removeClass("active");
+                        $("#shortBreakBtn").removeClass("active");
+                        $("#longBreakBtn").addClass("active");
+                    } else {
+                        resetPomodoroMode("shortBreak");
+                        $("#focusSessionBtn").removeClass("active");
+                        $("#longBreakBtn").removeClass("active");
+                        $("#shortBreakBtn").addClass("active");
+                    }
+                    startPomodoro();
+                }
+            } else {
+                showNotification("Break Complete", "Ready to focus?");
+                if (ps.autoStartPomodoros) {
+                    resetPomodoroMode("focus");
+                    $("#shortBreakBtn").removeClass("active");
+                    $("#longBreakBtn").removeClass("active");
+                    $("#focusSessionBtn").addClass("active");
+                    startPomodoro();
+                }
+            }
+        }
+        function showNotification(title, message) {
+            if (!usrSet.notifications.enabled) return;
+            if (usrSet.notifications.sound) {
+                try { let audio = new Audio("notification.mp3"); audio.play(); } catch (e) { }
+            }
+            if ("Notification" in window) {
+                if (Notification.permission === "granted") new Notification(title, { body: message });
+                else if (Notification.permission !== "denied") {
+                    Notification.requestPermission().then(p => {
+                        if (p === "granted") new Notification(title, { body: message });
+                    });
+                }
+            }
+        }
+        function toggleTracking() {
+            track = !track;
+            $("#toggleTracking").toggleClass("btn-primary btn-tracking-active")
+                .html(track ? '<i class="fas fa-stop me-1"></i> Stop Tracking' : '<i class="fas fa-play me-1"></i> Start Tracking');
+            if (!track) {
+                if (curSeg) {
+                    curSeg.category = getCategoryFromTitle(curSeg.title);
+                    evs.push(curSeg);
+                    curSeg = null;
+                    saveSegCSV();
+                }
+                renderView();
+            } else {
+                lastActiveWindowTime = Date.now();
+            }
+        }
+        $(document).ready(async () => {
+            loadSet();
+            applySet();
+            await renderView();
+            idleTimer = setInterval(checkIdleTime, 60 * 1000);
+            $("#startPomodoroBtn").click(startPomodoro);
+            $("#pausePomodoroBtn").click(pausePomodoro);
+            $("#resetPomodoroBtn").click(resetPomodoro);
+            $("#focusSessionBtn").click(() => {
+                resetPomodoroMode("focus");
+                $("#focusSessionBtn").addClass("active");
+                $("#shortBreakBtn,#longBreakBtn").removeClass("active");
+            });
+            $("#shortBreakBtn").click(() => {
+                resetPomodoroMode("shortBreak");
+                $("#shortBreakBtn").addClass("active");
+                $("#focusSessionBtn,#longBreakBtn").removeClass("active");
+            });
+            $("#longBreakBtn").click(() => {
+                resetPomodoroMode("longBreak");
+                $("#longBreakBtn").addClass("active");
+                $("#focusSessionBtn,#shortBreakBtn").removeClass("active");
+            });
+            $("#toggleTracking").click(toggleTracking);
+            $("#themeToggle").click(() => setThemeMode("toggle"));
+            $("#lightThemeBtn").click(() => setThemeMode("light"));
+            $("#darkThemeBtn").click(() => setThemeMode("dark"));
+            $("#systemThemeBtn").click(() => setThemeMode("system"));
+            $("#prevDay").click(() => { date.setDate(date.getDate() - 1); renderView(); });
+            $("#todayBtn").click(() => { date = new Date(); date.setHours(0, 0, 0, 0); renderView(); });
+            $("#nextDay").click(() => { date.setDate(date.getDate() + 1); renderView(); });
+            $(".nav-link").on("shown.bs.tab", function (e) {
+                let targetId = e.target.getAttribute("href").substring(1);
+                if (targetId === "dayView") view = "day";
+                else if (targetId === "weekView") view = "week";
+                else if (targetId === "monthView") view = "month";
+                else if (targetId === "statsView") view = "stats";
+                else if (targetId === "pomodoroView") view = "pomodoro";
+                else if (targetId === "goalsView") view = "goals";
+                renderView();
+            });
+            $("#settingsBtn").click(() => {
+                $("#settingsPanel").addClass("show");
+                $("#settingsOverlay").addClass("show");
+            });
+            $("#closeSettings,#settingsOverlay").click(() => {
+                $("#settingsPanel").removeClass("show");
+                $("#settingsOverlay").removeClass("show");
+            });
+            $("#exportDropdownBtn").click(() => {
+                $("#exportDropdownMenu").toggleClass("show");
+            });
+            $("#exportCsv").click(() => handleExport("csv"));
+            $("#exportPdf").click(() => handleExport("pdf"));
+            $("#exportJson").click(() => handleExport("json"));
+            $(document).click(function (e) {
+                if (!$(e.target).closest("#exportDropdownBtn, #exportDropdownMenu").length) {
+                    $("#exportDropdownMenu").removeClass("show");
+                }
+            });
+            $("#useEmojisCheck").change(function () { usrSet.useEmojis = this.checked; saveSet(); applySet(); });
+            $("#colorCodedEventsCheck").change(function () { usrSet.colorCodedEvents = this.checked; saveSet(); applySet(); });
+            $("#defaultViewSelect").change(function () { usrSet.defaultView = this.value; saveSet(); });
+            $("#timelineIncrementsSelect").change(function () { usrSet.timelineIncrements = parseInt(this.value); saveSet(); });
+            $("#idleThresholdSelect").change(function () { usrSet.idleThreshold = parseInt(this.value); saveSet(); });
+            $("#focusDurationSelect").change(function () {
+                usrSet.pomodoroSettings.focusDuration = parseInt(this.value); saveSet();
+                if (pomodoroState.mode === "focus") resetPomodoroMode("focus");
+            });
+            $("#shortBreakDurationSelect").change(function () {
+                usrSet.pomodoroSettings.shortBreakDuration = parseInt(this.value); saveSet();
+                if (pomodoroState.mode === "shortBreak") resetPomodoroMode("shortBreak");
+            });
+            $("#longBreakDurationSelect").change(function () {
+                usrSet.pomodoroSettings.longBreakDuration = parseInt(this.value); saveSet();
+                if (pomodoroState.mode === "longBreak") resetPomodoroMode("longBreak");
+            });
+            $("#longBreakIntervalSelect").change(function () {
+                usrSet.pomodoroSettings.longBreakInterval = parseInt(this.value); saveSet();
+            });
+            $("#enableNotificationsCheck").change(function () { usrSet.notifications.enabled = this.checked; saveSet(); });
+            $("#soundAlertsCheck").change(function () { usrSet.notifications.sound = this.checked; saveSet(); });
+            $("#autoStartBreaksCheck").change(function () { usrSet.pomodoroSettings.autoStartBreaks = this.checked; saveSet(); });
+            $("#autoStartPomodorosCheck").change(function () { usrSet.pomodoroSettings.autoStartPomodoros = this.checked; saveSet(); });
+            $("#addEntryBtn").click(showAddEntryModal);
+            $("#saveEntryBtn").click(saveEntry);
+            $("#categoryFilter").change(() => { renderDayView(); });
+            $(".legend-item").click(function () {
+                let cat = $(this).data("category");
+                if ($("#categoryFilter").val() === "all") { $("#categoryFilter").val(cat); }
+                else {
+                    if ($("#categoryFilter").val() === cat) $("#categoryFilter").val("all");
+                    else $("#categoryFilter").val(cat);
+                }
+                renderDayView();
+            });
+            $(document).keydown(e => {
+                if (e.ctrlKey) {
+                    if (e.key === ",") { zoom = Math.min(10.0, zoom + 0.2); renderView(); }
+                    else if (e.key === ".") { zoom = Math.max(0.1, zoom - 0.2); renderView(); }
+                }
+                if (e.key === "Escape") {
+                    $(".modal").modal("hide");
+                    $("#settingsPanel").removeClass("show");
+                    $("#settingsOverlay").removeClass("show");
+                }
+            });
+        });
+        function setThemeMode(mode) {
+            if (mode === "toggle") {
+                usrSet.themeMode = usrSet.themeMode === "dark" ? "light" : "dark";
+            } else {
+                usrSet.themeMode = mode;
+            }
+            saveSet();
+            applySet();
+        }
+        function showAddEntryModal() {
+            $("#addEntryForm")[0].reset();
+            $("#entryDate")[0].valueAsDate = date;
+            $("#entryStartTime").val("09:00");
+            $("#entryEndTime").val("10:00");
+            $("#saveEntryBtn").off("click").on("click", saveEntry);
+            $("#addEntryModal").modal("show");
+        }
+        function saveEntry() {
+            let title = $("#entryTitle").val();
+            let entryDate = $("#entryDate")[0].valueAsDate;
+            let startTimeStr = $("#entryStartTime").val();
+            let endTimeStr = $("#entryEndTime").val();
+            let category = $("#entryCategory").val();
+            let appName = $("#entryApp").val();
+            let tagsInput = $("#entryTags").val();
+            if (!title || !startTimeStr || !endTimeStr) {
+                alert("Please fill out all required fields");
+                return;
+            }
+            let [sh, sm] = startTimeStr.split(":").map(Number);
+            let [eh, em] = endTimeStr.split(":").map(Number);
+            let startDate = new Date(entryDate); startDate.setHours(sh, sm, 0, 0);
+            let endDate = new Date(entryDate); endDate.setHours(eh, em, 0, 0);
+            if (startDate >= endDate) {
+                alert("End time must be after start time");
+                return;
+            }
+            let newEvent = { title, start: startDate.getTime(), end: endDate.getTime(), category, tags: tagsInput ? tagsInput.split(",").map(t => t.trim()) : [] };
+            if (appName) { newEvent.details = { owner: { name: appName } }; }
+            evs.push(newEvent);
+            saveSegCSV();
+            $("#addEntryModal").modal("hide");
+            renderView();
+        }
+        function handleExport(format) {
+            let dateStr = new Date().toISOString().split("T")[0];
+            let filename;
+            switch (format) {
+                case "csv": filename = `timetracker_export_${dateStr}.csv`; alert(`Exporting data as CSV to ${filename}`); break;
+                case "pdf": filename = `timetracker_export_${dateStr}.pdf`; alert(`Exporting data as PDF to ${filename}`); break;
+                case "json": filename = `timetracker_export_${dateStr}.json`; alert(`Exporting data as JSON to ${filename}`); break;
+            }
+            $("#exportDropdownMenu").removeClass("show");
+        }
+        ipcRenderer.on("active-window-data", (e, data) => {
+            if (!track) return;
+            let now = Date.now();
+            if (curSeg) {
+                if (curSeg.title === data.title) curSeg.end = now;
+                else {
+                    curSeg.category = getCategoryFromTitle(curSeg.title);
+                    evs.push(curSeg);
+                    curSeg = { title: data.title, start: now, end: now, details: data };
+                }
+            } else {
+                curSeg = { title: data.title, start: now, end: now, details: data };
+            }
+            lastActiveWindowTime = now;
+            saveSegCSV();
+            if (Date.now() - lastSegUpdate > 5000) {
+                renderDayView();
+                lastSegUpdate = Date.now();
+            }
+            renderDaySummary();
         });
     </script>
 </body>

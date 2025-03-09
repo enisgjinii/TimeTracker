@@ -1,11 +1,24 @@
 {
-  "timelineIncrements": 30,
+  "timelineIncrements": 10,
   "darkMode": true,
-  "themeMode": "light",
-  "useEmojis": true,
+  "themeMode": "dark",
+  "useEmojis": false,
   "colorCodedEvents": true,
   "defaultView": "day",
+  "idleThreshold": 5,
   "categories": [],
+  "pomodoroSettings": {
+    "focusDuration": 25,
+    "shortBreakDuration": 5,
+    "longBreakDuration": 15,
+    "longBreakInterval": 4,
+    "autoStartBreaks": false,
+    "autoStartPomodoros": false
+  },
+  "notifications": {
+    "enabled": true,
+    "sound": true
+  },
   "appClassifications": {
     "Visual Studio Code": "Work",
     "Electron": "Productivity",
