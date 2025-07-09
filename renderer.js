@@ -325,27 +325,52 @@ const renderDayView = async () => {
   const hourHeight = 40 * zoom;
   const totalHeight = 24 * hourHeight;
   $timeline.css({ height: totalHeight + 'px', position: 'relative' });
+  
+  // Add hour markers
   for (let hour = 0; hour < 24; hour++) {
     let topPos = hour * hourHeight;
     let labelStr = new Date(dayStart.getTime() + hour * 3600000).toLocaleTimeString([], { hour: '2-digit' });
     $timeline.append(`<div class="hour-label" style="top:${topPos}px;">${labelStr}</div>`, `<div class="timeline-hour" style="top:${topPos}px; height: ${hourHeight}px;"></div>`);
   }
+  
+  // Add current time indicator
+  const now = new Date();
+  const isToday = now.toDateString() === date.toDateString();
+  if (isToday) {
+    const currentTime = now.getTime();
+    const timeFromStart = currentTime - dayStart.getTime();
+    const topOffset = (timeFromStart / 3600000) * hourHeight;
+    
+    if (topOffset >= 0 && topOffset <= totalHeight) {
+      const timeMarker = $(`
+        <div class="current-time-marker" style="top: ${topOffset}px;">
+          <div class="current-time-label">${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+        </div>
+      `);
+      $timeline.append(timeMarker);
+    }
+  }
+  
   if (!dayEvents.length) {
     $timeline.append('<p class="text-muted m-3">No events for this date.</p>');
     return dayEvents;
   }
+  
   let laneData = assignLanes(dayEvents);
   let laneCount = laneData.laneCount;
   let eventsAreaWidth = $timeline.width() - 100;
   let laneWidth = eventsAreaWidth / laneCount;
+  
   dayEvents.forEach(ev => {
     let evStartTime = Math.max(ev.start, dayStart.getTime());
     let evEndTime = Math.min(ev.end, dayEnd.getTime());
     let durationMs = evEndTime - evStartTime;
     if (durationMs < 60000) return;
+    
     let topOffset = ((evStartTime - dayStart.getTime()) / 3600000) * hourHeight;
     let blockHeight = (durationMs / 3600000) * hourHeight;
     if (blockHeight < 5) blockHeight = 5;
+    
     let isDistraction = /youtube|discord|facebook/i.test(ev.title);
     let colorClass = !usrSet.colorCodedEvents ? "singleColor" : (isDistraction ? "distraction" : "focus");
     let minutes = Math.round(durationMs / 60000);
@@ -356,17 +381,26 @@ const renderDayView = async () => {
     const category = getAppCat(appName);
     const iconEl = createAppIcon(appName);
     let badgeHTML = category ? `<span class="badge bg-info me-1">${category}</span>` : "";
+    
     let wrapper = $('<div/>', {
       class: `entry ${colorClass}`,
-      css: { top: topOffset + 'px', left: leftOffset + 'px', width: blockWidth + 'px', height: blockHeight + 'px' },
+      css: { 
+        top: topOffset + 'px', 
+        left: leftOffset + 'px', 
+        width: blockWidth + 'px', 
+        height: blockHeight + 'px',
+        position: 'absolute'
+      },
       data: { event: JSON.stringify(ev) },
       click: () => showSegDetails(ev)
     }).append(iconEl, $('<span/>', {
       style: 'marginLeft:0.5rem',
       html: `${badgeHTML}${titleText} (${minutes} min)`
     }));
+    
     $timeline.append(wrapper);
   });
+  
   return dayEvents;
 };
 
@@ -406,7 +440,44 @@ $(document).ready(async () => {
   initSetUI();
   applySet();
   await renderView();
+  
+  // Update current time indicator every minute
+  setInterval(() => {
+    if (view === "day") {
+      updateCurrentTimeIndicator();
+    }
+  }, 60000);
+  
+  // Initial update
+  updateCurrentTimeIndicator();
 });
+
+const updateCurrentTimeIndicator = () => {
+  const now = new Date();
+  const isToday = now.toDateString() === date.toDateString();
+  
+  if (isToday && view === "day") {
+    const dayStart = new Date(date.getTime());
+    dayStart.setHours(0, 0, 0, 0);
+    const currentTime = now.getTime();
+    const timeFromStart = currentTime - dayStart.getTime();
+    const hourHeight = 40 * zoom;
+    const topOffset = (timeFromStart / 3600000) * hourHeight;
+    
+    // Remove existing time marker
+    $('.current-time-marker').remove();
+    
+    // Add new time marker if within timeline bounds
+    if (topOffset >= 0 && topOffset <= 24 * hourHeight) {
+      const timeMarker = $(`
+        <div class="current-time-marker" style="top: ${topOffset}px;">
+          <div class="current-time-label">${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+        </div>
+      `);
+      $timeline.append(timeMarker);
+    }
+  }
+};
 
 ipcRenderer.on('active-window-data', (e, data) => {
   if (!track) return;

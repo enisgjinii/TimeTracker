@@ -31,6 +31,9 @@
             --input: hsl(0 0% 89.8%);
             --ring: hsl(0 0% 3.9%);
             --radius: 0.5rem;
+            --success: hsl(142 76% 36%);
+            --warning: hsl(38 92% 50%);
+            --info: hsl(199 89% 48%);
         }
 
         .dark-mode {
@@ -92,50 +95,15 @@
              background-color: var(--primary-hover);
         }
 
-        .app-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            position: relative;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-        }
-
-        .logo i {
-            font-size: 1.5rem;
-            color: var(--primary);
-        }
-
-        .card {
-            background-color: var(--card);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            margin-bottom: 1rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
-        }
-
+        /* Timeline Styles */
         .timeline-container {
             position: relative;
             height: 480px;
             overflow-y: auto;
             padding-left: 70px;
             scrollbar-width: thin;
+            background-color: var(--card);
+            border-radius: var(--radius);
         }
 
         .timeline-container::-webkit-scrollbar {
@@ -143,7 +111,7 @@
         }
 
         .timeline-container::-webkit-scrollbar-thumb {
-            background-color: var(--neutral);
+            background-color: var(--muted-foreground);
             border-radius: 4px;
         }
 
@@ -157,7 +125,7 @@
             width: 60px;
             padding: 0.5rem;
             border-top: 1px solid var(--border);
-            color: var(--neutral);
+            color: var(--muted-foreground);
             font-size: 0.8rem;
             text-align: right;
         }
@@ -167,15 +135,21 @@
             left: 70px;
             right: 0;
             height: 2px;
-            background-color: var(--primary);
+            background-color: var(--destructive);
             z-index: 10;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .current-time-label {
             position: absolute;
             left: 0;
-            background-color: var(--primary);
-            color: white;
+            background-color: var(--destructive);
+            color: var(--destructive-foreground);
             font-size: 0.7rem;
             padding: 2px 5px;
             border-radius: 3px;
@@ -187,13 +161,14 @@
             border-radius: 6px;
             padding: 0.4rem 0.6rem;
             font-size: 0.8rem;
-            color: white;
+            color: var(--card-foreground);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             cursor: pointer;
             transition: all 0.2s;
             z-index: 5;
+            border: 1px solid var(--border);
         }
 
         .time-entry:hover {
@@ -202,35 +177,105 @@
         }
 
         .time-entry.focus {
-            background-color: var(--focus);
+            background-color: var(--primary);
+            color: var(--primary-foreground);
         }
 
         .time-entry.focus:hover {
-            background-color: var(--focus-hover);
+            background-color: var(--primary-hover);
         }
 
         .time-entry.distraction {
-            background-color: var(--distraction);
+            background-color: var(--destructive);
+            color: var(--destructive-foreground);
         }
 
         .time-entry.distraction:hover {
-            background-color: var(--distraction-hover);
+            background-color: var(--destructive);
+            opacity: 0.8;
         }
 
-        .time-entry.meeting {
+        .time-entry.singleColor {
             background-color: var(--secondary);
+            color: var(--secondary-foreground);
         }
 
-        .time-entry.break {
-            background-color: var(--info);
+        .time-entry.singleColor:hover {
+            background-color: var(--accent);
         }
 
-        .time-entry.idle {
-            background-color: #757575;
+        .entry {
+            position: absolute;
+            border-radius: var(--radius);
+            padding: 0.4rem 0.6rem;
+            font-size: 0.8rem;
+            color: var(--card-foreground);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 5;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
         }
 
-        .time-entry.idle:hover {
-            background-color: #616161;
+        .entry:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .entry.focus {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+        }
+
+        .entry.focus:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .entry.distraction {
+            background-color: var(--destructive);
+            color: var(--destructive-foreground);
+        }
+
+        .entry.distraction:hover {
+            background-color: var(--destructive);
+            opacity: 0.8;
+        }
+
+        .entry.singleColor {
+            background-color: var(--secondary);
+            color: var(--secondary-foreground);
+        }
+
+        .entry.singleColor:hover {
+            background-color: var(--accent);
+        }
+
+        .app-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 0.5rem;
+        }
+
+        .hour-label {
+            position: absolute;
+            left: 0;
+            width: 60px;
+            padding: 0.5rem;
+            color: var(--muted-foreground);
+            font-size: 0.8rem;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .timeline-hour {
+            position: absolute;
+            left: 70px;
+            right: 0;
+            border-top: 1px solid var(--border);
         }
 
         .btn-toggle {
@@ -250,6 +295,26 @@
             border-color: var(--primary-hover);
         }
 
+        .btn-success {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .btn-danger {
+            background-color: var(--destructive);
+            border-color: var(--destructive);
+        }
+
+        .btn-outline-secondary {
+            color: var(--muted-foreground);
+            border-color: var(--border);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--accent);
+            color: var(--accent-foreground);
+        }
+
         .view-tabs {
             border-bottom: 1px solid var(--border);
             margin-bottom: 1rem;
@@ -257,7 +322,7 @@
 
         .view-tabs .nav-link {
             border: none;
-            color: var(--neutral);
+            color: var(--muted-foreground);
             position: relative;
             padding: 0.7rem 1.5rem;
             font-weight: 500;
@@ -282,26 +347,19 @@
             padding: 1rem;
             margin-bottom: 0.5rem;
             border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.02);
+            background-color: var(--accent);
             transition: all 0.2s;
         }
 
-        body.dark-mode .stat-card {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
         .stat-card:hover {
-            background-color: rgba(0, 0, 0, 0.04);
-        }
-
-        body.dark-mode .stat-card:hover {
-            background-color: rgba(255, 255, 255, 0.08);
+            background-color: var(--accent);
+            opacity: 0.8;
         }
 
         .theme-toggle {
             background: transparent;
             border: none;
-            color: var(--neutral);
+            color: var(--muted-foreground);
             font-size: 1.2rem;
             cursor: pointer;
             transition: color 0.2s;
@@ -326,11 +384,11 @@
         }
 
         .trend-up {
-            color: var(--focus);
+            color: var(--primary);
         }
 
         .trend-down {
-            color: var(--distraction);
+            color: var(--destructive);
         }
 
         .pomodoro-container {
@@ -359,7 +417,8 @@
         }
 
         .tag {
-            background-color: rgba(0, 0, 0, 0.05);
+            background-color: var(--accent);
+            color: var(--accent-foreground);
             padding: 3px 10px;
             border-radius: 15px;
             font-size: 0.75rem;
@@ -367,13 +426,9 @@
             cursor: pointer;
         }
 
-        body.dark-mode .tag {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
         .tag:hover {
             background-color: var(--primary);
-            color: white;
+            color: var(--primary-foreground);
         }
 
         .progress {
@@ -389,16 +444,13 @@
             padding: 1rem;
             margin-bottom: 10px;
             border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.02);
+            background-color: var(--accent);
             transition: all 0.2s;
         }
 
-        body.dark-mode .goal-card {
-            background-color: rgba(255, 255, 255, 0.05);
-        }
-
         .goal-card:hover {
-            background-color: rgba(0, 0, 0, 0.04);
+            background-color: var(--accent);
+            opacity: 0.8;
         }
 
         .goal-icon {
