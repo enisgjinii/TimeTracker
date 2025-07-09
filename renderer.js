@@ -315,19 +315,41 @@ $('#nav-about').click(() => {
 $('#toggleTracking').click(() => {
   track = !track;
   $('#toggleTracking').toggleClass('btn-success btn-danger').text(track ? "Stop Tracking" : "Start Tracking");
-  if (!track) renderView();
+  if (!track) {
+    // When stopping tracking, save current segment if exists
+    if (curSeg) {
+      evs.push(curSeg);
+      saveSegCSV();
+      curSeg = null;
+    }
+    renderView();
+  }
 });
 
-$('#dayViewBtn').click(() => { view = "day"; date = new Date(); date.setHours(0, 0, 0, 0); renderView(); });
-$('#prevDay').click(() => { date.setDate(date.getDate() - 1); renderView(); });
-$('#todayBtn').click(() => { date = new Date(); date.setHours(0, 0, 0, 0); renderView(); });
-$('#nextDay').click(() => { date.setDate(date.getDate() + 1); renderView(); });
+$('#prevDay').click(() => { 
+  date.setDate(date.getDate() - 1); 
+  renderView(); 
+});
+
+$('#todayBtn').click(() => { 
+  date = new Date(); 
+  date.setHours(0, 0, 0, 0); 
+  renderView(); 
+});
+
+$('#nextDay').click(() => { 
+  date.setDate(date.getDate() + 1); 
+  renderView(); 
+});
 
 const loadSegCSV = () => {
   evs = [];
+  console.log('Loading CSV file:', SEG_FILE);
   if (fs.existsSync(SEG_FILE)) {
     try {
-      fs.readFileSync(SEG_FILE, 'utf8').trim().split('\n').forEach(line => {
+      const fileContent = fs.readFileSync(SEG_FILE, 'utf8');
+      console.log('CSV file exists, content length:', fileContent.length);
+      fileContent.trim().split('\n').forEach(line => {
         let parts = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
         if (parts.length >= 3) {
           let title = rmQuotes(parts[0]);
@@ -348,9 +370,38 @@ const loadSegCSV = () => {
           evs.push(ev);
         }
       });
+      console.log('Loaded events:', evs.length);
     } catch (e) {
       console.error("CSV Error:", e);
     }
+  } else {
+    console.log('CSV file does not exist');
+    // Create some sample data for testing
+    const now = Date.now();
+    const oneHourAgo = now - (60 * 60 * 1000);
+    const twoHoursAgo = now - (2 * 60 * 60 * 1000);
+    
+    evs = [
+      {
+        title: "Sample Work Session",
+        start: twoHoursAgo,
+        end: oneHourAgo,
+        details: {
+          owner: { name: "Sample App" },
+          isManual: false
+        }
+      },
+      {
+        title: "Sample Break",
+        start: oneHourAgo,
+        end: now,
+        details: {
+          owner: { name: "Break App" },
+          isManual: false
+        }
+      }
+    ];
+    console.log('Created sample data for testing');
   }
 };
 
@@ -419,6 +470,9 @@ const extractAppName = title => {
 };
 
 const renderDayView = async () => {
+  console.log('Rendering day view for date:', date);
+  console.log('Total events loaded:', evs.length);
+  
   $timeline.show().empty();
   $dateLabel.text(date.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' }));
   let dayStart = new Date(date.getTime()); dayStart.setHours(0, 0, 0, 0);
@@ -426,6 +480,9 @@ const renderDayView = async () => {
   let dayEvents = [...evs];
   if (curSeg) dayEvents.push(curSeg);
   dayEvents = dayEvents.filter(ev => ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime());
+  
+  console.log('Events for this day:', dayEvents.length);
+  
   const hourHeight = 40 * zoom;
   const totalHeight = 24 * hourHeight;
   $timeline.css({ height: totalHeight + 'px', position: 'relative' });
@@ -514,6 +571,7 @@ const renderDayView = async () => {
 };
 
 const renderView = async () => {
+  console.log('renderView called, view:', view, 'date:', date);
   loadSegCSV();
   $dateLabel.text(date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
   if (view === "day") {
@@ -558,9 +616,16 @@ function showSegDetails(details) {
 }
 
 $(document).ready(async () => {
+  console.log('Document ready, initializing...');
   loadSet();
   initSetUI();
   applySet();
+  
+  // Ensure timeline view is visible
+  $('#timeline-view').removeClass('d-none');
+  $('#settings-view').addClass('d-none');
+  $('#about-view').addClass('d-none');
+  
   await renderView();
   
   // Update current time indicator every minute
@@ -572,6 +637,8 @@ $(document).ready(async () => {
   
   // Initial update
   updateCurrentTimeIndicator();
+  
+  console.log('Initialization complete');
 });
 
 const updateCurrentTimeIndicator = () => {
