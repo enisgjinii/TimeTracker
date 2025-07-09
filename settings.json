@@ -1,11 +1,13 @@
 {
-  "timelineIncrements": 10,
+  "timelineIncrements": 5,
   "darkMode": true,
-  "themeMode": "system",
-  "useEmojis": false,
+  "themeMode": "light",
+  "useEmojis": true,
   "colorCodedEvents": true,
-  "defaultView": "day",
-  "categories": [],
+  "defaultView": "week",
+  "categories": [
+    "EEEEEEEA"
+  ],
   "appClassifications": {
     "Visual Studio Code": "Work",
     "Electron": "Productivity",

@@ -1103,21 +1103,21 @@
                         <i class="fas fa-chart-line me-2"></i>
                         Timeline
                     </a>
-                </li>
+            </li>
                 <li class="mb-1">
                     <a href="#" class="nav-link" id="nav-settings">
                         <i class="fas fa-cog me-2"></i>
                         Settings
                     </a>
-                </li>
+            </li>
                 <li class="mb-1">
                     <a href="#" class="nav-link" id="nav-about">
                         <i class="fas fa-info-circle me-2"></i>
                         About
                     </a>
-                </li>
-            </ul>
-        </div>
+            </li>
+        </ul>
+            </div>
         <div class="flex-grow-1 p-4" style="overflow-y: auto; background-color: var(--background); color: var(--foreground)">
             <div id="timeline-view">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1127,17 +1127,17 @@
                             <button id="prevDay" class="btn btn-outline-secondary" aria-label="Previous Day"><i class="fas fa-chevron-left"></i></button>
                             <button id="todayBtn" class="btn btn-outline-secondary">Today</button>
                             <button id="nextDay" class="btn btn-outline-secondary" aria-label="Next Day"><i class="fas fa-chevron-right"></i></button>
-                        </div>
+        </div>
                         <h2 id="currentDateLabel" class="h5 mb-0 me-3"></h2>
                         <button id="toggleTracking" class="btn btn-primary">Start Tracking</button>
                     </div>
-                </div>
+                    </div>
                 <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
                     <div class="card-body">
-                        <div id="timeline" class="timeline-container"></div>
+                                <div id="timeline" class="timeline-container"></div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
             <div id="settings-view" class="d-none">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -1145,28 +1145,28 @@
                     <button id="saveSettingsBtn" class="btn btn-primary">
                         <i class="fas fa-save me-2"></i>Save Settings
                     </button>
-                </div>
+                                </div>
 
                 <div class="row">
                     <div class="col-md-6">
                         <div class="settings-section">
                             <h3><i class="fas fa-palette me-2"></i>Appearance</h3>
                             <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
-                                <div class="card-body">
+                            <div class="card-body">
                                     <div class="mb-3">
                                         <label class="form-label">Theme Mode</label>
                                         <div class="btn-group w-100" role="group">
                                             <button id="lightModeBtn" class="btn btn-outline-secondary">
                                                 <i class="fas fa-sun me-2"></i>Light
-                                            </button>
+                                        </button>
                                             <button id="darkModeBtn" class="btn btn-outline-secondary">
                                                 <i class="fas fa-moon me-2"></i>Dark
-                                            </button>
+                                        </button>
                                             <button id="systemModeBtn" class="btn btn-outline-secondary">
                                                 <i class="fas fa-desktop me-2"></i>System
-                                            </button>
-                                        </div>
+                                        </button>
                                     </div>
+                                        </div>
                                     <div class="mb-3">
                                         <div class="form-check">
                                             <input class="form-check-input" type="checkbox" id="useEmojisCheck">
@@ -1180,12 +1180,12 @@
                                             <input class="form-check-input" type="checkbox" id="colorCodedEventsCheck">
                                             <label class="form-check-label" for="colorCodedEventsCheck">
                                                 Color Code Events (Focus/Distraction)
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                </label>
+            </div>
+        </div>
+                </div>
+            </div>
+                </div>
 
                         <div class="settings-section">
                             <h3><i class="fas fa-clock me-2"></i>Timeline Settings</h3>
@@ -1194,13 +1194,13 @@
                                     <div class="mb-3">
                                         <label for="timelineIncrements" class="form-label">Timeline Increments (minutes)</label>
                                         <select class="form-select" id="timelineIncrements">
-                                            <option value="5">5 minutes</option>
-                                            <option value="10">10 minutes</option>
+                    <option value="5">5 minutes</option>
+                    <option value="10">10 minutes</option>
                                             <option value="15">15 minutes</option>
-                                            <option value="30">30 minutes</option>
+                    <option value="30">30 minutes</option>
                                             <option value="60">1 hour</option>
-                                        </select>
-                                    </div>
+                </select>
+            </div>
                                     <div class="mb-3">
                                         <label for="defaultViewSelect" class="form-label">Default View</label>
                                         <select class="form-select" id="defaultViewSelect">
@@ -1208,14 +1208,14 @@
                                             <option value="week">Week View</option>
                                             <option value="month">Month View</option>
                                         </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+            </div>
+                </div>
+            </div>
+        </div>
 
                     <div class="col-md-6">
-                        <div class="settings-section">
+        <div class="settings-section">
                             <h3><i class="fas fa-tags me-2"></i>Categories</h3>
                             <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
                                 <div class="card-body">
@@ -1223,17 +1223,17 @@
                                         <label class="form-label">Manage Categories</label>
                                         <div id="categoriesList" class="mb-3">
                                             <!-- Categories will be populated here -->
-                                        </div>
+                </div>
                                         <div class="d-flex gap-2">
                                             <input type="text" id="newCategoryInput" class="form-control" placeholder="New category name">
                                             <button id="addCategoryBtn" class="btn btn-outline-secondary" aria-label="Add new category">
                                                 <i class="fas fa-plus"></i>
                                             </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            </div>
+                </div>
+            </div>
+                </div>
+            </div>
 
                         <div class="settings-section">
                             <h3><i class="fas fa-desktop me-2"></i>App Classifications</h3>
@@ -1243,22 +1243,22 @@
                                         <label class="form-label">App to Category Mapping</label>
                                         <div id="appClassificationsList" class="list-group mb-3">
                                             <!-- App classifications will be populated here -->
-                                        </div>
+                </div>
                                         <div class="d-flex gap-2">
                                             <input type="text" id="newAppInput" class="form-control" placeholder="App name">
                                             <select id="newCategorySelect" class="form-select" aria-label="Select category for app">
                                                 <!-- Categories will be populated here -->
-                                            </select>
+                </select>
                                             <button id="addClassificationBtn" class="btn btn-outline-secondary" aria-label="Add new app classification">
                                                 <i class="fas fa-plus"></i>
                                             </button>
-                                        </div>
-                                    </div>
-                                </div>
+            </div>
+        </div>
+    </div>
+                </div>
+                        </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
                 <div class="settings-section">
                     <h3><i class="fas fa-info-circle me-2"></i>Data Management</h3>
@@ -1280,9 +1280,9 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+                        </div>
+                        </div>
+                        </div>
 
             <div id="about-view" class="d-none">
                 <h1 class="h3">About</h1>
@@ -1290,11 +1290,11 @@
                     <div class="card-body">
                         <p>TimeTracker Pro - a simple app to track your time.</p>
                         <p>Version: 1.0.0</p>
-                    </div>
+                        </div>
+                </div>
                 </div>
             </div>
         </div>
-    </div>
     <script src="renderer.js"></script>
 </body>
 

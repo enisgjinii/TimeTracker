@@ -49,19 +49,27 @@ const getDevIcon = appName => {
   return `${base}/${normName}/${normName}-original.svg`;
 };
 
-const createAppIcon = appName => {
+const createAppIcon = appNameOrIconData => {
   const img = document.createElement('img');
   img.classList.add('app-icon');
-  img.alt = appName;
-  img.src = getDevIcon(appName);
-  img.onerror = function () {
-    if (this.src.includes("devicon")) {
-      this.src = `https://img.icons8.com/color/48/000000/${encodeURIComponent(appName)}.png`;
-    } else if (this.src.includes("icons8")) {
-      this.onerror = null;
-      this.src = 'images/default-icon.png';
-    }
-  };
+  
+  if (appNameOrIconData.startsWith('data:image/png;base64,')) {
+    img.src = appNameOrIconData;
+    img.alt = 'App Icon';
+  } else {
+    // Fallback for old data or if icon fetching fails
+    const appName = appNameOrIconData;
+    img.alt = appName;
+    img.src = getDevIcon(appName);
+    img.onerror = function () {
+      if (this.src.includes("devicon")) {
+        this.src = `https://img.icons8.com/color/48/000000/${encodeURIComponent(appName)}.png`;
+      } else if (this.src.includes("icons8")) {
+        this.onerror = null;
+        this.src = 'images/default-icon.png';
+      }
+    };
+  }
   return img;
 };
 
@@ -321,13 +329,14 @@ const loadSegCSV = () => {
           let en = parseInt(parts[2]);
           if (isNaN(st) || isNaN(en)) return;
           let ev = { title, start: st, end: en };
-          if (parts.length >= 14) {
+          if (parts.length >= 15) { // Increased for icon data
             ev.details = {
               id: parseInt(parts[3]),
               bounds: { x: parseInt(parts[4]), y: parseInt(parts[5]), width: parseInt(parts[6]), height: parseInt(parts[7]) },
               owner: { name: rmQuotes(parts[8]), processId: parseInt(parts[9]), bundleId: rmQuotes(parts[10]), path: rmQuotes(parts[11]) },
               url: rmQuotes(parts[12]),
-              memoryUsage: parseInt(parts[13])
+              memoryUsage: parseInt(parts[13]),
+              icon: rmQuotes(parts[14]) // Icon is the 15th element
             };
           }
           evs.push(ev);
@@ -361,7 +370,8 @@ const saveSegCSV = () => {
       const ownerPath = `"${owner.path || ''}"`;
       const url = `"${d.url || ''}"`;
       const memoryUsage = d.memoryUsage || '';
-      return [title, start, end, d.id, x, y, width, height, ownerName, processId, bundleId, ownerPath, url, memoryUsage].join(',');
+      const icon = `"${d.icon || ''}"`; // Add icon data
+      return [title, start, end, d.id, x, y, width, height, ownerName, processId, bundleId, ownerPath, url, memoryUsage, icon].join(',');
     }
     return [title, start, end].join(',');
   }).join('\n');
@@ -465,9 +475,14 @@ const renderDayView = async () => {
     let leftOffset = 100 + (ev.lane * laneWidth);
     let blockWidth = laneWidth - 5;
     let titleText = usrSet.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
+    
     const appName = ev.details?.owner?.name || extractAppName(ev.title);
     const category = getAppCat(appName);
-    const iconEl = createAppIcon(appName);
+    
+    // Use icon from details if available, otherwise use appName for fallback
+    const iconData = ev.details?.icon || appName;
+    const iconEl = createAppIcon(iconData);
+    
     let badgeHTML = category ? `<span class="badge bg-info me-1">${category}</span>` : "";
     
     let wrapper = $('<div/>', {
@@ -576,9 +591,11 @@ ipcRenderer.on('active-window-data', (e, data) => {
     curSeg.end = now;
   } else {
     evs.push(curSeg);
+    saveSegCSV(); // Save before creating the new segment
     curSeg = { title: data.title, start: now, end: now, details: data };
   }
-  saveSegCSV();
+  // No need to save on every single update, maybe just when segment changes
+  
   if (Date.now() - lastSegUpdate > 5000) {
     renderDayView();
     lastSegUpdate = Date.now();
