@@ -4,7 +4,7 @@
   "themeMode": "light",
   "useEmojis": true,
   "colorCodedEvents": true,
-  "defaultView": "week",
+  "defaultView": "month",
   "categories": [
     "EEEEEEEA"
   ],

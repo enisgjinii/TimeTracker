@@ -277,12 +277,6 @@
             height: 2px;
             background-color: var(--destructive);
             z-index: 10;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
         }
 
         .current-time-label {
@@ -1040,6 +1034,9 @@
             align-items: center;
             gap: 5px;
             cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
             user-select: none;
         }
 
@@ -1129,6 +1126,9 @@
                             <button id="nextDay" class="btn btn-outline-secondary" aria-label="Next Day"><i class="fas fa-chevron-right"></i></button>
         </div>
                         <h2 id="currentDateLabel" class="h5 mb-0 me-3"></h2>
+                        <button id="addEntryBtn" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-plus me-2"></i>Add Entry
+                        </button>
                         <button id="toggleTracking" class="btn btn-primary">Start Tracking</button>
                     </div>
                     </div>
@@ -1295,6 +1295,82 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Segment Details Modal -->
+    <div class="modal fade" id="segmentDetailsModal" tabindex="-1" aria-labelledby="segmentDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: var(--card); border: 1px solid var(--border);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+                    <h5 class="modal-title" id="segmentDetailsModalLabel">
+                        <i class="fas fa-info-circle me-2"></i>Entry Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="segmentDetailsContent">
+                        <!-- Content will be populated by JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--border);">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Entry Modal -->
+    <div class="modal fade" id="manualEntryModal" tabindex="-1" aria-labelledby="manualEntryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="background-color: var(--card); border: 1px solid var(--border);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border);">
+                    <h5 class="modal-title" id="manualEntryModalLabel">
+                        <i class="fas fa-plus me-2"></i>Add Manual Entry
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="manualEntryForm">
+                        <div class="mb-3">
+                            <label for="entryTitle" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="entryTitle" placeholder="Enter activity title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryCategory" class="form-label">Category</label>
+                            <select class="form-select" id="entryCategory">
+                                <option value="">Select category (optional)</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="entryStartTime" class="form-label">Start Time</label>
+                                    <input type="datetime-local" class="form-control" id="entryStartTime" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="entryEndTime" class="form-label">End Time</label>
+                                    <input type="datetime-local" class="form-control" id="entryEndTime" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryDescription" class="form-label">Description (optional)</label>
+                            <textarea class="form-control" id="entryDescription" rows="3" placeholder="Add any additional notes..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--border);">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveManualEntryBtn">
+                        <i class="fas fa-save me-2"></i>Save Entry
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="renderer.js"></script>
 </body>
 

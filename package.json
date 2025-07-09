@@ -6,7 +6,6 @@
   "scripts": {
     "start": "electron ."
   },
-  "type": "module",
   "dependencies": {
     "electron": "^29.0.1",
     "electron-store": "^8.1.0",

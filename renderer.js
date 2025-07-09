@@ -60,15 +60,21 @@ const createAppIcon = appNameOrIconData => {
     // Fallback for old data or if icon fetching fails
     const appName = appNameOrIconData;
     img.alt = appName;
-    img.src = getDevIcon(appName);
-    img.onerror = function () {
-      if (this.src.includes("devicon")) {
-        this.src = `https://img.icons8.com/color/48/000000/${encodeURIComponent(appName)}.png`;
-      } else if (this.src.includes("icons8")) {
-        this.onerror = null;
-        this.src = 'images/default-icon.png';
-      }
-    };
+    
+    // Handle manual entries
+    if (appName === 'Manual Entry') {
+      img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggM0M4LjU1MjI4IDMgOSAzLjQ0Nzc5IDkgNFY3SDhWNFY3SDdWNFM4IDMgOCAzWiIgZmlsbD0iY3VycmVudENvbG9yIi8+CjxwYXRoIGQ9Ik04IDEzQzguNTUyMjggMTMgOSAxMi41NTIzIDkgMTJWMHMyIDAgMiAwVjEyQzExIDEyLjU1MjMgMTAuNTUyMyAxMyAxMCAxM0g4WiIgZmlsbD0iY3VycmVudENvbG9yIi8+Cjwvc3ZnPgo=';
+    } else {
+      img.src = getDevIcon(appName);
+      img.onerror = function () {
+        if (this.src.includes("devicon")) {
+          this.src = `https://img.icons8.com/color/48/000000/${encodeURIComponent(appName)}.png`;
+        } else if (this.src.includes("icons8")) {
+          this.onerror = null;
+          this.src = 'images/default-icon.png';
+        }
+      };
+    }
   }
   return img;
 };
@@ -477,7 +483,7 @@ const renderDayView = async () => {
     let titleText = usrSet.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
     
     const appName = ev.details?.owner?.name || extractAppName(ev.title);
-    const category = getAppCat(appName);
+    const category = ev.details?.isManual ? ev.details.category : getAppCat(appName);
     
     // Use icon from details if available, otherwise use appName for fallback
     const iconData = ev.details?.icon || appName;
@@ -522,10 +528,22 @@ function showSegDetails(details) {
                    <strong>Start:</strong> ${fmtDate(new Date(details.start))}<br>
                    <strong>End:</strong> ${fmtDate(new Date(details.end))}<br>
                    <strong>Duration:</strong> ${durMin} min`;
+  
   if (details.details) {
     const d = details.details;
-    const { bounds = {}, owner = {} } = d;
-    content += `<hr>
+    
+    // Handle manual entries
+    if (d.isManual) {
+      content += `<hr>
+                   <strong>Type:</strong> Manual Entry<br>
+                   <strong>Category:</strong> ${d.category || 'None'}<br>`;
+      if (d.description) {
+        content += `<strong>Description:</strong> ${d.description}`;
+      }
+    } else {
+      // Handle automatic entries
+      const { bounds = {}, owner = {} } = d;
+      content += `<hr>
                    <strong>Window ID:</strong> ${d.id || ''}<br>
                    <strong>Bounds:</strong> x: ${bounds.x || ''}, y: ${bounds.y || ''}, width: ${bounds.width || ''}, height: ${bounds.height || ''}<br>
                    <strong>Owner:</strong> ${owner.name || ''} (PID: ${owner.processId || ''})<br>
@@ -533,6 +551,7 @@ function showSegDetails(details) {
                    <strong>Path:</strong> ${owner.path || ''}<br>
                    <strong>URL:</strong> ${d.url || ''}<br>
                    <strong>Memory:</strong> ${d.memoryUsage || ''}`;
+    }
   }
   $("#segmentDetailsContent").html(content);
   $("#segmentDetailsModal").modal("show");
@@ -608,4 +627,97 @@ $(document).keydown(e => {
     else if (e.key === '.') zoom = Math.max(0.1, zoom - 0.2);
     renderView();
   }
+});
+
+// Manual Entry Functionality
+const initializeManualEntry = () => {
+  // Populate category dropdown
+  const categorySelect = $('#entryCategory');
+  categorySelect.empty().append('<option value="">Select category (optional)</option>');
+  if (usrSet.categories) {
+    usrSet.categories.forEach(category => {
+      categorySelect.append(`<option value="${category}">${category}</option>`);
+    });
+  }
+  
+  // Set default times to current date
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 16);
+  $('#entryStartTime').val(dateStr);
+  $('#entryEndTime').val(dateStr);
+};
+
+const openManualEntryModal = () => {
+  initializeManualEntry();
+  $('#manualEntryModal').modal('show');
+};
+
+const saveManualEntry = () => {
+  const title = $('#entryTitle').val().trim();
+  const category = $('#entryCategory').val();
+  const startTime = $('#entryStartTime').val();
+  const endTime = $('#entryEndTime').val();
+  const description = $('#entryDescription').val().trim();
+  
+  if (!title || !startTime || !endTime) {
+    alert('Please fill in all required fields (Title, Start Time, End Time)');
+    return;
+  }
+  
+  const startDate = new Date(startTime);
+  const endDate = new Date(endTime);
+  
+  if (startDate >= endDate) {
+    alert('End time must be after start time');
+    return;
+  }
+  
+  // Create manual entry
+  const manualEntry = {
+    title: title,
+    start: startDate.getTime(),
+    end: endDate.getTime(),
+    details: {
+      owner: { name: 'Manual Entry' },
+      isManual: true,
+      description: description,
+      category: category
+    }
+  };
+  
+  // Add to events array
+  evs.push(manualEntry);
+  
+  // Save to CSV
+  saveSegCSV();
+  
+  // Close modal and refresh view
+  $('#manualEntryModal').modal('hide');
+  $('#manualEntryForm')[0].reset();
+  
+  // Show success message
+  const successAlert = $(`
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fas fa-check-circle me-2"></i>Manual entry added successfully!
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  `);
+  $('#timeline-view .card-body').first().prepend(successAlert);
+  
+  // Auto-dismiss after 3 seconds
+  setTimeout(() => {
+    successAlert.alert('close');
+  }, 3000);
+  
+  // Refresh the timeline view
+  renderView();
+};
+
+// Event listeners for manual entry
+$('#addEntryBtn').click(openManualEntryModal);
+$('#saveManualEntryBtn').click(saveManualEntry);
+
+// Initialize manual entry when document is ready
+$(document).ready(() => {
+  initializeManualEntry();
 });
