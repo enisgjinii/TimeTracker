@@ -71,9 +71,11 @@ const popCats = () => {
   $('#categoriesList').empty();
   usrSet.categories = usrSet.categories || [];
   usrSet.categories.forEach((cat, i) => {
-    $('#categoriesList').append(`<div class="d-flex align-items-center mb-1">
+    $('#categoriesList').append(`<div class="d-flex align-items-center justify-content-between p-2 rounded mb-2" style="background-color: var(--accent);">
             <span class="badge bg-secondary me-2">${cat}</span>
-            <button class="btn btn-sm btn-outline-danger rm-cat" data-index="${i}">&times;</button>
+            <button class="btn btn-sm btn-outline-danger rm-cat" data-index="${i}" aria-label="Remove category ${cat}">
+                <i class="fas fa-times"></i>
+            </button>
         </div>`);
   });
 };
@@ -84,8 +86,12 @@ const popAppClass = () => {
   for (let app in usrSet.appClassifications) {
     let cat = usrSet.appClassifications[app];
     $('#appClassificationsList').append(`<div class="list-group-item d-flex justify-content-between align-items-center">
-            <span>${app} &rarr; <em>${cat}</em></span>
-            <button class="btn btn-sm btn-outline-danger rm-class" data-app="${app}">&times;</button>
+            <div>
+                <strong>${app}</strong> → <em>${cat}</em>
+            </div>
+            <button class="btn btn-sm btn-outline-danger rm-class" data-app="${app}" aria-label="Remove classification for ${app}">
+                <i class="fas fa-times"></i>
+            </button>
         </div>`);
   }
 };
@@ -94,28 +100,9 @@ $(document).on('click', '.rm-cat', function () {
   usrSet.categories.splice($(this).data('index'), 1);
   popCats();
 });
-$('#addCategoryBtn').click(() => {
-  let newCat = prompt("Enter new category:");
-  if (newCat) {
-    usrSet.categories = usrSet.categories || [];
-    usrSet.categories.push(newCat);
-    popCats();
-  }
-});
 $(document).on('click', '.rm-class', function () {
   delete usrSet.appClassifications[$(this).data('app')];
   popAppClass();
-});
-$('#addClassificationBtn').click(() => {
-  let appName = prompt("Enter app name for classification:");
-  if (appName) {
-    let newCat = prompt("Enter category for " + appName + ":");
-    if (newCat) {
-      usrSet.appClassifications = usrSet.appClassifications || {};
-      usrSet.appClassifications[appName] = newCat;
-      popAppClass();
-    }
-  }
 });
 
 const loadSet = () => {
@@ -173,7 +160,101 @@ $('#saveSettingsBtn').click(() => {
   usrSet.defaultView = $('#defaultViewSelect').val();
   saveSet();
   applySet();
-  $('#settingsModal').modal('hide');
+  
+  // Show success message
+  const successAlert = $(`
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fas fa-check-circle me-2"></i>Settings saved successfully!
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  `);
+  $('#settings-view .card-body').first().prepend(successAlert);
+  
+  // Auto-dismiss after 3 seconds
+  setTimeout(() => {
+    successAlert.alert('close');
+  }, 3000);
+});
+
+$('#addCategoryBtn').click(() => {
+  let newCat = $('#newCategoryInput').val().trim();
+  if (newCat) {
+    usrSet.categories = usrSet.categories || [];
+    usrSet.categories.push(newCat);
+    popCats();
+    $('#newCategoryInput').val('');
+    saveSet();
+  }
+});
+
+$('#addClassificationBtn').click(() => {
+  let appName = $('#newAppInput').val().trim();
+  let newCat = $('#newCategorySelect').val();
+  if (appName && newCat) {
+    usrSet.appClassifications = usrSet.appClassifications || {};
+    usrSet.appClassifications[appName] = newCat;
+    popAppClass();
+    $('#newAppInput').val('');
+    $('#newCategorySelect').val('');
+    saveSet();
+  }
+});
+
+$('#exportDataBtn').click(() => {
+  const { dialog } = require('electron').remote;
+  dialog.showSaveDialog({
+    title: 'Export TimeTracker Data',
+    defaultPath: 'timetracker-export.csv',
+    filters: [
+      { name: 'CSV Files', extensions: ['csv'] },
+      { name: 'All Files', extensions: ['*'] }
+    ]
+  }).then(result => {
+    if (!result.canceled && result.filePath) {
+      try {
+        fs.copyFileSync(SEG_FILE, result.filePath);
+        alert('Data exported successfully!');
+      } catch (error) {
+        alert('Error exporting data: ' + error.message);
+      }
+    }
+  });
+});
+
+$('#importDataBtn').click(() => {
+  const { dialog } = require('electron').remote;
+  dialog.showOpenDialog({
+    title: 'Import TimeTracker Data',
+    filters: [
+      { name: 'CSV Files', extensions: ['csv'] },
+      { name: 'All Files', extensions: ['*'] }
+    ],
+    properties: ['openFile']
+  }).then(result => {
+    if (!result.canceled && result.filePaths.length > 0) {
+      try {
+        fs.copyFileSync(result.filePaths[0], SEG_FILE);
+        loadSegCSV();
+        renderView();
+        alert('Data imported successfully!');
+      } catch (error) {
+        alert('Error importing data: ' + error.message);
+      }
+    }
+  });
+});
+
+$('#clearDataBtn').click(() => {
+  if (confirm('Are you sure you want to clear all tracking data? This action cannot be undone.')) {
+    try {
+      fs.unlinkSync(SEG_FILE);
+      evs = [];
+      renderView();
+      alert('All data cleared successfully!');
+    } catch (error) {
+      alert('Error clearing data: ' + error.message);
+    }
+  }
 });
 
 $('#lightModeBtn').click(() => setThemeMode('light'));
@@ -200,6 +281,13 @@ $('#nav-settings').click(() => {
     $('#about-view').addClass('d-none');
     $('.nav-link').removeClass('active');
     $('#nav-settings').addClass('active');
+    
+    // Populate category select for app classifications
+    $('#newCategorySelect').empty();
+    $('#newCategorySelect').append('<option value="">Select category...</option>');
+    usrSet.categories.forEach(cat => {
+        $('#newCategorySelect').append(`<option value="${cat}">${cat}</option>`);
+    });
 });
 
 $('#nav-about').click(() => {

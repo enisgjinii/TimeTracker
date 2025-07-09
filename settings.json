@@ -1,20 +1,11 @@
 {
   "timelineIncrements": 10,
   "darkMode": true,
-  "themeMode": "light",
+  "themeMode": "system",
   "useEmojis": false,
   "colorCodedEvents": true,
   "defaultView": "day",
-  "idleThreshold": 5,
   "categories": [],
-  "pomodoroSettings": {
-    "focusDuration": 25,
-    "shortBreakDuration": 5,
-    "longBreakDuration": 15,
-    "longBreakInterval": 4,
-    "autoStartBreaks": false,
-    "autoStartPomodoros": false
-  },
   "appClassifications": {
     "Visual Studio Code": "Work",
     "Electron": "Productivity",
@@ -22,6 +13,15 @@
     "Zen Browser": "Entertainment",
     "YouTube": "Entertainment",
     "Discord": "Social"
+  },
+  "idleThreshold": 5,
+  "pomodoroSettings": {
+    "focusDuration": 25,
+    "shortBreakDuration": 5,
+    "longBreakDuration": 15,
+    "longBreakInterval": 4,
+    "autoStartBreaks": false,
+    "autoStartPomodoros": false
   },
   "notifications": {
     "enabled": true,
