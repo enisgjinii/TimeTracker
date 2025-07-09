@@ -36,10 +36,6 @@ let usrSet = {
 
 const $timeline = $('#timeline');
 const $dateLabel = $('#currentDateLabel');
-const $focusTime = $('#focusedTime');
-const $distractTime = $('#distractedTime');
-const $usedList = $('#mostUsedList');
-const $distractList = $('#topDistractionsList');
 const $appTitle = $('#appTitle');
 let lastSegUpdate = 0;
 
@@ -189,6 +185,30 @@ function setThemeMode(mode) {
   saveSet();
   applySet();
 }
+
+$('#nav-timeline').click(() => {
+    $('#timeline-view').removeClass('d-none');
+    $('#settings-view').addClass('d-none');
+    $('#about-view').addClass('d-none');
+    $('.nav-link').removeClass('active');
+    $('#nav-timeline').addClass('active');
+});
+
+$('#nav-settings').click(() => {
+    $('#timeline-view').addClass('d-none');
+    $('#settings-view').removeClass('d-none');
+    $('#about-view').addClass('d-none');
+    $('.nav-link').removeClass('active');
+    $('#nav-settings').addClass('active');
+});
+
+$('#nav-about').click(() => {
+    $('#timeline-view').addClass('d-none');
+    $('#settings-view').addClass('d-none');
+    $('#about-view').removeClass('d-none');
+    $('.nav-link').removeClass('active');
+    $('#nav-about').addClass('active');
+});
 
 $('#toggleTracking').click(() => {
   track = !track;
@@ -350,71 +370,11 @@ const renderDayView = async () => {
   return dayEvents;
 };
 
-const renderDaySummary = () => {
-  let dayStart = new Date(date.getTime()); dayStart.setHours(0, 0, 0, 0);
-  let dayEnd = new Date(date.getTime()); dayEnd.setHours(23, 59, 59, 999);
-  const dayEvents = evs.filter(ev => ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime());
-  renderSum(dayEvents, dayStart.getTime(), dayEnd.getTime());
-};
-
-const renderSum = (evList, startMs, endMs) => {
-  if (!track && document.querySelector("#donutChart").innerHTML !== "") document.querySelector("#donutChart").innerHTML = "";
-  let focusMs = 0, distractMs = 0;
-  let usageMap = {};
-  evList.forEach(ev => {
-    let s = Math.max(ev.start, startMs);
-    let e = Math.min(ev.end, endMs);
-    let dur = e - s;
-    if (dur < 60000) return;
-    let app = ev.details?.owner?.name || extractAppName(ev.title);
-    usageMap[app] = (usageMap[app] || 0) + dur;
-    if (/youtube|discord|facebook/i.test(app)) distractMs += dur;
-    else focusMs += dur;
-  });
-
-  if (!track) {
-    new ApexCharts(document.querySelector("#donutChart"), {
-      chart: { type: 'donut', width: 250 },
-      labels: ["Focused", "Distracted"],
-      series: [focusMs, distractMs],
-      colors: ["#2eb85c", "#e55353"]
-    }).render();
-  }
-
-  const formatTime = ms => {
-    const h = Math.floor(ms / 3600000);
-    const m = Math.floor((ms % 3600000) / 60000);
-    return `${h}h ${m}m`;
-  };
-
-  $focusTime.text(formatTime(focusMs));
-  $distractTime.text(formatTime(distractMs));
-
-  const appendUsageList = ($list, usageArr, isDistract) => {
-    $list.empty();
-    usageArr.slice(0, 5).forEach(async ([app, ms]) => {
-      let min = Math.round(ms / 60000);
-      const iconUrl = getDevIcon(app) || `https://img.icons8.com/color/48/000000/${encodeURIComponent(app)}.png`;
-      $list.append(`<li><img src="${iconUrl}" alt="${app}" style="width:16px; height:16px; margin-right:4px;">${app} - ${min} min</li>`);
-    });
-  };
-
-  let usageArr = Object.entries(usageMap).sort(([, a], [, b]) => b - a);
-  $usedList.empty();
-  appendUsageList($usedList, usageArr);
-
-  let distractors = usageArr.filter(([app]) => /youtube|discord|facebook/i.test(app));
-  $distractList.empty();
-  appendUsageList($distractList, distractors);
-};
-
-
 const renderView = async () => {
   loadSegCSV();
+  $dateLabel.text(date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
   if (view === "day") {
-    $('#dayNav').show();
     await renderDayView();
-    renderDaySummary();
   }
 };
 
@@ -464,7 +424,6 @@ ipcRenderer.on('active-window-data', (e, data) => {
     renderDayView();
     lastSegUpdate = Date.now();
   }
-  renderDaySummary();
 });
 
 $(document).keydown(e => {
