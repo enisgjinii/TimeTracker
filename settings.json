@@ -1,20 +1,13 @@
 {
   "timelineIncrements": 5,
   "darkMode": true,
-  "themeMode": "light",
+  "themeMode": "system",
   "useEmojis": true,
   "colorCodedEvents": true,
   "defaultView": "month",
-  "categories": [
-    "EEEEEEEA"
-  ],
+  "categories": [],
   "appClassifications": {
-    "Visual Studio Code": "Work",
-    "Electron": "Productivity",
-    "Search": "Work",
-    "Zen Browser": "Entertainment",
-    "YouTube": "Entertainment",
-    "Discord": "Social"
+    "sda": "EEEEEEEA"
   },
   "idleThreshold": 5,
   "pomodoroSettings": {

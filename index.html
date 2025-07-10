@@ -394,6 +394,23 @@
             margin-right: 0.5rem;
         }
 
+        /* Week and Month View Styles */
+        .day-header, .week-header {
+            background-color: var(--accent);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--foreground);
+        }
+
+        .timeline-day, .timeline-week {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .current-day {
+            background-color: rgba(58, 134, 255, 0.1);
+            border-radius: 4px;
+        }
+
         .hour-label {
             position: absolute;
             left: 0;
@@ -1124,7 +1141,12 @@
                             <button id="prevDay" class="btn btn-outline-secondary" aria-label="Previous Day"><i class="fas fa-chevron-left"></i></button>
                             <button id="todayBtn" class="btn btn-outline-secondary">Today</button>
                             <button id="nextDay" class="btn btn-outline-secondary" aria-label="Next Day"><i class="fas fa-chevron-right"></i></button>
-        </div>
+                        </div>
+                        <div class="btn-group me-2" role="group">
+                            <button id="viewDay" class="btn btn-outline-secondary active" data-view="day">Day</button>
+                            <button id="viewWeek" class="btn btn-outline-secondary" data-view="week">Week</button>
+                            <button id="viewMonth" class="btn btn-outline-secondary" data-view="month">Month</button>
+                        </div>
                         <h2 id="currentDateLabel" class="h5 mb-0 me-3"></h2>
                         <button id="addEntryBtn" class="btn btn-outline-secondary me-2">
                             <i class="fas fa-plus me-2"></i>Add Entry

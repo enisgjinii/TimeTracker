@@ -147,7 +147,10 @@ const applySet = () => {
     $('#systemModeBtn').addClass('active');
   }
   $appTitle.html(usrSet.useEmojis ? "Time Tracker <span>⏳</span>" : "Time Tracker");
-  view = usrSet.defaultView;
+  view = usrSet.defaultView || "day";
+  // Update view button states
+  $('.btn-group .btn').removeClass('active');
+  $(`#view${view.charAt(0).toUpperCase() + view.slice(1)}`).addClass('active');
   renderView();
 };
 const initSetUI = () => {
@@ -327,7 +330,13 @@ $('#toggleTracking').click(() => {
 });
 
 $('#prevDay').click(() => { 
-  date.setDate(date.getDate() - 1); 
+  if (view === "day") {
+    date.setDate(date.getDate() - 1);
+  } else if (view === "week") {
+    date.setDate(date.getDate() - 7);
+  } else if (view === "month") {
+    date.setMonth(date.getMonth() - 1);
+  }
   renderView(); 
 });
 
@@ -338,8 +347,36 @@ $('#todayBtn').click(() => {
 });
 
 $('#nextDay').click(() => { 
-  date.setDate(date.getDate() + 1); 
+  if (view === "day") {
+    date.setDate(date.getDate() + 1);
+  } else if (view === "week") {
+    date.setDate(date.getDate() + 7);
+  } else if (view === "month") {
+    date.setMonth(date.getMonth() + 1);
+  }
   renderView(); 
+});
+
+// View selector buttons
+$('#viewDay').click(() => {
+  view = "day";
+  $('.btn-group .btn').removeClass('active');
+  $('#viewDay').addClass('active');
+  renderView();
+});
+
+$('#viewWeek').click(() => {
+  view = "week";
+  $('.btn-group .btn').removeClass('active');
+  $('#viewWeek').addClass('active');
+  renderView();
+});
+
+$('#viewMonth').click(() => {
+  view = "month";
+  $('.btn-group .btn').removeClass('active');
+  $('#viewMonth').addClass('active');
+  renderView();
 });
 
 const loadSegCSV = () => {
@@ -364,7 +401,10 @@ const loadSegCSV = () => {
               owner: { name: rmQuotes(parts[8]), processId: parseInt(parts[9]), bundleId: rmQuotes(parts[10]), path: rmQuotes(parts[11]) },
               url: rmQuotes(parts[12]),
               memoryUsage: parseInt(parts[13]),
-              icon: rmQuotes(parts[14]) // Icon is the 15th element
+              icon: rmQuotes(parts[14]),
+              productivityScore: parts[15] !== undefined && parts[15] !== '' ? parseInt(parts[15]) : undefined,
+              isFocus: parts[16] === '1',
+              isIdle: parts[17] === '1'
             };
           }
           evs.push(ev);
@@ -427,8 +467,11 @@ const saveSegCSV = () => {
       const ownerPath = `"${owner.path || ''}"`;
       const url = `"${d.url || ''}"`;
       const memoryUsage = d.memoryUsage || '';
-      const icon = `"${d.icon || ''}"`; // Add icon data
-      return [title, start, end, d.id, x, y, width, height, ownerName, processId, bundleId, ownerPath, url, memoryUsage, icon].join(',');
+      const icon = `"${d.icon || ''}"`;
+      const productivityScore = d.productivityScore ?? '';
+      const isFocus = d.isFocus ? 1 : '';
+      const isIdle = d.isIdle ? 1 : '';
+      return [title, start, end, d.id, x, y, width, height, ownerName, processId, bundleId, ownerPath, url, memoryUsage, icon, productivityScore, isFocus, isIdle].join(',');
     }
     return [title, start, end].join(',');
   }).join('\n');
@@ -482,6 +525,11 @@ const renderDayView = async () => {
   dayEvents = dayEvents.filter(ev => ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime());
   
   console.log('Events for this day:', dayEvents.length);
+  
+  // Productivity summary
+  $('#prod-summary').remove();
+  const summary = getDailyProductivitySummary(dayEvents);
+  $timeline.before(`<div id="prod-summary" class="alert alert-info mb-2">Total productive minutes: <b>${summary.totalMinutes}</b> | Focus: <b>${summary.focusMinutes}</b> | Idle: <b>${summary.idleMinutes}</b></div>`);
   
   const hourHeight = 40 * zoom;
   const totalHeight = 24 * hourHeight;
@@ -570,12 +618,259 @@ const renderDayView = async () => {
   return dayEvents;
 };
 
+const renderWeekView = async () => {
+  console.log('Rendering week view for date:', date);
+  $timeline.show().empty();
+  
+  // Calculate week start (Monday) and end (Sunday)
+  const weekStart = new Date(date);
+  const dayOfWeek = date.getDay();
+  const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  weekStart.setDate(date.getDate() - daysToMonday);
+  weekStart.setHours(0, 0, 0, 0);
+  
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+  weekEnd.setHours(23, 59, 59, 999);
+  
+  $dateLabel.text(`Week of ${weekStart.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - ${weekEnd.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}`);
+  
+  let weekEvents = [...evs];
+  if (curSeg) weekEvents.push(curSeg);
+  weekEvents = weekEvents.filter(ev => ev.end >= weekStart.getTime() && ev.start <= weekEnd.getTime());
+  
+  console.log('Events for this week:', weekEvents.length);
+  
+  // Week productivity summary
+  const weekSummary = getDailyProductivitySummary(weekEvents);
+  $('#prod-summary').remove();
+  $timeline.before(`<div id="prod-summary" class="alert alert-info mb-2">Week Summary - Total productive minutes: <b>${weekSummary.totalMinutes}</b> | Focus: <b>${weekSummary.focusMinutes}</b> | Idle: <b>${weekSummary.idleMinutes}</b></div>`);
+  
+  const dayHeight = 60 * zoom;
+  const totalHeight = 7 * dayHeight;
+  $timeline.css({ height: totalHeight + 'px', position: 'relative' });
+  
+  // Add day headers
+  for (let i = 0; i < 7; i++) {
+    const dayDate = new Date(weekStart);
+    dayDate.setDate(weekStart.getDate() + i);
+    const topPos = i * dayHeight;
+    const dayName = dayDate.toLocaleDateString(undefined, { weekday: 'short' });
+    const dayNum = dayDate.getDate();
+    const isToday = dayDate.toDateString() === new Date().toDateString();
+    
+    $timeline.append(`
+      <div class="day-header" style="top:${topPos}px; height: 30px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; font-weight: 600; ${isToday ? 'background-color: var(--accent);' : ''}">
+        ${dayName} ${dayNum}
+      </div>
+      <div class="timeline-day" style="top:${topPos + 30}px; height: ${dayHeight - 30}px;"></div>
+    `);
+  }
+  
+  if (!weekEvents.length) {
+    $timeline.append('<p class="text-muted m-3">No events for this week.</p>');
+    return weekEvents;
+  }
+  
+  // Group events by day
+  const eventsByDay = {};
+  for (let i = 0; i < 7; i++) {
+    const dayDate = new Date(weekStart);
+    dayDate.setDate(weekStart.getDate() + i);
+    const dayStart = new Date(dayDate);
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date(dayDate);
+    dayEnd.setHours(23, 59, 59, 999);
+    
+    eventsByDay[i] = weekEvents.filter(ev => ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime());
+  }
+  
+  // Render events for each day
+  Object.keys(eventsByDay).forEach(dayIndex => {
+    const dayEvents = eventsByDay[dayIndex];
+    const dayDate = new Date(weekStart);
+    dayDate.setDate(weekStart.getDate() + parseInt(dayIndex));
+    const dayStart = new Date(dayDate);
+    dayStart.setHours(0, 0, 0, 0);
+    
+    const dayTop = parseInt(dayIndex) * dayHeight + 30;
+    const dayHeightPx = dayHeight - 30;
+    const eventsAreaWidth = $timeline.width() - 100;
+    
+    dayEvents.forEach(ev => {
+      const evStartTime = Math.max(ev.start, dayStart.getTime());
+      const evEndTime = Math.min(ev.end, dayStart.getTime() + 24 * 60 * 60 * 1000);
+      const durationMs = evEndTime - evStartTime;
+      if (durationMs < 60000) return;
+      
+      const topOffset = ((evStartTime - dayStart.getTime()) / (24 * 60 * 60 * 1000)) * dayHeightPx;
+      const blockHeight = (durationMs / (24 * 60 * 60 * 1000)) * dayHeightPx;
+      if (blockHeight < 3) return;
+      
+      const isDistraction = /youtube|discord|facebook/i.test(ev.title);
+      const colorClass = !usrSet.colorCodedEvents ? "singleColor" : (isDistraction ? "distraction" : "focus");
+      const minutes = Math.round(durationMs / 60000);
+      const leftOffset = 100;
+      const blockWidth = eventsAreaWidth - 5;
+      const titleText = usrSet.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
+      
+      const appName = ev.details?.owner?.name || extractAppName(ev.title);
+      const category = ev.details?.isManual ? ev.details.category : getAppCat(appName);
+      const iconData = ev.details?.icon || appName;
+      const iconEl = createAppIcon(iconData);
+      
+      let badgeHTML = category ? `<span class="badge bg-info me-1">${category}</span>` : "";
+      if (ev.details?.isFocus) badgeHTML += `<span class="badge bg-success me-1">Focus</span>`;
+      if (ev.details?.isIdle) badgeHTML += `<span class="badge bg-secondary me-1">Idle</span>`;
+      
+      let wrapper = $('<div/>', {
+        class: `entry ${colorClass}`,
+        css: { 
+          top: (dayTop + topOffset) + 'px', 
+          left: leftOffset + 'px', 
+          width: blockWidth + 'px', 
+          height: blockHeight + 'px',
+          position: 'absolute',
+          fontSize: '0.75rem'
+        },
+        data: { event: JSON.stringify(ev) },
+        click: () => showSegDetails(ev)
+      }).append(iconEl, $('<span/>', {
+        style: 'marginLeft:0.25rem',
+        html: `${badgeHTML}${titleText} (${minutes}m)`
+      }));
+      
+      $timeline.append(wrapper);
+    });
+  });
+  
+  return weekEvents;
+};
+
+const renderMonthView = async () => {
+  console.log('Rendering month view for date:', date);
+  $timeline.show().empty();
+  
+  // Calculate month start and end
+  const monthStart = new Date(date.getFullYear(), date.getMonth(), 1);
+  const monthEnd = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+  
+  $dateLabel.text(date.toLocaleDateString(undefined, { month: 'long', year: 'numeric' }));
+  
+  let monthEvents = [...evs];
+  if (curSeg) monthEvents.push(curSeg);
+  monthEvents = monthEvents.filter(ev => ev.end >= monthStart.getTime() && ev.start <= monthEnd.getTime());
+  
+  console.log('Events for this month:', monthEvents.length);
+  
+  // Month productivity summary
+  const monthSummary = getDailyProductivitySummary(monthEvents);
+  $('#prod-summary').remove();
+  $timeline.before(`<div id="prod-summary" class="alert alert-info mb-2">Month Summary - Total productive minutes: <b>${monthSummary.totalMinutes}</b> | Focus: <b>${monthSummary.focusMinutes}</b> | Idle: <b>${monthSummary.idleMinutes}</b></div>`);
+  
+  // Calculate calendar grid
+  const firstDayOfMonth = monthStart.getDay();
+  const daysInMonth = monthEnd.getDate();
+  const totalDays = firstDayOfMonth + daysInMonth;
+  const weeksInMonth = Math.ceil(totalDays / 7);
+  
+  const weekHeight = 80 * zoom;
+  const totalHeight = weeksInMonth * weekHeight;
+  $timeline.css({ height: totalHeight + 'px', position: 'relative' });
+  
+  // Add week headers
+  for (let week = 0; week < weeksInMonth; week++) {
+    const weekTop = week * weekHeight;
+    $timeline.append(`<div class="week-header" style="top:${weekTop}px; height: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; font-weight: 600; font-size: 0.8rem; color: var(--muted-foreground);">Week ${week + 1}</div>`);
+  }
+  
+  if (!monthEvents.length) {
+    $timeline.append('<p class="text-muted m-3">No events for this month.</p>');
+    return monthEvents;
+  }
+  
+  // Group events by week
+  const eventsByWeek = {};
+  for (let week = 0; week < weeksInMonth; week++) {
+    const weekStart = new Date(monthStart);
+    weekStart.setDate(monthStart.getDate() + (week * 7) - firstDayOfMonth);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+    
+    eventsByWeek[week] = monthEvents.filter(ev => ev.end >= weekStart.getTime() && ev.start <= weekEnd.getTime());
+  }
+  
+  // Render events for each week
+  Object.keys(eventsByWeek).forEach(weekIndex => {
+    const weekEvents = eventsByWeek[weekIndex];
+    const weekStart = new Date(monthStart);
+    weekStart.setDate(monthStart.getDate() + (parseInt(weekIndex) * 7) - firstDayOfMonth);
+    
+    const weekTop = parseInt(weekIndex) * weekHeight + 20;
+    const weekHeightPx = weekHeight - 20;
+    const eventsAreaWidth = $timeline.width() - 100;
+    
+    weekEvents.forEach(ev => {
+      const evStartTime = Math.max(ev.start, weekStart.getTime());
+      const evEndTime = Math.min(ev.end, weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const durationMs = evEndTime - evStartTime;
+      if (durationMs < 60000) return;
+      
+      const topOffset = ((evStartTime - weekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)) * weekHeightPx;
+      const blockHeight = (durationMs / (7 * 24 * 60 * 60 * 1000)) * weekHeightPx;
+      if (blockHeight < 2) return;
+      
+      const isDistraction = /youtube|discord|facebook/i.test(ev.title);
+      const colorClass = !usrSet.colorCodedEvents ? "singleColor" : (isDistraction ? "distraction" : "focus");
+      const minutes = Math.round(durationMs / 60000);
+      const leftOffset = 100;
+      const blockWidth = eventsAreaWidth - 5;
+      const titleText = usrSet.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
+      
+      const appName = ev.details?.owner?.name || extractAppName(ev.title);
+      const category = ev.details?.isManual ? ev.details.category : getAppCat(appName);
+      const iconData = ev.details?.icon || appName;
+      const iconEl = createAppIcon(iconData);
+      
+      let badgeHTML = category ? `<span class="badge bg-info me-1">${category}</span>` : "";
+      if (ev.details?.isFocus) badgeHTML += `<span class="badge bg-success me-1">Focus</span>`;
+      if (ev.details?.isIdle) badgeHTML += `<span class="badge bg-secondary me-1">Idle</span>`;
+      
+      let wrapper = $('<div/>', {
+        class: `entry ${colorClass}`,
+        css: { 
+          top: (weekTop + topOffset) + 'px', 
+          left: leftOffset + 'px', 
+          width: blockWidth + 'px', 
+          height: blockHeight + 'px',
+          position: 'absolute',
+          fontSize: '0.7rem'
+        },
+        data: { event: JSON.stringify(ev) },
+        click: () => showSegDetails(ev)
+      }).append(iconEl, $('<span/>', {
+        style: 'marginLeft:0.25rem',
+        html: `${badgeHTML}${titleText} (${minutes}m)`
+      }));
+      
+      $timeline.append(wrapper);
+    });
+  });
+  
+  return monthEvents;
+};
+
 const renderView = async () => {
   console.log('renderView called, view:', view, 'date:', date);
   loadSegCSV();
   $dateLabel.text(date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
   if (view === "day") {
     await renderDayView();
+  } else if (view === "week") {
+    await renderWeekView();
+  } else if (view === "month") {
+    await renderMonthView();
   }
 };
 
@@ -598,6 +893,9 @@ function showSegDetails(details) {
       if (d.description) {
         content += `<strong>Description:</strong> ${d.description}`;
       }
+      if (d.isFocus) content += `<br><span class='badge bg-success'>Focus Session</span>`;
+      if (d.isIdle) content += `<br><span class='badge bg-secondary'>Idle</span>`;
+      if (d.productivityScore !== undefined) content += `<br><strong>Productivity Score:</strong> ${d.productivityScore}`;
     } else {
       // Handle automatic entries
       const { bounds = {}, owner = {} } = d;
@@ -609,6 +907,9 @@ function showSegDetails(details) {
                    <strong>Path:</strong> ${owner.path || ''}<br>
                    <strong>URL:</strong> ${d.url || ''}<br>
                    <strong>Memory:</strong> ${d.memoryUsage || ''}`;
+      if (d.isFocus) content += `<br><span class='badge bg-success'>Focus Session</span>`;
+      if (d.isIdle) content += `<br><span class='badge bg-secondary'>Idle</span>`;
+      if (d.productivityScore !== undefined) content += `<br><strong>Productivity Score:</strong> ${d.productivityScore}`;
     }
   }
   $("#segmentDetailsContent").html(content);
@@ -665,28 +966,81 @@ const updateCurrentTimeIndicator = () => {
       `);
       $timeline.append(timeMarker);
     }
+  } else {
+    // Remove time marker for week/month views
+    $('.current-time-marker').remove();
   }
 };
 
+// --- ADVANCED TRACKING LOGIC ---
+let lastActivityTime = Date.now();
+const IDLE_THRESHOLD = 3 * 60 * 1000; // 3 minutes
+const FOCUS_THRESHOLD = 25 * 60 * 1000; // 25 minutes
+
+function isIdle(now) {
+  return now - lastActivityTime > IDLE_THRESHOLD;
+}
+
+function getProductivityScore(ev) {
+  // Simple scoring: Work/Productivity = 2, Social/Entertainment = 0, else 1
+  const cat = ev.details?.category || getAppCat(ev.details?.owner?.name || ev.title);
+  if (["Work", "Productivity"].includes(cat)) return 2;
+  if (["Social", "Entertainment"].includes(cat)) return 0;
+  return 1;
+}
+
+function isFocusSession(ev) {
+  return (ev.end - ev.start) >= FOCUS_THRESHOLD && getProductivityScore(ev) === 2;
+}
+
+// Patch the ipcRenderer event handler for advanced logic
 ipcRenderer.on('active-window-data', (e, data) => {
   if (!track) return;
   const now = Date.now();
+  if (isIdle(now)) {
+    // Insert idle segment if user was idle
+    if (curSeg) {
+      curSeg.end = lastActivityTime;
+      evs.push({ ...curSeg });
+      evs.push({
+        title: 'Idle',
+        start: lastActivityTime,
+        end: now,
+        details: { isIdle: true, owner: { name: 'Idle' }, category: 'Idle' }
+      });
+      saveSegCSV();
+      curSeg = null;
+    }
+  }
+  lastActivityTime = now;
   if (!curSeg) {
     curSeg = { title: data.title, start: now, end: now, details: data };
   } else if (curSeg.title === data.title) {
     curSeg.end = now;
   } else {
+    // Mark focus session if applicable
+    if (isFocusSession(curSeg)) curSeg.details.isFocus = true;
+    curSeg.details.productivityScore = getProductivityScore(curSeg);
     evs.push(curSeg);
-    saveSegCSV(); // Save before creating the new segment
+    saveSegCSV();
     curSeg = { title: data.title, start: now, end: now, details: data };
   }
-  // No need to save on every single update, maybe just when segment changes
-  
   if (Date.now() - lastSegUpdate > 5000) {
     renderDayView();
     lastSegUpdate = Date.now();
   }
 });
+
+// Add analytics function for trends
+function getDailyProductivitySummary(dayEvents) {
+  let total = 0, focus = 0, idle = 0;
+  for (const ev of dayEvents) {
+    if (ev.details?.isIdle) idle += (ev.end - ev.start);
+    else if (ev.details?.isFocus) focus += (ev.end - ev.start);
+    total += (ev.end - ev.start) * (getProductivityScore(ev) / 2);
+  }
+  return { totalMinutes: Math.round(total / 60000), focusMinutes: Math.round(focus / 60000), idleMinutes: Math.round(idle / 60000) };
+}
 
 $(document).keydown(e => {
   if (e.ctrlKey) {
