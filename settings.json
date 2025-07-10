@@ -5,6 +5,8 @@
   "useEmojis": true,
   "colorCodedEvents": true,
   "defaultView": "month",
+  "enableGrouping": true,
+  "groupingThreshold": 5,
   "categories": [],
   "appClassifications": {
     "sda": "EEEEEEEA"

@@ -21,6 +21,9 @@ let usrSet = {
   useEmojis: true,
   colorCodedEvents: true,
   defaultView: "day",
+  enableGrouping: true,
+  groupingThreshold: 5, // minutes
+  showIcons: true,
   categories: ["Work", "Entertainment", "Productivity", "Social"],
   appClassifications: {
     "Visual Studio Code": "Work",
@@ -53,6 +56,12 @@ const createAppIcon = appNameOrIconData => {
   const img = document.createElement('img');
   img.classList.add('app-icon');
   
+  // Skip icon loading if disabled
+  if (!usrSet.showIcons) {
+    img.style.display = 'none';
+    return img;
+  }
+  
   if (appNameOrIconData.startsWith('data:image/png;base64,')) {
     img.src = appNameOrIconData;
     img.alt = 'App Icon';
@@ -71,7 +80,8 @@ const createAppIcon = appNameOrIconData => {
           this.src = `https://img.icons8.com/color/48/000000/${encodeURIComponent(appName)}.png`;
         } else if (this.src.includes("icons8")) {
           this.onerror = null;
-          this.src = 'images/default-icon.png';
+          // Use a simple default icon as data URI instead of trying to load from file
+          this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iOCIgY3k9IjgiIHI9IjgiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8L3N2Zz4K';
         }
       };
     }
@@ -157,7 +167,10 @@ const initSetUI = () => {
   $('#timelineIncrements').val(usrSet.timelineIncrements.toString());
   $('#useEmojisCheck').prop('checked', usrSet.useEmojis);
   $('#colorCodedEventsCheck').prop('checked', usrSet.colorCodedEvents);
+  $('#enableGroupingCheck').prop('checked', usrSet.enableGrouping !== false);
+  $('#showIconsCheck').prop('checked', usrSet.showIcons !== false);
   $('#defaultViewSelect').val(usrSet.defaultView);
+  $('#groupingThreshold').val(usrSet.groupingThreshold || 5);
   popCats();
   popAppClass();
   $('#lightModeBtn, #darkModeBtn, #systemModeBtn').removeClass('active');
@@ -174,7 +187,10 @@ $('#saveSettingsBtn').click(() => {
   usrSet.timelineIncrements = parseInt($('#timelineIncrements').val());
   usrSet.useEmojis = $('#useEmojisCheck').is(':checked');
   usrSet.colorCodedEvents = $('#colorCodedEventsCheck').is(':checked');
+  usrSet.enableGrouping = $('#enableGroupingCheck').is(':checked');
+  usrSet.showIcons = $('#showIconsCheck').is(':checked');
   usrSet.defaultView = $('#defaultViewSelect').val();
+  usrSet.groupingThreshold = parseInt($('#groupingThreshold').val());
   saveSet();
   applySet();
   
@@ -526,6 +542,10 @@ const renderDayView = async () => {
   
   console.log('Events for this day:', dayEvents.length);
   
+  // Group similar activities
+  dayEvents = groupSimilarActivities(dayEvents);
+  console.log('Events after grouping:', dayEvents.length);
+  
   // Productivity summary
   $('#prod-summary').remove();
   const summary = getDailyProductivitySummary(dayEvents);
@@ -594,7 +614,9 @@ const renderDayView = async () => {
     const iconData = ev.details?.icon || appName;
     const iconEl = createAppIcon(iconData);
     
-    let badgeHTML = category ? `<span class="badge bg-info me-1">${category}</span>` : "";
+    let badgeHTML = category ? `<span class="badge bg-danger me-1">${category}</span>` : "";
+    if (ev.details?.isFocus) badgeHTML += `<span class="badge bg-success me-1">Focus</span>`;
+    if (ev.details?.isIdle) badgeHTML += `<span class="badge bg-secondary me-1">Idle</span>`;
     
     let wrapper = $('<div/>', {
       class: `entry ${colorClass}`,
@@ -608,8 +630,11 @@ const renderDayView = async () => {
       data: { event: JSON.stringify(ev) },
       click: () => showSegDetails(ev)
     }).append(iconEl, $('<span/>', {
-      style: 'marginLeft:0.5rem',
-      html: `${badgeHTML}${titleText} (${minutes} min)`
+      style: 'marginLeft:0.5rem; flex: 1',
+      html: `${titleText} (${minutes} min)`
+    }), $('<div/>', {
+      style: 'marginLeft: auto; display: flex; gap: 0.25rem;',
+      html: badgeHTML
     }));
     
     $timeline.append(wrapper);
@@ -640,6 +665,10 @@ const renderWeekView = async () => {
   weekEvents = weekEvents.filter(ev => ev.end >= weekStart.getTime() && ev.start <= weekEnd.getTime());
   
   console.log('Events for this week:', weekEvents.length);
+  
+  // Group similar activities
+  weekEvents = groupSimilarActivities(weekEvents);
+  console.log('Events after grouping:', weekEvents.length);
   
   // Week productivity summary
   const weekSummary = getDailyProductivitySummary(weekEvents);
@@ -719,7 +748,7 @@ const renderWeekView = async () => {
       const iconData = ev.details?.icon || appName;
       const iconEl = createAppIcon(iconData);
       
-      let badgeHTML = category ? `<span class="badge bg-info me-1">${category}</span>` : "";
+      let badgeHTML = category ? `<span class="badge bg-danger me-1">${category}</span>` : "";
       if (ev.details?.isFocus) badgeHTML += `<span class="badge bg-success me-1">Focus</span>`;
       if (ev.details?.isIdle) badgeHTML += `<span class="badge bg-secondary me-1">Idle</span>`;
       
@@ -736,8 +765,11 @@ const renderWeekView = async () => {
         data: { event: JSON.stringify(ev) },
         click: () => showSegDetails(ev)
       }).append(iconEl, $('<span/>', {
-        style: 'marginLeft:0.25rem',
-        html: `${badgeHTML}${titleText} (${minutes}m)`
+        style: 'marginLeft:0.25rem; flex: 1',
+        html: `${titleText} (${minutes}m)`
+      }), $('<div/>', {
+        style: 'marginLeft: auto; display: flex; gap: 0.25rem;',
+        html: badgeHTML
       }));
       
       $timeline.append(wrapper);
@@ -762,6 +794,10 @@ const renderMonthView = async () => {
   monthEvents = monthEvents.filter(ev => ev.end >= monthStart.getTime() && ev.start <= monthEnd.getTime());
   
   console.log('Events for this month:', monthEvents.length);
+  
+  // Group similar activities
+  monthEvents = groupSimilarActivities(monthEvents);
+  console.log('Events after grouping:', monthEvents.length);
   
   // Month productivity summary
   const monthSummary = getDailyProductivitySummary(monthEvents);
@@ -833,7 +869,7 @@ const renderMonthView = async () => {
       const iconData = ev.details?.icon || appName;
       const iconEl = createAppIcon(iconData);
       
-      let badgeHTML = category ? `<span class="badge bg-info me-1">${category}</span>` : "";
+      let badgeHTML = category ? `<span class="badge bg-danger me-1">${category}</span>` : "";
       if (ev.details?.isFocus) badgeHTML += `<span class="badge bg-success me-1">Focus</span>`;
       if (ev.details?.isIdle) badgeHTML += `<span class="badge bg-secondary me-1">Idle</span>`;
       
@@ -850,8 +886,11 @@ const renderMonthView = async () => {
         data: { event: JSON.stringify(ev) },
         click: () => showSegDetails(ev)
       }).append(iconEl, $('<span/>', {
-        style: 'marginLeft:0.25rem',
-        html: `${badgeHTML}${titleText} (${minutes}m)`
+        style: 'marginLeft:0.25rem; flex: 1',
+        html: `${titleText} (${minutes}m)`
+      }), $('<div/>', {
+        style: 'marginLeft: auto; display: flex; gap: 0.25rem;',
+        html: badgeHTML
       }));
       
       $timeline.append(wrapper);
@@ -881,6 +920,11 @@ function showSegDetails(details) {
                    <strong>Start:</strong> ${fmtDate(new Date(details.start))}<br>
                    <strong>End:</strong> ${fmtDate(new Date(details.end))}<br>
                    <strong>Duration:</strong> ${durMin} min`;
+  
+  // Check if this is a grouped event (has multiple original segments)
+  if (details.details?.isGrouped) {
+    content += `<br><span class='badge bg-info'>Grouped Activity</span>`;
+  }
   
   if (details.details) {
     const d = details.details;
@@ -1040,6 +1084,80 @@ function getDailyProductivitySummary(dayEvents) {
     total += (ev.end - ev.start) * (getProductivityScore(ev) / 2);
   }
   return { totalMinutes: Math.round(total / 60000), focusMinutes: Math.round(focus / 60000), idleMinutes: Math.round(idle / 60000) };
+}
+
+// Group similar window activities
+function groupSimilarActivities(events, maxGapMs = null) {
+  if (!events || events.length === 0) return events;
+  
+  // Skip grouping if disabled
+  if (!usrSet.enableGrouping) return events;
+  
+  // Use user setting or default to 5 minutes
+  const threshold = maxGapMs || (usrSet.groupingThreshold || 5) * 60 * 1000;
+  
+  const sortedEvents = [...events].sort((a, b) => a.start - b.start);
+  const groupedEvents = [];
+  let currentGroup = null;
+  
+  for (const event of sortedEvents) {
+    const windowId = event.details?.id;
+    const title = event.title;
+    const ownerName = event.details?.owner?.name;
+    
+    // Skip idle events from grouping
+    if (event.details?.isIdle) {
+      if (currentGroup) {
+        groupedEvents.push(currentGroup);
+        currentGroup = null;
+      }
+      groupedEvents.push(event);
+      continue;
+    }
+    
+    // Check if this event can be grouped with the current group
+    if (currentGroup && 
+        currentGroup.details?.id === windowId && 
+        currentGroup.title === title &&
+        currentGroup.details?.owner?.name === ownerName &&
+        (event.start - currentGroup.end) <= threshold) {
+      
+      // Extend the current group
+      currentGroup.end = event.end;
+      
+      // Ensure details object exists
+      if (!currentGroup.details) {
+        currentGroup.details = {};
+      }
+      
+      currentGroup.details.productivityScore = getProductivityScore(currentGroup);
+      currentGroup.details.isGrouped = true; // Mark as grouped
+      
+      // Update focus status if either event was a focus session
+      if (event.details?.isFocus) {
+        currentGroup.details.isFocus = true;
+      }
+      
+    } else {
+      // Start a new group
+      if (currentGroup) {
+        groupedEvents.push(currentGroup);
+      }
+      currentGroup = { ...event };
+      
+      // Ensure details object exists for new group
+      if (!currentGroup.details) {
+        currentGroup.details = {};
+      }
+    }
+  }
+  
+  // Add the last group
+  if (currentGroup) {
+    groupedEvents.push(currentGroup);
+  }
+  
+  return groupedEvents;
 }
 
 $(document).keydown(e => {

@@ -281,7 +281,7 @@
 
         .current-time-label {
             position: absolute;
-            left: 0;
+            right: 0;
             background-color: var(--destructive);
             color: var(--destructive-foreground);
             font-size: 0.7rem;
@@ -353,6 +353,7 @@
             border: 1px solid var(--border);
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
 
         .entry:hover {
@@ -1202,9 +1203,25 @@
                                             <input class="form-check-input" type="checkbox" id="colorCodedEventsCheck">
                                             <label class="form-check-label" for="colorCodedEventsCheck">
                                                 Color Code Events (Focus/Distraction)
-                </label>
-            </div>
-        </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="enableGroupingCheck">
+                                            <label class="form-check-label" for="enableGroupingCheck">
+                                                Enable Activity Grouping
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="showIconsCheck">
+                                            <label class="form-check-label" for="showIconsCheck">
+                                                Show App Icons
+                                            </label>
+                                        </div>
+                                    </div>
                 </div>
             </div>
                 </div>
@@ -1230,7 +1247,19 @@
                                             <option value="week">Week View</option>
                                             <option value="month">Month View</option>
                                         </select>
-                </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="groupingThreshold" class="form-label">Activity Grouping Threshold (minutes)</label>
+                                        <select class="form-select" id="groupingThreshold">
+                                            <option value="1">1 minute</option>
+                                            <option value="2">2 minutes</option>
+                                            <option value="5">5 minutes</option>
+                                            <option value="10">10 minutes</option>
+                                            <option value="15">15 minutes</option>
+                                            <option value="30">30 minutes</option>
+                                        </select>
+                                        <div class="form-text">Activities with gaps smaller than this will be grouped together</div>
+                                    </div>
             </div>
                 </div>
             </div>
