@@ -1,12 +1,13 @@
 {
   "timelineIncrements": 5,
   "darkMode": true,
-  "themeMode": "system",
+  "themeMode": "light",
   "useEmojis": true,
   "colorCodedEvents": true,
-  "defaultView": "month",
+  "defaultView": "day",
   "enableGrouping": true,
   "groupingThreshold": 5,
+  "showIcons": true,
   "categories": [],
   "appClassifications": {
     "sda": "EEEEEEEA"
