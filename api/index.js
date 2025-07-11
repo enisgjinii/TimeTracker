@@ -12,13 +12,6 @@ const createPortalSession = require('./create-portal-session.js');
 const cancelSubscription = require('./cancel-subscription.js');
 const subscriptionPlans = require('./subscription-plans.js');
 const stripeConfig = require('./stripe-config.js');
-const debugSession = require('./debug-session.js');
-const manualUpdate = require('./manual-update.js');
-const testFirebase = require('./test-firebase.js');
-const simpleTest = require('./simple-test.js');
-const testWebhook = require('./test-webhook.js');
-const debugEnv = require('./debug-env.js');
-const vercelTest = require('./vercel-test.js');
 
 const app = express();
 
@@ -36,13 +29,6 @@ app.post('/create-portal-session', createPortalSession);
 app.post('/cancel-subscription', cancelSubscription);
 app.get('/subscription-plans', subscriptionPlans);
 app.get('/stripe-config', stripeConfig);
-app.get('/debug-session', debugSession);
-app.post('/manual-update', manualUpdate);
-app.get('/test-firebase', testFirebase);
-app.get('/simple-test', simpleTest);
-app.post('/test-webhook', testWebhook);
-app.get('/debug-env', debugEnv);
-app.get('/vercel-test', vercelTest);
 
 // Health check
 app.get('/health', (req, res) => {
