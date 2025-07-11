@@ -1,21 +1,46 @@
 const admin = require('firebase-admin');
 
+let db = null;
+let firebaseInitialized = false;
+
 // Initialize Firebase Admin if not already initialized and credentials are valid
-if (!admin.apps.length && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_PRIVATE_KEY !== '-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...\\n-----END PRIVATE KEY-----\\n') {
+const initializeFirebase = () => {
+  if (firebaseInitialized) return;
+  
+  const { FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY } = process.env;
+  
+  // Check if we have valid Firebase credentials (not placeholders)
+  if (!FIREBASE_PROJECT_ID || 
+      !FIREBASE_CLIENT_EMAIL || 
+      !FIREBASE_PRIVATE_KEY ||
+      FIREBASE_PROJECT_ID === 'test-project' ||
+      FIREBASE_CLIENT_EMAIL === 'test@test.com' ||
+      FIREBASE_PRIVATE_KEY.includes('placeholder') ||
+      FIREBASE_PRIVATE_KEY.includes('MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...')) {
+    console.warn('⚠️  Firebase credentials not configured or are placeholders');
+    return;
+  }
+
   try {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      }),
-    });
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: FIREBASE_PROJECT_ID,
+          clientEmail: FIREBASE_CLIENT_EMAIL,
+          privateKey: FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+        }),
+      });
+    }
+    db = admin.firestore();
+    firebaseInitialized = true;
+    console.log('✅ Firebase initialized successfully');
   } catch (error) {
     console.warn('Firebase initialization failed:', error.message);
   }
-}
+};
 
-const db = admin.apps.length > 0 ? admin.firestore() : null;
+// Try to initialize Firebase
+initializeFirebase();
 
 /**
  * Verify user subscription status
@@ -33,6 +58,15 @@ const verifySubscription = async (req, res) => {
   if (!firebaseUid) {
     return res.status(400).json({ 
       error: 'firebaseUid is required' 
+    });
+  }
+
+  // Check if Firebase is properly initialized
+  if (!db || !firebaseInitialized) {
+    return res.status(503).json({ 
+      error: 'Firebase service unavailable',
+      details: process.env.NODE_ENV === 'development' ? 
+        'Firebase credentials not configured. Please check your .env file.' : undefined
     });
   }
 

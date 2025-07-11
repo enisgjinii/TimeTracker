@@ -5,8 +5,13 @@
 
 class PaymentService {
     constructor() {
-        this.apiBaseUrl = 'http://localhost:3000/api'; // Update with your actual API URL
+        // Use production URL if deployed, otherwise localhost
+        this.apiBaseUrl = window.location.hostname === 'localhost' ? 
+            'http://localhost:3001/api' : 
+            `${window.location.origin}/api`;
         this.stripe = null;
+        console.log('💳 PaymentService: Initializing...');
+        console.log('💳 PaymentService: API Base URL:', this.apiBaseUrl);
         // Initialize Stripe when needed
         this.initializeStripe();
     }
@@ -17,6 +22,7 @@ class PaymentService {
      */
     async initializeStripe(publishableKey = null) {
         try {
+            console.log('💳 PaymentService: Initializing Stripe...');
             // Load Stripe.js dynamically
             const script = document.createElement('script');
             script.src = 'https://js.stripe.com/v3/';
@@ -24,11 +30,11 @@ class PaymentService {
                 // Use environment variable or passed key
                 const key = publishableKey || 'pk_test_your_stripe_publishable_key_here';
                 this.stripe = Stripe(key);
-                console.log('Stripe initialized successfully');
+                console.log('💳 PaymentService: Stripe initialized successfully');
             };
             document.head.appendChild(script);
         } catch (error) {
-            console.error('Failed to initialize Stripe:', error);
+            console.error('💳 PaymentService: Failed to initialize Stripe:', error);
         }
     }
 
@@ -104,6 +110,11 @@ class PaymentService {
             });
 
             if (!response.ok) {
+                // Handle Firebase service unavailable (503) - treat as no subscription
+                if (response.status === 503) {
+                    console.warn('Firebase service unavailable - treating as no subscription');
+                    return { success: true, active: false, warning: 'Firebase service unavailable' };
+                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
@@ -111,7 +122,8 @@ class PaymentService {
             return { success: true, active: data.active };
         } catch (error) {
             console.error('Error verifying subscription:', error);
-            return { success: false, error: error.message };
+            // For network errors or server issues, default to no subscription
+            return { success: true, active: false, error: error.message };
         }
     }
 
@@ -201,6 +213,7 @@ class PaymentService {
      */
     async getSubscriptionPlans() {
         try {
+            console.log('💳 PaymentService: Getting subscription plans...');
             const response = await fetch(`${this.apiBaseUrl}/subscription-plans`, {
                 method: 'GET',
                 headers: {
@@ -213,9 +226,10 @@ class PaymentService {
             }
 
             const data = await response.json();
+            console.log('💳 PaymentService: Plans received:', data.plans.length);
             return { success: true, plans: data.plans };
         } catch (error) {
-            console.error('Error getting subscription plans:', error);
+            console.error('💳 PaymentService: Error getting subscription plans:', error);
             return { success: false, error: error.message };
         }
     }

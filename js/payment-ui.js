@@ -11,6 +11,7 @@ class PaymentUI {
         this.currentUser = null;
         this.subscriptionStatus = null;
         this.plans = [];
+        console.log('🔧 PaymentUI: Initializing...');
         this.initialize();
     }
 
@@ -18,8 +19,11 @@ class PaymentUI {
      * Initialize payment UI
      */
     async initialize() {
+        console.log('🔧 PaymentUI: Starting initialization...');
+        
         // Listen for auth state changes
         authService.onAuthStateChanged((user) => {
+            console.log('🔧 PaymentUI: Auth state changed:', user ? 'User logged in' : 'User logged out');
             this.currentUser = user;
             if (user) {
                 this.checkSubscriptionStatus();
@@ -30,6 +34,7 @@ class PaymentUI {
 
         // Load subscription plans
         await this.loadSubscriptionPlans();
+        console.log('🔧 PaymentUI: Initialization complete');
     }
 
     /**
@@ -37,13 +42,17 @@ class PaymentUI {
      */
     async loadSubscriptionPlans() {
         try {
+            console.log('🔧 PaymentUI: Loading subscription plans...');
             const result = await paymentService.getSubscriptionPlans();
             if (result.success) {
                 this.plans = result.plans;
+                console.log('🔧 PaymentUI: Plans loaded:', this.plans.length);
                 this.renderSubscriptionPlans();
+            } else {
+                console.error('🔧 PaymentUI: Failed to load plans:', result.error);
             }
         } catch (error) {
-            console.error('Error loading subscription plans:', error);
+            console.error('🔧 PaymentUI: Error loading subscription plans:', error);
         }
     }
 
@@ -54,13 +63,15 @@ class PaymentUI {
         if (!this.currentUser) return;
 
         try {
+            console.log('🔧 PaymentUI: Checking subscription status for user:', this.currentUser.uid);
             const result = await paymentService.verifySubscription(this.currentUser.uid);
             if (result.success) {
                 this.subscriptionStatus = result;
                 this.updateSubscriptionUI();
+                console.log('🔧 PaymentUI: Subscription status updated');
             }
         } catch (error) {
-            console.error('Error checking subscription status:', error);
+            console.error('🔧 PaymentUI: Error checking subscription status:', error);
         }
     }
 
@@ -68,9 +79,14 @@ class PaymentUI {
      * Render subscription plans in the UI
      */
     renderSubscriptionPlans() {
+        console.log('🔧 PaymentUI: Rendering subscription plans...');
         const plansContainer = document.getElementById('subscription-plans');
-        if (!plansContainer) return;
+        if (!plansContainer) {
+            console.error('🔧 PaymentUI: subscription-plans container not found!');
+            return;
+        }
 
+        console.log('🔧 PaymentUI: Found plans container, rendering...');
         plansContainer.innerHTML = this.plans.map(plan => this.createPlanCard(plan)).join('');
         
         // Add event listeners to upgrade buttons
@@ -79,9 +95,11 @@ class PaymentUI {
                 const upgradeBtn = document.getElementById(`upgrade-${plan.id}`);
                 if (upgradeBtn) {
                     upgradeBtn.addEventListener('click', () => this.handleUpgrade(plan));
+                    console.log('🔧 PaymentUI: Added event listener for', plan.id);
                 }
             }
         });
+        console.log('🔧 PaymentUI: Plans rendered successfully');
     }
 
     /**
@@ -345,6 +363,29 @@ class PaymentUI {
             element.style.display = 'block';
         });
     }
+
+    /**
+     * Manual trigger to show payment section (for testing)
+     */
+    showPaymentSection() {
+        console.log('🔧 PaymentUI: Manually showing payment section...');
+        
+        // Show the subscription section
+        const subscriptionSection = document.querySelector('.settings-section.payment-related');
+        if (subscriptionSection) {
+            subscriptionSection.style.display = 'block';
+            console.log('🔧 PaymentUI: Subscription section shown');
+        } else {
+            console.error('🔧 PaymentUI: Subscription section not found');
+        }
+        
+        // Render plans if not already rendered
+        if (this.plans.length > 0) {
+            this.renderSubscriptionPlans();
+        } else {
+            this.loadSubscriptionPlans();
+        }
+    }
 }
 
 // Create and export a single instance
@@ -354,4 +395,9 @@ export default paymentUI;
 // Global function for contact sales
 window.contactSales = function() {
     window.open('mailto:sales@timetracker.com?subject=Enterprise%20Inquiry', '_blank');
+};
+
+// Global function to manually show payment section (for testing)
+window.showPaymentSection = function() {
+    paymentUI.showPaymentSection();
 }; 

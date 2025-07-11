@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "functions": {
+    "api/create-checkout-session.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/stripe-webhook.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/verify-subscription.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/subscription-details.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/create-portal-session.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/cancel-subscription.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/subscription-plans.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "**",
+      "use": "@vercel/static"
+    }
+  ]
+} 
