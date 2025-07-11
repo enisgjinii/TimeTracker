@@ -31,20 +31,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
-// API Routes
-app.post('/api/create-checkout-session', require('./api/create-checkout-session.js'));
-app.post('/api/create-payment-intent', require('./api/create-payment-intent.js'));
-app.post('/api/stripe-webhook', require('./api/stripe-webhook.js'));
-app.get('/api/verify-subscription', require('./api/verify-subscription.js'));
-app.get('/api/subscription-details', require('./api/subscription-details.js'));
-app.post('/api/create-portal-session', require('./api/create-portal-session.js'));
-app.post('/api/cancel-subscription', require('./api/cancel-subscription.js'));
-app.get('/api/subscription-plans', require('./api/subscription-plans.js'));
-app.get('/api/stripe-config', require('./api/stripe-config.js'));
-app.get('/api/debug-session', require('./api/debug-session.js'));
-app.post('/api/manual-update', require('./api/manual-update.js'));
-app.get('/api/test-firebase', require('./api/test-firebase.js'));
-app.get('/api/simple-test', require('./api/simple-test.js'));
+// API Routes - Use consolidated API handler
+app.use('/api', require('./api/index.js'));
 
 // Serve the main application
 app.get('/', (req, res) => {
