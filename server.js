@@ -33,6 +33,7 @@ app.use(express.static(path.join(__dirname)));
 
 // API Routes
 app.post('/api/create-checkout-session', require('./api/create-checkout-session.js'));
+app.post('/api/create-payment-intent', require('./api/create-payment-intent.js'));
 app.post('/api/stripe-webhook', require('./api/stripe-webhook.js'));
 app.get('/api/verify-subscription', require('./api/verify-subscription.js'));
 app.get('/api/subscription-details', require('./api/subscription-details.js'));
@@ -44,6 +45,11 @@ app.get('/api/stripe-config', require('./api/stripe-config.js'));
 // Serve the main application
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Serve the custom checkout page
+app.get('/checkout.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'checkout.html'));
 });
 
 // Health check endpoint

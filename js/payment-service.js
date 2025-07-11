@@ -115,6 +115,27 @@ class PaymentService {
     }
 
     /**
+     * Get Stripe configuration from server
+     * @returns {Promise<Object>} - Stripe configuration
+     */
+    async getStripeConfig() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/stripe-config`);
+            if (response.ok) {
+                return await response.json();
+            } else {
+                throw new Error('Failed to fetch Stripe configuration');
+            }
+        } catch (error) {
+            console.error('💳 PaymentService: Error fetching Stripe config:', error);
+            // Fallback to hardcoded key for Electron
+            return {
+                publishableKey: 'pk_test_51RjlZuRjVTeY4vTLvc4HDiRgdt0ay9LVir7S4vFQhkcJZKHozU0pUGaXcJR6bbg4LtEEjtlx8u60Y7VnnhjIZHoC00YZlQhf6l'
+            };
+        }
+    }
+
+    /**
      * Ensure Stripe is initialized and ready for use
      * @returns {Promise<boolean>} - Whether Stripe is ready
      */
@@ -126,17 +147,68 @@ class PaymentService {
         return this.state === 'initialized';
     }
 
-    /**
-     * Create a checkout session for subscription
+        /**
+     * Create a payment intent for subscription (alternative to checkout session)
      * @param {string} priceId - Stripe price ID for the subscription
      * @param {string} firebaseUid - Firebase user ID
-     * @returns {Promise<Object>} - Checkout session data
+     * @param {number} amount - Amount in cents
+     * @returns {Promise<Object>} - Payment intent data
      */
-    async createCheckoutSession(priceId, firebaseUid) {
+    async createPaymentIntent(priceId, firebaseUid, amount) {
         try {
             const isReady = await this.ensureStripeReady();
             if (!isReady) {
-                 return { 
+                return { 
+                    success: false, 
+                    error: 'Payment system is not initialized. Please try again in a moment.',
+                    needsInitialization: true
+                };
+            }
+
+            const response = await fetch(`${this.apiBaseUrl}/create-payment-intent`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    priceId,
+                    firebaseUid,
+                    amount
+                })
+            });
+
+            if (!response.ok) {
+                if (response.status === 503) {
+                    return { 
+                        success: false, 
+                        error: 'Payment service not configured. Please contact support.',
+                        needsConfiguration: true
+                    };
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('💳 PaymentService: Payment intent created:', data);
+            return { success: true, clientSecret: data.clientSecret, paymentIntentId: data.paymentIntentId };
+        } catch (error) {
+            console.error('Error creating payment intent:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Create a checkout session for subscription (legacy method)
+     * @param {string} priceId - Stripe price ID for the subscription
+     * @param {string} firebaseUid - Firebase user ID
+     * @param {string} email - User's email address
+     * @returns {Promise<Object>} - Checkout session data
+     */
+    async createCheckoutSession(priceId, firebaseUid, email = null) {
+        try {
+            const isReady = await this.ensureStripeReady();
+            if (!isReady) {
+                return { 
                     success: false, 
                     error: 'Payment system is not initialized. Please try again in a moment.',
                     needsInitialization: true
@@ -150,7 +222,8 @@ class PaymentService {
                 },
                 body: JSON.stringify({
                     priceId,
-                    firebaseUid
+                    firebaseUid,
+                    email
                 })
             });
 
@@ -168,6 +241,10 @@ class PaymentService {
 
             const data = await response.json();
             console.log('💳 PaymentService: Checkout session created:', data);
+            
+            // Store the email for use in redirect
+            this.lastCreatedSessionEmail = email;
+            
             return { success: true, sessionId: data.sessionId };
         } catch (error) {
             console.error('Error creating checkout session:', error);
@@ -186,9 +263,17 @@ class PaymentService {
             if (window && window.process && window.process.type === 'renderer') {
                 // Electron renderer process
                 const { shell } = window.require('electron');
-                // Use the direct checkout URL - Stripe handles the API key on their side
-                const checkoutUrl = `https://checkout.stripe.com/c/pay/${sessionId}`;
-                console.log('💳 PaymentService: Opening checkout URL in external browser:', checkoutUrl);
+                
+                // Get the publishable key from our configuration
+                const stripeConfig = await this.getStripeConfig();
+                const publishableKey = stripeConfig.publishableKey;
+                
+                // Get user email from the checkout session creation
+                const userEmail = this.lastCreatedSessionEmail || '';
+                
+                // Use our custom checkout page with the publishable key and email
+                const checkoutUrl = `http://localhost:3001/checkout.html?session_id=${sessionId}&key=${publishableKey}&email=${encodeURIComponent(userEmail)}`;
+                console.log('💳 PaymentService: Opening custom checkout page with email:', checkoutUrl);
                 shell.openExternal(checkoutUrl);
                 return { success: true };
             }

@@ -1,3 +1,8 @@
+/**
+ * Create Stripe payment intent for subscription
+ * This avoids client-side Stripe.js initialization issues
+ */
+
 // Check if we have a valid Stripe key
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 if (!stripeKey || stripeKey.includes('placeholder')) {
@@ -8,11 +13,11 @@ const stripe = stripeKey && !stripeKey.includes('placeholder') ?
   require('stripe')(stripeKey) : null;
 
 /**
- * Create Stripe checkout session for subscription
+ * Create Stripe payment intent for subscription
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
-const createCheckoutSession = async (req, res) => {
+const createPaymentIntent = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -25,55 +30,49 @@ const createCheckoutSession = async (req, res) => {
     });
   }
 
-  const { priceId, firebaseUid, email } = req.body;
+  const { priceId, firebaseUid, amount } = req.body;
 
   // Validate required fields
-  if (!priceId || !firebaseUid) {
+  if (!priceId || !firebaseUid || !amount) {
     return res.status(400).json({ 
-      error: 'Missing required fields: priceId and firebaseUid are required' 
+      error: 'Missing required fields: priceId, firebaseUid, and amount are required' 
     });
   }
 
   try {
-    console.log('🔧 Creating checkout session for:', { priceId, firebaseUid });
+    console.log('🔧 Creating payment intent for:', { priceId, firebaseUid, amount });
     
     // Validate price ID format
     if (!priceId.startsWith('price_')) {
       return res.status(400).json({ error: 'Invalid price ID format' });
     }
 
-    // Create standard checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [{ 
-        price: priceId, 
-        quantity: 1 
-      }],
-      mode: 'subscription',
-      success_url: `${process.env.APP_URL || 'http://localhost:3001'}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.APP_URL || 'http://localhost:3001'}/cancel`,
+    // Create payment intent
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount, // Amount in cents
+      currency: 'usd',
       metadata: { 
         firebaseUid,
         priceId 
       },
-      customer_email: email, // Pre-fill email from user
-      billing_address_collection: 'required',
-      allow_promotion_codes: true,
-      subscription_data: {
-        metadata: {
-          firebaseUid
-        }
-      },
-      client_reference_id: firebaseUid
+      customer_email: req.body.email, // Optional: pre-fill email
+      receipt_email: req.body.email,
+      description: `Subscription payment for ${priceId}`,
+      // For subscriptions, we'll create the subscription after successful payment
+      setup_future_usage: 'off_session'
     });
 
-    console.log('🔧 Checkout session created successfully:', { sessionId: session.id, url: session.url });
+    console.log('🔧 Payment intent created successfully:', { 
+      clientSecret: paymentIntent.client_secret,
+      id: paymentIntent.id 
+    });
+
     res.status(200).json({ 
-      sessionId: session.id,
-      url: session.url 
+      clientSecret: paymentIntent.client_secret,
+      paymentIntentId: paymentIntent.id
     });
   } catch (err) {
-    console.error('Stripe checkout session error:', err);
+    console.error('Stripe payment intent error:', err);
     
     // Handle specific Stripe errors
     if (err.type === 'StripeInvalidRequestError') {
@@ -89,10 +88,10 @@ const createCheckoutSession = async (req, res) => {
     }
 
     res.status(500).json({ 
-      error: 'Failed to create checkout session',
+      error: 'Failed to create payment intent',
       details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 };
 
-module.exports = createCheckoutSession; 
+module.exports = createPaymentIntent; 

@@ -325,8 +325,11 @@ class PaymentUI {
             button.textContent = 'Processing...';
             button.disabled = true;
 
-            // Create checkout session
-            const result = await paymentService.createCheckoutSession(plan.priceId, this.currentUser.uid);
+            // Get user email from current user
+            const userEmail = this.currentUser.email || this.currentUser.emailVerified ? this.currentUser.email : null;
+            
+            // Create checkout session with user email
+            const result = await paymentService.createCheckoutSession(plan.priceId, this.currentUser.uid, userEmail);
             
             if (result.success) {
                 // Redirect to Stripe checkout
@@ -358,6 +361,53 @@ class PaymentUI {
                 button.textContent = `Upgrade to ${plan.name}`;
                 button.disabled = false;
             }
+        }
+    }
+
+    /**
+     * Handle payment using our own Stripe.js initialization
+     * @param {string} clientSecret - Payment intent client secret
+     * @param {Object} plan - Selected plan
+     * @returns {Promise<Object>} - Payment result
+     */
+    async handlePaymentWithStripe(clientSecret, plan) {
+        try {
+            // Ensure Stripe is ready
+            const isReady = await paymentService.ensureStripeReady();
+            if (!isReady) {
+                throw new Error('Payment system not initialized');
+            }
+
+            // Create payment method using Stripe.js
+            const { error: paymentMethodError, paymentMethod } = await paymentService.stripe.createPaymentMethod({
+                type: 'card',
+                card: {
+                    // We'll use a test card for now
+                    number: '4242424242424242',
+                    exp_month: 12,
+                    exp_year: 2025,
+                    cvc: '123'
+                }
+            });
+
+            if (paymentMethodError) {
+                throw new Error(paymentMethodError.message);
+            }
+
+            // Confirm the payment intent
+            const { error: confirmError } = await paymentService.stripe.confirmCardPayment(clientSecret, {
+                payment_method: paymentMethod.id
+            });
+
+            if (confirmError) {
+                throw new Error(confirmError.message);
+            }
+
+            this.showSuccess(`Successfully upgraded to ${plan.name}!`);
+            return { success: true };
+        } catch (error) {
+            console.error('Payment error:', error);
+            return { success: false, error: error.message };
         }
     }
 
