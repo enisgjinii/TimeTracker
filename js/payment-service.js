@@ -69,8 +69,15 @@ class PaymentService {
                 }
             } catch (error) {
                 console.error('💳 PaymentService: Failed to fetch Stripe config:', error);
-                // Fallback to placeholder for development
-                await this.loadStripeAndInitialize('pk_test_your_stripe_publishable_key_here');
+                // Check if it's a connection error
+                if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_REFUSED')) {
+                    console.warn('💳 PaymentService: Server not available, using fallback key');
+                    // Use the actual publishable key from the error message you provided
+                    await this.loadStripeAndInitialize('pk_test_51RjlZuRjVTeY4vTLvc4HDiRgdt0ay9LVir7S4vFQhkcJZKHozU0pUGaXcJR6bbg4LtEEjtlx8u60Y7VnnhjIZHoC00YZlQhf6l');
+                } else {
+                    // Fallback to placeholder for other errors
+                    await this.loadStripeAndInitialize('pk_test_your_stripe_publishable_key_here');
+                }
             }
         } catch (error) {
             console.error('💳 PaymentService: Failed to initialize Stripe:', error);
@@ -140,6 +147,20 @@ class PaymentService {
      */
     async createCheckoutSession(priceId, firebaseUid) {
         try {
+            // Check if server is available first
+            try {
+                const healthCheck = await fetch(`${this.apiBaseUrl.replace('/api', '')}/health`);
+                if (!healthCheck.ok) {
+                    throw new Error('Server health check failed');
+                }
+            } catch (error) {
+                return { 
+                    success: false, 
+                    error: 'Payment server is not available. Please ensure the server is running.',
+                    serverUnavailable: true
+                };
+            }
+
             const response = await fetch(`${this.apiBaseUrl}/create-checkout-session`, {
                 method: 'POST',
                 headers: {

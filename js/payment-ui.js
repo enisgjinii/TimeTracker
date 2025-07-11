@@ -291,6 +291,10 @@ class PaymentUI {
             } else {
                 if (result.needsConfiguration) {
                     this.showError('Payment system is being configured. Please try again later or contact support.');
+                } else if (result.serverUnavailable) {
+                    this.showError('Payment server is not available. Please ensure the server is running and try again.');
+                } else if (result.error && result.error.includes('Failed to fetch')) {
+                    this.showError('Unable to connect to payment server. Please ensure the server is running and try again.');
                 } else {
                     throw new Error(result.error);
                 }
@@ -302,7 +306,7 @@ class PaymentUI {
             // Reset button state
             const button = document.getElementById(`upgrade-${plan.id}`);
             if (button) {
-                button.textContent = originalText;
+                button.textContent = originalText || 'Upgrade';
                 button.disabled = false;
             }
         }
