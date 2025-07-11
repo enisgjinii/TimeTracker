@@ -68,6 +68,14 @@ class PaymentService {
             });
 
             if (!response.ok) {
+                // Handle payment service not configured
+                if (response.status === 503) {
+                    return { 
+                        success: false, 
+                        error: 'Payment service not configured. Please contact support.',
+                        needsConfiguration: true
+                    };
+                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 

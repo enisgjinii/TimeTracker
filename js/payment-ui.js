@@ -282,16 +282,22 @@ class PaymentUI {
                     throw new Error(redirectResult.error);
                 }
             } else {
-                throw new Error(result.error);
+                if (result.needsConfiguration) {
+                    this.showError('Payment system is being configured. Please try again later or contact support.');
+                } else {
+                    throw new Error(result.error);
+                }
             }
         } catch (error) {
             console.error('Error during upgrade:', error);
             this.showError('Failed to process upgrade. Please try again.');
-            
+        } finally {
             // Reset button state
             const button = document.getElementById(`upgrade-${plan.id}`);
-            button.textContent = originalText;
-            button.disabled = false;
+            if (button) {
+                button.textContent = originalText;
+                button.disabled = false;
+            }
         }
     }
 

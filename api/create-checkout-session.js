@@ -1,4 +1,11 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// Check if we have a valid Stripe key
+const stripeKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeKey || stripeKey.includes('placeholder')) {
+  console.warn('⚠️  Stripe secret key not configured or is placeholder');
+}
+
+const stripe = stripeKey && !stripeKey.includes('placeholder') ? 
+  require('stripe')(stripeKey) : null;
 
 /**
  * Create Stripe checkout session for subscription
@@ -8,6 +15,14 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const createCheckoutSession = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Check if Stripe is configured
+  if (!stripe) {
+    return res.status(503).json({ 
+      error: 'Payment service not configured',
+      details: 'Stripe credentials not configured. Please check your environment variables.'
+    });
   }
 
   const { priceId, firebaseUid } = req.body;

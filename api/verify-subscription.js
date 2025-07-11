@@ -32,8 +32,10 @@ const verifySubscription = async (req, res) => {
     const userDoc = await db.collection('users').doc(firebaseUid).get();
     
     if (!userDoc.exists) {
-      return res.status(404).json({ 
-        error: 'User not found' 
+      return res.status(200).json({
+        active: false,
+        status: 'no_subscription',
+        subscription: null
       });
     }
 
