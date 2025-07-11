@@ -966,6 +966,91 @@
             font-size: 0.7rem;
         }
 
+        /* Calendar Grid Styles */
+        .calendar-grid {
+            display: grid;
+            gap: 1px;
+            background-color: var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .calendar-header {
+            background-color: var(--card);
+            padding: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: var(--muted-foreground);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .calendar-cell {
+            background-color: var(--card);
+            padding: 0.25rem;
+            min-height: 40px;
+            position: relative;
+            border: 1px solid var(--border);
+            font-size: 0.7rem;
+        }
+
+        .calendar-day-cell {
+            background-color: var(--card);
+            padding: 0.5rem;
+            min-height: 120px;
+            position: relative;
+            border: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+
+        .calendar-event {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.1rem 0.25rem;
+            border-radius: 0.2rem;
+            margin-bottom: 0.1rem;
+            font-size: 0.6rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            max-width: 100%;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-event:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-event.focus {
+            background-color: var(--success);
+        }
+
+        .calendar-event.distraction {
+            background-color: var(--destructive);
+        }
+
+        .calendar-event.singleColor {
+            background-color: var(--primary);
+        }
+
+        .time-slot {
+            background-color: var(--card);
+            padding: 0.25rem;
+            text-align: right;
+            font-size: 0.7rem;
+            color: var(--muted-foreground);
+            border-right: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        /* Week view specific styles */
         .week-view {
             display: grid;
             grid-template-columns: 50px repeat(7, 1fr);
@@ -1242,6 +1327,17 @@
                                             <label class="form-check-label" for="enableGroupingCheck">
                                                 Enable Activity Grouping
                                             </label>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="prioritizeWindowIdCheck">
+                                            <label class="form-check-label" for="prioritizeWindowIdCheck">
+                                                Prioritize Window ID Grouping
+                                            </label>
+                                            <div class="settings-description">
+                                                Group events by Window ID first, then by title and owner name
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="mb-3">

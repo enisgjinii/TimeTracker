@@ -23,6 +23,7 @@ let usrSet = {
   defaultView: "day",
   enableGrouping: true,
   groupingThreshold: 5, // minutes
+  prioritizeWindowId: true, // prioritize Window ID grouping
   showIcons: true,
   categories: ["Work", "Entertainment", "Productivity", "Social"],
   appClassifications: {
@@ -168,6 +169,7 @@ const initSetUI = () => {
   $('#useEmojisCheck').prop('checked', usrSet.useEmojis);
   $('#colorCodedEventsCheck').prop('checked', usrSet.colorCodedEvents);
   $('#enableGroupingCheck').prop('checked', usrSet.enableGrouping !== false);
+  $('#prioritizeWindowIdCheck').prop('checked', usrSet.prioritizeWindowId !== false);
   $('#showIconsCheck').prop('checked', usrSet.showIcons !== false);
   $('#defaultViewSelect').val(usrSet.defaultView);
   $('#groupingThreshold').val(usrSet.groupingThreshold || 5);
@@ -188,6 +190,7 @@ $('#saveSettingsBtn').click(() => {
   usrSet.useEmojis = $('#useEmojisCheck').is(':checked');
   usrSet.colorCodedEvents = $('#colorCodedEventsCheck').is(':checked');
   usrSet.enableGrouping = $('#enableGroupingCheck').is(':checked');
+  usrSet.prioritizeWindowId = $('#prioritizeWindowIdCheck').is(':checked');
   usrSet.showIcons = $('#showIconsCheck').is(':checked');
   usrSet.defaultView = $('#defaultViewSelect').val();
   usrSet.groupingThreshold = parseInt($('#groupingThreshold').val());
@@ -683,114 +686,156 @@ const renderWeekView = async () => {
   $('#prod-summary').remove();
   $timeline.before(`<div id="prod-summary" class="alert alert-info mb-2">Week Summary - Total productive minutes: <b>${weekSummary.totalMinutes}</b> | Focus: <b>${weekSummary.focusMinutes}</b> | Idle: <b>${weekSummary.idleMinutes}</b></div>`);
   
-  const dayHeight = 60 * zoom;
-  const totalHeight = 7 * dayHeight;
-  $timeline.css({ height: totalHeight + 'px', position: 'relative' });
+  // Create calendar grid
+  const calendarContainer = $('<div/>', {
+    class: 'calendar-grid',
+    css: {
+      display: 'grid',
+      gridTemplateColumns: '60px repeat(7, 1fr)',
+      gap: '1px',
+      backgroundColor: 'var(--border)',
+      borderRadius: 'var(--radius)',
+      overflow: 'hidden',
+      border: '1px solid var(--border)'
+    }
+  });
+  
+  // Add time column header
+  calendarContainer.append($('<div/>', {
+    class: 'calendar-header',
+    css: {
+      backgroundColor: 'var(--card)',
+      padding: '0.5rem',
+      textAlign: 'center',
+      fontWeight: '600',
+      fontSize: '0.8rem',
+      color: 'var(--muted-foreground)'
+    },
+    text: 'Time'
+  }));
   
   // Add day headers
-  for (let i = 0; i < 7; i++) {
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  dayNames.forEach((dayName, index) => {
     const dayDate = new Date(weekStart);
-    dayDate.setDate(weekStart.getDate() + i);
-    const topPos = i * dayHeight;
-    const dayName = dayDate.toLocaleDateString(undefined, { weekday: 'short' });
+    dayDate.setDate(weekStart.getDate() + index);
     const dayNum = dayDate.getDate();
     const isToday = dayDate.toDateString() === new Date().toDateString();
     
-    $timeline.append(`
-      <div class="day-header" style="top:${topPos}px; height: 30px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; font-weight: 600; ${isToday ? 'background-color: var(--accent);' : ''}">
-        ${dayName} ${dayNum}
-      </div>
-      <div class="timeline-day" style="top:${topPos + 30}px; height: ${dayHeight - 30}px;"></div>
-    `);
+    calendarContainer.append($('<div/>', {
+      class: 'calendar-header',
+      css: {
+        backgroundColor: isToday ? 'var(--primary)' : 'var(--card)',
+        color: isToday ? 'var(--primary-foreground)' : 'var(--foreground)',
+        padding: '0.5rem',
+        textAlign: 'center',
+        fontWeight: '600',
+        fontSize: '0.8rem'
+      },
+      html: `${dayName}<br><small>${dayNum}</small>`
+    }));
+  });
+  
+  // Create time slots (24 hours)
+  for (let hour = 0; hour < 24; hour++) {
+    // Time label
+    calendarContainer.append($('<div/>', {
+      class: 'time-slot',
+      css: {
+        backgroundColor: 'var(--card)',
+        padding: '0.25rem',
+        textAlign: 'right',
+        fontSize: '0.7rem',
+        color: 'var(--muted-foreground)',
+        borderRight: '1px solid var(--border)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end'
+      },
+      text: `${hour.toString().padStart(2, '0')}:00`
+    }));
+    
+    // Day cells for this hour
+    for (let day = 0; day < 7; day++) {
+      const dayDate = new Date(weekStart);
+      dayDate.setDate(weekStart.getDate() + day);
+      const dayStart = new Date(dayDate);
+      dayStart.setHours(hour, 0, 0, 0);
+      const dayEnd = new Date(dayDate);
+      dayEnd.setHours(hour, 59, 59, 999);
+      
+      const cellEvents = weekEvents.filter(ev => 
+        ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime()
+      );
+      
+      const cell = $('<div/>', {
+        class: 'calendar-cell',
+        css: {
+          backgroundColor: 'var(--card)',
+          padding: '0.25rem',
+          minHeight: '40px',
+          position: 'relative',
+          border: '1px solid var(--border)',
+          fontSize: '0.7rem'
+        }
+      });
+      
+      // Add events to this cell
+      cellEvents.forEach(ev => {
+        const evStartTime = Math.max(ev.start, dayStart.getTime());
+        const evEndTime = Math.min(ev.end, dayEnd.getTime());
+        const durationMs = evEndTime - evStartTime;
+        if (durationMs < 60000) return;
+        
+        const isDistraction = /youtube|discord|facebook/i.test(ev.title);
+        const colorClass = !usrSet.colorCodedEvents ? "singleColor" : (isDistraction ? "distraction" : "focus");
+        const minutes = Math.round(durationMs / 60000);
+        const titleText = usrSet.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
+        
+        const appName = ev.details?.owner?.name || extractAppName(ev.title);
+        const category = ev.details?.isManual ? ev.details.category : getAppCat(appName);
+        const iconData = ev.details?.icon || appName;
+        const iconEl = createAppIcon(iconData);
+        
+        const eventElement = $('<div/>', {
+          class: `calendar-event ${colorClass}`,
+          css: {
+            backgroundColor: colorClass === 'distraction' ? 'var(--destructive)' : 
+                           colorClass === 'focus' ? 'var(--success)' : 'var(--primary)',
+            color: 'white',
+            padding: '0.1rem 0.25rem',
+            borderRadius: '0.2rem',
+            marginBottom: '0.1rem',
+            fontSize: '0.6rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.2rem',
+            maxWidth: '100%',
+            overflow: 'hidden'
+          },
+          data: { event: JSON.stringify(ev) },
+          click: () => showSegDetails(ev)
+        }).append(
+          iconEl,
+          $('<span/>', {
+            style: 'flex: 1; overflow: hidden; textOverflow: ellipsis; whiteSpace: nowrap;',
+            text: `${titleText} (${minutes}m)`
+          })
+        );
+        
+        cell.append(eventElement);
+      });
+      
+      calendarContainer.append(cell);
+    }
   }
+  
+  $timeline.append(calendarContainer);
   
   if (!weekEvents.length) {
     $timeline.append('<p class="text-muted m-3">No events for this week.</p>');
-    return weekEvents;
   }
-  
-  // Group events by day
-  const eventsByDay = {};
-  for (let i = 0; i < 7; i++) {
-    const dayDate = new Date(weekStart);
-    dayDate.setDate(weekStart.getDate() + i);
-    const dayStart = new Date(dayDate);
-    dayStart.setHours(0, 0, 0, 0);
-    const dayEnd = new Date(dayDate);
-    dayEnd.setHours(23, 59, 59, 999);
-    
-    eventsByDay[i] = weekEvents.filter(ev => ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime());
-  }
-  
-  // Render events for each day
-  Object.keys(eventsByDay).forEach(dayIndex => {
-    const dayEvents = eventsByDay[dayIndex];
-    const dayDate = new Date(weekStart);
-    dayDate.setDate(weekStart.getDate() + parseInt(dayIndex));
-    const dayStart = new Date(dayDate);
-    dayStart.setHours(0, 0, 0, 0);
-    
-    const dayTop = parseInt(dayIndex) * dayHeight + 30;
-    const dayHeightPx = dayHeight - 30;
-    const eventsAreaWidth = $timeline.width() - 100;
-    
-    dayEvents.forEach(ev => {
-      const evStartTime = Math.max(ev.start, dayStart.getTime());
-      const evEndTime = Math.min(ev.end, dayStart.getTime() + 24 * 60 * 60 * 1000);
-      const durationMs = evEndTime - evStartTime;
-      if (durationMs < 60000) return;
-      
-      const topOffset = ((evStartTime - dayStart.getTime()) / (24 * 60 * 60 * 1000)) * dayHeightPx;
-      const blockHeight = (durationMs / (24 * 60 * 60 * 1000)) * dayHeightPx;
-      if (blockHeight < 3) return;
-      
-      const isDistraction = /youtube|discord|facebook/i.test(ev.title);
-      const colorClass = !usrSet.colorCodedEvents ? "singleColor" : (isDistraction ? "distraction" : "focus");
-      const minutes = Math.round(durationMs / 60000);
-      const leftOffset = 100;
-      const blockWidth = eventsAreaWidth - 5;
-      const titleText = usrSet.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
-      
-      const appName = ev.details?.owner?.name || extractAppName(ev.title);
-      const category = ev.details?.isManual ? ev.details.category : getAppCat(appName);
-      const iconData = ev.details?.icon || appName;
-      const iconEl = createAppIcon(iconData);
-      
-      let badgeHTML = category ? `<span class="badge bg-danger me-1">${category}</span>` : "";
-      if (ev.details?.isFocus) badgeHTML += `<span class="badge bg-success me-1">Focus</span>`;
-      if (ev.details?.isIdle) badgeHTML += `<span class="badge bg-secondary me-1">Idle</span>`;
-      
-      let wrapper = $('<div/>', {
-        class: `entry ${colorClass}`,
-        css: { 
-          top: (dayTop + topOffset) + 'px', 
-          left: leftOffset + 'px', 
-          width: blockWidth + 'px', 
-          height: blockHeight + 'px',
-          position: 'absolute',
-          fontSize: '0.75rem'
-        },
-        data: { event: JSON.stringify(ev) },
-        click: () => showSegDetails(ev)
-      }).append(iconEl, $('<span/>', {
-        style: 'marginLeft:0.25rem; flex: 1',
-        html: `${titleText} (${minutes}m)`
-      }), $('<div/>', {
-        style: 'marginLeft: auto; display: flex; gap: 0.25rem;',
-        html: badgeHTML
-      }), $('<i/>', {
-        class: 'fas fa-trash delete-icon',
-        style: 'marginLeft: 0.25rem;',
-        click: (e) => {
-          e.stopPropagation();
-          currentEventForDeletion = ev;
-          deleteCurrentEntry();
-        }
-      }));
-      
-      $timeline.append(wrapper);
-    });
-  });
   
   return weekEvents;
 };
@@ -826,100 +871,150 @@ const renderMonthView = async () => {
   const totalDays = firstDayOfMonth + daysInMonth;
   const weeksInMonth = Math.ceil(totalDays / 7);
   
-  const weekHeight = 80 * zoom;
-  const totalHeight = weeksInMonth * weekHeight;
-  $timeline.css({ height: totalHeight + 'px', position: 'relative' });
+  // Create calendar grid
+  const calendarContainer = $('<div/>', {
+    class: 'calendar-grid',
+    css: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(7, 1fr)',
+      gap: '1px',
+      backgroundColor: 'var(--border)',
+      borderRadius: 'var(--radius)',
+      overflow: 'hidden',
+      border: '1px solid var(--border)'
+    }
+  });
   
-  // Add week headers
+  // Add day headers
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  dayNames.forEach(dayName => {
+    calendarContainer.append($('<div/>', {
+      class: 'calendar-header',
+      css: {
+        backgroundColor: 'var(--card)',
+        padding: '0.5rem',
+        textAlign: 'center',
+        fontWeight: '600',
+        fontSize: '0.8rem',
+        color: 'var(--muted-foreground)'
+      },
+      text: dayName
+    }));
+  });
+  
+  // Create calendar days
+  let dayCount = 1;
+  const today = new Date();
+  
   for (let week = 0; week < weeksInMonth; week++) {
-    const weekTop = week * weekHeight;
-    $timeline.append(`<div class="week-header" style="top:${weekTop}px; height: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 10px; font-weight: 600; font-size: 0.8rem; color: var(--muted-foreground);">Week ${week + 1}</div>`);
+    for (let day = 0; day < 7; day++) {
+      const isCurrentMonth = (week === 0 && day < firstDayOfMonth) ? false : 
+                            (dayCount > daysInMonth) ? false : true;
+      
+      const cell = $('<div/>', {
+        class: 'calendar-day-cell',
+        css: {
+          backgroundColor: 'var(--card)',
+          padding: '0.5rem',
+          minHeight: '120px',
+          position: 'relative',
+          border: '1px solid var(--border)',
+          fontSize: '0.8rem'
+        }
+      });
+      
+      if (isCurrentMonth) {
+        const currentDate = new Date(monthStart);
+        currentDate.setDate(dayCount);
+        const isToday = currentDate.toDateString() === today.toDateString();
+        
+        // Day number
+        cell.append($('<div/>', {
+          css: {
+            fontWeight: '600',
+            fontSize: '1rem',
+            marginBottom: '0.5rem',
+            color: isToday ? 'var(--primary)' : 'var(--foreground)',
+            textAlign: 'center'
+          },
+          text: dayCount
+        }));
+        
+        // Get events for this day
+        const dayStart = new Date(currentDate);
+        dayStart.setHours(0, 0, 0, 0);
+        const dayEnd = new Date(currentDate);
+        dayEnd.setHours(23, 59, 59, 999);
+        
+        const dayEvents = monthEvents.filter(ev => 
+          ev.end >= dayStart.getTime() && ev.start <= dayEnd.getTime()
+        );
+        
+        // Add events to this day
+        dayEvents.forEach(ev => {
+          const evStartTime = Math.max(ev.start, dayStart.getTime());
+          const evEndTime = Math.min(ev.end, dayEnd.getTime());
+          const durationMs = evEndTime - evStartTime;
+          if (durationMs < 60000) return;
+          
+          const isDistraction = /youtube|discord|facebook/i.test(ev.title);
+          const colorClass = !usrSet.colorCodedEvents ? "singleColor" : (isDistraction ? "distraction" : "focus");
+          const minutes = Math.round(durationMs / 60000);
+          const titleText = usrSet.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
+          
+          const appName = ev.details?.owner?.name || extractAppName(ev.title);
+          const category = ev.details?.isManual ? ev.details.category : getAppCat(appName);
+          const iconData = ev.details?.icon || appName;
+          const iconEl = createAppIcon(iconData);
+          
+          const eventElement = $('<div/>', {
+            class: `calendar-event ${colorClass}`,
+            css: {
+              backgroundColor: colorClass === 'distraction' ? 'var(--destructive)' : 
+                             colorClass === 'focus' ? 'var(--success)' : 'var(--primary)',
+              color: 'white',
+              padding: '0.1rem 0.25rem',
+              borderRadius: '0.2rem',
+              marginBottom: '0.1rem',
+              fontSize: '0.6rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.2rem',
+              maxWidth: '100%',
+              overflow: 'hidden'
+            },
+            data: { event: JSON.stringify(ev) },
+            click: () => showSegDetails(ev)
+          }).append(
+            iconEl,
+            $('<span/>', {
+              style: 'flex: 1; overflow: hidden; textOverflow: ellipsis; whiteSpace: nowrap;',
+              text: `${titleText} (${minutes}m)`
+            })
+          );
+          
+          cell.append(eventElement);
+        });
+        
+        dayCount++;
+      } else {
+        // Empty cell for days outside current month
+        cell.css({
+          backgroundColor: 'var(--muted)',
+          color: 'var(--muted-foreground)'
+        });
+      }
+      
+      calendarContainer.append(cell);
+    }
   }
+  
+  $timeline.append(calendarContainer);
   
   if (!monthEvents.length) {
     $timeline.append('<p class="text-muted m-3">No events for this month.</p>');
-    return monthEvents;
   }
-  
-  // Group events by week
-  const eventsByWeek = {};
-  for (let week = 0; week < weeksInMonth; week++) {
-    const weekStart = new Date(monthStart);
-    weekStart.setDate(monthStart.getDate() + (week * 7) - firstDayOfMonth);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
-    
-    eventsByWeek[week] = monthEvents.filter(ev => ev.end >= weekStart.getTime() && ev.start <= weekEnd.getTime());
-  }
-  
-  // Render events for each week
-  Object.keys(eventsByWeek).forEach(weekIndex => {
-    const weekEvents = eventsByWeek[weekIndex];
-    const weekStart = new Date(monthStart);
-    weekStart.setDate(monthStart.getDate() + (parseInt(weekIndex) * 7) - firstDayOfMonth);
-    
-    const weekTop = parseInt(weekIndex) * weekHeight + 20;
-    const weekHeightPx = weekHeight - 20;
-    const eventsAreaWidth = $timeline.width() - 100;
-    
-    weekEvents.forEach(ev => {
-      const evStartTime = Math.max(ev.start, weekStart.getTime());
-      const evEndTime = Math.min(ev.end, weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
-      const durationMs = evEndTime - evStartTime;
-      if (durationMs < 60000) return;
-      
-      const topOffset = ((evStartTime - weekStart.getTime()) / (7 * 24 * 60 * 60 * 1000)) * weekHeightPx;
-      const blockHeight = (durationMs / (7 * 24 * 60 * 60 * 1000)) * weekHeightPx;
-      if (blockHeight < 2) return;
-      
-      const isDistraction = /youtube|discord|facebook/i.test(ev.title);
-      const colorClass = !usrSet.colorCodedEvents ? "singleColor" : (isDistraction ? "distraction" : "focus");
-      const minutes = Math.round(durationMs / 60000);
-      const leftOffset = 100;
-      const blockWidth = eventsAreaWidth - 5;
-      const titleText = usrSet.useEmojis ? ev.title : ev.title.replace(/[^\w\s]/g, '');
-      
-      const appName = ev.details?.owner?.name || extractAppName(ev.title);
-      const category = ev.details?.isManual ? ev.details.category : getAppCat(appName);
-      const iconData = ev.details?.icon || appName;
-      const iconEl = createAppIcon(iconData);
-      
-      let badgeHTML = category ? `<span class="badge bg-danger me-1">${category}</span>` : "";
-      if (ev.details?.isFocus) badgeHTML += `<span class="badge bg-success me-1">Focus</span>`;
-      if (ev.details?.isIdle) badgeHTML += `<span class="badge bg-secondary me-1">Idle</span>`;
-      
-      let wrapper = $('<div/>', {
-        class: `entry ${colorClass}`,
-        css: { 
-          top: (weekTop + topOffset) + 'px', 
-          left: leftOffset + 'px', 
-          width: blockWidth + 'px', 
-          height: blockHeight + 'px',
-          position: 'absolute',
-          fontSize: '0.7rem'
-        },
-        data: { event: JSON.stringify(ev) },
-        click: () => showSegDetails(ev)
-      }).append(iconEl, $('<span/>', {
-        style: 'marginLeft:0.25rem; flex: 1',
-        html: `${titleText} (${minutes}m)`
-      }), $('<div/>', {
-        style: 'marginLeft: auto; display: flex; gap: 0.25rem;',
-        html: badgeHTML
-      }), $('<i/>', {
-        class: 'fas fa-trash delete-icon',
-        style: 'marginLeft: 0.25rem;',
-        click: (e) => {
-          e.stopPropagation();
-          currentEventForDeletion = ev;
-          deleteCurrentEntry();
-        }
-      }));
-      
-      $timeline.append(wrapper);
-    });
-  });
   
   return monthEvents;
 };
@@ -950,7 +1045,9 @@ function showSegDetails(details) {
   
   // Check if this is a grouped event (has multiple original segments)
   if (details.details?.isGrouped) {
-    content += `<br><span class='badge bg-info'>Grouped Activity</span>`;
+    const groupType = details.details.groupType === 'windowId' ? 'Window ID Grouped' : 'Grouped Activity';
+    const badgeClass = details.details.groupType === 'windowId' ? 'bg-primary' : 'bg-info';
+    content += `<br><span class='badge ${badgeClass}'>${groupType}</span>`;
   }
   
   if (details.details) {
@@ -1097,7 +1194,7 @@ ipcRenderer.on('active-window-data', (e, data) => {
     curSeg = { title: data.title, start: now, end: now, details: data };
   }
   if (Date.now() - lastSegUpdate > 5000) {
-    renderDayView();
+    renderView();
     lastSegUpdate = Date.now();
   }
 });
@@ -1113,7 +1210,7 @@ function getDailyProductivitySummary(dayEvents) {
   return { totalMinutes: Math.round(total / 60000), focusMinutes: Math.round(focus / 60000), idleMinutes: Math.round(idle / 60000) };
 }
 
-// Group similar window activities
+// Group similar window activities - prioritize Window ID grouping
 function groupSimilarActivities(events, maxGapMs = null) {
   if (!events || events.length === 0) return events;
   
@@ -1143,12 +1240,15 @@ function groupSimilarActivities(events, maxGapMs = null) {
     }
     
     // Check if this event can be grouped with the current group
-    if (currentGroup && 
-        currentGroup.details?.id === windowId && 
-        currentGroup.title === title &&
-        currentGroup.details?.owner?.name === ownerName &&
-        (event.start - currentGroup.end) <= threshold) {
-      
+    // Priority: Window ID > Title > Owner Name (if prioritizeWindowId is enabled)
+    const canGroup = currentGroup && (event.start - currentGroup.end) <= threshold && (
+      // Same Window ID (highest priority if enabled)
+      (usrSet.prioritizeWindowId && currentGroup.details?.id === windowId && windowId !== undefined) ||
+      // Same title and owner (fallback or when Window ID priority is disabled)
+      (currentGroup.title === title && currentGroup.details?.owner?.name === ownerName)
+    );
+    
+    if (canGroup) {
       // Extend the current group
       currentGroup.end = event.end;
       
@@ -1163,6 +1263,13 @@ function groupSimilarActivities(events, maxGapMs = null) {
       // Update focus status if either event was a focus session
       if (event.details?.isFocus) {
         currentGroup.details.isFocus = true;
+      }
+      
+      // Mark group type for better identification
+      if (currentGroup.details?.id === windowId && windowId !== undefined) {
+        currentGroup.details.groupType = 'windowId';
+      } else {
+        currentGroup.details.groupType = 'titleAndOwner';
       }
       
     } else {
