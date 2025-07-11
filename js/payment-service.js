@@ -5,84 +5,86 @@
 
 class PaymentService {
     constructor() {
-        // Detect environment and set appropriate API URL
         let apiBaseUrl;
-        
-        // Check if we're in Electron (file:// protocol) or localhost
         if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '') {
             apiBaseUrl = 'http://localhost:3001/api';
         } else {
-            // Production environment
             apiBaseUrl = `${window.location.origin}/api`;
         }
-        
+
         this.apiBaseUrl = apiBaseUrl;
         this.stripe = null;
         this.initializationPromise = null;
-        console.log('💳 PaymentService: Initializing...');
+        this.state = 'uninitialized'; // uninitialized, initializing, initialized, error
+
+        console.log('💳 PaymentService: Instance created.');
         console.log('💳 PaymentService: API Base URL:', this.apiBaseUrl);
-        console.log('💳 PaymentService: Protocol:', window.location.protocol);
-        console.log('💳 PaymentService: Hostname:', window.location.hostname);
-        
-        // Initialize Stripe after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            this.initializeStripe();
-        }, 100);
     }
 
     /**
-     * Initialize Stripe with publishable key
-     * @param {string} publishableKey - Stripe publishable key
+     * Initializes the PaymentService, fetching configuration and loading Stripe.js.
+     * This method is idempotent.
+     * @returns {Promise<void>}
      */
-    async initializeStripe(publishableKey = null) {
-        // If already initializing, return the existing promise
-        if (this.initializationPromise) {
+    async init() {
+        if (this.state === 'initialized') {
+            console.log('💳 PaymentService: Already initialized.');
+            return;
+        }
+
+        if (this.state === 'initializing') {
+            console.log('💳 PaymentService: Initialization in progress, waiting...');
             return this.initializationPromise;
         }
 
-        this.initializationPromise = this._initializeStripe(publishableKey);
-        return this.initializationPromise;
+        this.state = 'initializing';
+        console.log('💳 PaymentService: Starting initialization...');
+
+        this.initializationPromise = this._initializeStripeWithRetry();
+        
+        try {
+            await this.initializationPromise;
+            this.state = 'initialized';
+            console.log('💳 PaymentService: Initialization successful.');
+        } catch (error) {
+            this.state = 'error';
+            console.error('💳 PaymentService: Initialization failed.', error);
+            this.initializationPromise = null;
+            throw error; // Re-throw to allow UI to handle it
+        }
     }
 
     /**
-     * Internal method to initialize Stripe
-     * @param {string} publishableKey - Stripe publishable key
+     * Internal method to initialize Stripe, with retry logic for fetching config.
      */
-    async _initializeStripe(publishableKey = null) {
-        try {
-            console.log('💳 PaymentService: Initializing Stripe...');
-            
-            // If publishable key is provided, use it directly
-            if (publishableKey) {
-                await this.loadStripeAndInitialize(publishableKey);
-                return;
-            }
-            
-            // Otherwise, fetch from backend
+    async _initializeStripeWithRetry(retries = 3, delay = 1000) {
+        for (let i = 0; i < retries; i++) {
             try {
+                console.log(`💳 PaymentService: Attempting to fetch config (Attempt ${i + 1}/${retries})`);
                 const response = await fetch(`${this.apiBaseUrl}/stripe-config`);
-                if (response.ok) {
-                    const config = await response.json();
-                    await this.loadStripeAndInitialize(config.publishableKey);
-                } else {
-                    throw new Error('Failed to fetch Stripe configuration');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch Stripe configuration (status: ${response.status})`);
                 }
+                const config = await response.json();
+                if (!config.publishableKey) {
+                    throw new Error('Publishable key not found in server response.');
+                }
+                await this.loadStripeAndInitialize(config.publishableKey);
+                return; // Success
             } catch (error) {
-                console.error('💳 PaymentService: Failed to fetch Stripe config:', error);
-                // Check if it's a connection error
-                if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_REFUSED')) {
-                    console.warn('💳 PaymentService: Server not available, using fallback key');
-                    // Use the actual publishable key from the error message you provided
-                    await this.loadStripeAndInitialize('pk_test_51RjlZuRjVTeY4vTLvc4HDiRgdt0ay9LVir7S4vFQhkcJZKHozU0pUGaXcJR6bbg4LtEEjtlx8u60Y7VnnhjIZHoC00YZlQhf6l');
-                } else {
-                    // Fallback to placeholder for other errors
-                    await this.loadStripeAndInitialize('pk_test_your_stripe_publishable_key_here');
+                console.warn(`💳 PaymentService: Attempt ${i + 1} failed.`, error.message);
+                if (i === retries - 1) {
+                    console.error('💳 PaymentService: All attempts to fetch config failed.');
+                    // Fallback to hardcoded key as a last resort in Electron/dev environments
+                    if (window.location.protocol === 'file:') {
+                        console.warn('💳 PaymentService: Falling back to hardcoded publishable key.');
+                        await this.loadStripeAndInitialize('pk_test_51RjlZuRjVTeY4vTLvc4HDiRgdt0ay9LVir7S4vFQhkcJZKHozU0pUGaXcJR6bbg4LtEEjtlx8u60Y7VnnhjIZHoC00YZlQhf6l');
+                        return;
+                    }
+                    throw new Error('Could not initialize payment service. Please ensure the server is running and accessible.');
                 }
+                await new Promise(res => setTimeout(res, delay));
             }
-        } catch (error) {
-            console.error('💳 PaymentService: Failed to initialize Stripe:', error);
-            this.initializationPromise = null; // Reset on error
-            throw error;
         }
     }
 
@@ -117,26 +119,11 @@ class PaymentService {
      * @returns {Promise<boolean>} - Whether Stripe is ready
      */
     async ensureStripeReady() {
-        if (this.stripe) {
-            return true;
+        if (this.state !== 'initialized') {
+             console.log('💳 PaymentService: Stripe not ready, attempting to initialize...');
+            await this.init();
         }
-
-        try {
-            console.log('💳 PaymentService: Ensuring Stripe is ready...');
-            
-            // If initialization is already in progress, wait for it
-            if (this.initializationPromise) {
-                await this.initializationPromise;
-                return !!this.stripe;
-            }
-            
-            // Otherwise, start initialization
-            await this.initializeStripe();
-            return !!this.stripe;
-        } catch (error) {
-            console.error('💳 PaymentService: Failed to ensure Stripe is ready:', error);
-            return false;
-        }
+        return this.state === 'initialized';
     }
 
     /**
@@ -147,17 +134,12 @@ class PaymentService {
      */
     async createCheckoutSession(priceId, firebaseUid) {
         try {
-            // Check if server is available first
-            try {
-                const healthCheck = await fetch(`${this.apiBaseUrl.replace('/api', '')}/health`);
-                if (!healthCheck.ok) {
-                    throw new Error('Server health check failed');
-                }
-            } catch (error) {
-                return { 
+            const isReady = await this.ensureStripeReady();
+            if (!isReady) {
+                 return { 
                     success: false, 
-                    error: 'Payment server is not available. Please ensure the server is running.',
-                    serverUnavailable: true
+                    error: 'Payment system is not initialized. Please try again in a moment.',
+                    needsInitialization: true
                 };
             }
 
@@ -185,6 +167,7 @@ class PaymentService {
             }
 
             const data = await response.json();
+            console.log('💳 PaymentService: Checkout session created:', data);
             return { success: true, sessionId: data.sessionId };
         } catch (error) {
             console.error('Error creating checkout session:', error);
@@ -203,15 +186,17 @@ class PaymentService {
             if (window && window.process && window.process.type === 'renderer') {
                 // Electron renderer process
                 const { shell } = window.require('electron');
+                // Use the direct checkout URL - Stripe handles the API key on their side
                 const checkoutUrl = `https://checkout.stripe.com/c/pay/${sessionId}`;
+                console.log('💳 PaymentService: Opening checkout URL in external browser:', checkoutUrl);
                 shell.openExternal(checkoutUrl);
                 return { success: true };
             }
 
-            // Ensure Stripe is initialized before proceeding
+            // For browser environments, ensure Stripe is initialized before proceeding
             const isReady = await this.ensureStripeReady();
             if (!isReady) {
-                throw new Error('Failed to initialize Stripe');
+                throw new Error('Failed to initialize Stripe for checkout.');
             }
 
             const { error } = await this.stripe.redirectToCheckout({

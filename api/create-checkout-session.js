@@ -35,6 +35,8 @@ const createCheckoutSession = async (req, res) => {
   }
 
   try {
+    console.log('🔧 Creating checkout session for:', { priceId, firebaseUid });
+    
     // Validate price ID format
     if (!priceId.startsWith('price_')) {
       return res.status(400).json({ error: 'Invalid price ID format' });
@@ -48,8 +50,8 @@ const createCheckoutSession = async (req, res) => {
         quantity: 1 
       }],
       mode: 'subscription',
-      success_url: `${process.env.APP_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.APP_URL || 'http://localhost:3000'}/cancel`,
+      success_url: `${process.env.APP_URL || 'http://localhost:3001'}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.APP_URL || 'http://localhost:3001'}/cancel`,
       metadata: { 
         firebaseUid,
         priceId 
@@ -61,9 +63,14 @@ const createCheckoutSession = async (req, res) => {
         metadata: {
           firebaseUid
         }
-      }
+      },
+      // Disable client-side Stripe.js to prevent API key issues
+      client_reference_id: firebaseUid,
+      // Ensure the session doesn't require client-side initialization
+      payment_method_collection: 'always'
     });
 
+    console.log('🔧 Checkout session created successfully:', { sessionId: session.id, url: session.url });
     res.status(200).json({ 
       sessionId: session.id,
       url: session.url 

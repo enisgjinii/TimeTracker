@@ -11,6 +11,7 @@ class PaymentUI {
         this.currentUser = null;
         this.subscriptionStatus = null;
         this.plans = [];
+        this.isInitialized = false;
         console.log('🔧 PaymentUI: Initializing...');
         this.initialize();
     }
@@ -20,7 +21,10 @@ class PaymentUI {
      */
     async initialize() {
         console.log('🔧 PaymentUI: Starting initialization...');
-        
+
+        // Initialize the payment service first
+        await this.initializePaymentService();
+
         // Listen for auth state changes
         authService.onAuthStateChanged((user) => {
             console.log('🔧 PaymentUI: Auth state changed:', user ? 'User logged in' : 'User logged out');
@@ -34,35 +38,66 @@ class PaymentUI {
             }
         });
 
-        // Load subscription plans
+        // Load subscription plans after payment service is ready
         await this.loadSubscriptionPlans();
         
         // Always show payment section for testing
         this.showPaymentSection();
         
         console.log('🔧 PaymentUI: Initialization complete');
+        this.isInitialized = true;
     }
 
     /**
-     * Load available subscription plans
+     * Initializes the payment service and updates the UI accordingly.
      */
-    async loadSubscriptionPlans() {
+    async initializePaymentService() {
         try {
-            console.log('🔧 PaymentUI: Loading subscription plans...');
-            const result = await paymentService.getSubscriptionPlans();
-            if (result.success) {
-                this.plans = result.plans;
-                console.log('🔧 PaymentUI: Plans loaded:', this.plans.length);
-                this.renderSubscriptionPlans();
-            } else {
-                console.error('🔧 PaymentUI: Failed to load plans:', result.error);
-                // Fallback to default plans if API fails
-                this.loadDefaultPlans();
+            this.setPlanButtonsState(false, 'Initializing Payments...');
+            await paymentService.init();
+            this.setPlanButtonsState(true);
+            this.showSuccess('Payment system ready.');
+            
+            // If we loaded default plans earlier, try to reload real plans now
+            if (this.plans.length > 0 && this.plans.some(p => p.priceId && p.priceId.includes('_monthly'))) {
+                console.log('🔧 PaymentUI: Reloading plans with real price IDs...');
+                await this.loadSubscriptionPlans(1); // Single retry
             }
         } catch (error) {
-            console.error('🔧 PaymentUI: Error loading subscription plans:', error);
-            // Fallback to default plans if API fails
-            this.loadDefaultPlans();
+            this.showError(`Payment Error: ${error.message}`);
+            this.setPlanButtonsState(false, 'Payments Disabled');
+        }
+    }
+
+    /**
+     * Load available subscription plans with retry logic
+     */
+    async loadSubscriptionPlans(retries = 3) {
+        for (let attempt = 1; attempt <= retries; attempt++) {
+            try {
+                console.log(`🔧 PaymentUI: Loading subscription plans (attempt ${attempt}/${retries})...`);
+                const result = await paymentService.getSubscriptionPlans();
+                if (result.success) {
+                    this.plans = result.plans;
+                    console.log('🔧 PaymentUI: Plans loaded successfully:', this.plans.length);
+                    console.log('🔧 PaymentUI: Plan price IDs:', this.plans.map(p => ({ id: p.id, priceId: p.priceId })));
+                    this.renderSubscriptionPlans();
+                    return; // Success
+                } else {
+                    console.error('🔧 PaymentUI: Failed to load plans:', result.error);
+                    if (attempt === retries) {
+                        this.loadDefaultPlans();
+                    }
+                }
+            } catch (error) {
+                console.error(`🔧 PaymentUI: Error loading subscription plans (attempt ${attempt}):`, error);
+                if (attempt === retries) {
+                    this.loadDefaultPlans();
+                } else {
+                    // Wait before retrying
+                    await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+                }
+            }
         }
     }
 
@@ -189,17 +224,8 @@ class PaymentUI {
         console.log('🔧 PaymentUI: Found plans container, rendering...');
         plansContainer.innerHTML = this.plans.map(plan => this.createPlanCard(plan)).join('');
         
-        // Add event listeners to upgrade buttons
-        this.plans.forEach(plan => {
-            if (plan.priceId) {
-                const upgradeBtn = document.getElementById(`upgrade-${plan.id}`);
-                if (upgradeBtn) {
-                    upgradeBtn.addEventListener('click', () => this.handleUpgrade(plan));
-                    console.log('🔧 PaymentUI: Added event listener for', plan.id);
-                }
-            }
-        });
-        console.log('🔧 PaymentUI: Plans rendered successfully');
+        // Add event listeners to upgrade buttons and set initial state
+        this.setPlanButtonsState(paymentService.state === 'initialized');
     }
 
     /**
@@ -256,7 +282,34 @@ class PaymentUI {
     }
 
     /**
-     * Handle subscription upgrade
+     * Sets the enabled/disabled state of all plan buttons.
+     * @param {boolean} isEnabled - Whether to enable the buttons.
+     * @param {string} [text] - Optional text to display on the buttons.
+     */
+    setPlanButtonsState(isEnabled, text = '') {
+        this.plans.forEach(plan => {
+            if (plan.priceId) {
+                const upgradeBtn = document.getElementById(`upgrade-${plan.id}`);
+                if (upgradeBtn) {
+                    upgradeBtn.disabled = !isEnabled;
+                    if (text) {
+                        upgradeBtn.textContent = text;
+                    } else if (isEnabled) {
+                        upgradeBtn.textContent = `Upgrade to ${plan.name}`;
+                    }
+                    
+                    if (isEnabled && !upgradeBtn.hasAttribute('data-listener-attached')) {
+                        upgradeBtn.addEventListener('click', () => this.handleUpgrade(plan));
+                        upgradeBtn.setAttribute('data-listener-attached', 'true');
+                        console.log('🔧 PaymentUI: Added event listener for', plan.id);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Handle user upgrade to a new plan
      * @param {Object} plan - Selected plan
      */
     async handleUpgrade(plan) {
@@ -272,13 +325,6 @@ class PaymentUI {
             button.textContent = 'Processing...';
             button.disabled = true;
 
-            // Ensure Stripe is ready before proceeding
-            console.log('🔧 PaymentUI: Ensuring Stripe is ready for checkout...');
-            const isStripeReady = await paymentService.ensureStripeReady();
-            if (!isStripeReady) {
-                throw new Error('Failed to initialize payment system. Please refresh the page and try again.');
-            }
-
             // Create checkout session
             const result = await paymentService.createCheckoutSession(plan.priceId, this.currentUser.uid);
             
@@ -289,7 +335,10 @@ class PaymentUI {
                     throw new Error(redirectResult.error);
                 }
             } else {
-                if (result.needsConfiguration) {
+                if (result.needsInitialization) {
+                    this.showError('Payment system is not ready. Please wait a moment and try again.');
+                    this.initializePaymentService(); // Attempt to re-initialize
+                } else if (result.needsConfiguration) {
                     this.showError('Payment system is being configured. Please try again later or contact support.');
                 } else if (result.serverUnavailable) {
                     this.showError('Payment server is not available. Please ensure the server is running and try again.');
@@ -301,12 +350,12 @@ class PaymentUI {
             }
         } catch (error) {
             console.error('Error during upgrade:', error);
-            this.showError('Failed to process upgrade. Please try again.');
+            this.showError(`Upgrade Failed: ${error.message}`);
         } finally {
-            // Reset button state
+            // Reset button state (only if it still exists)
             const button = document.getElementById(`upgrade-${plan.id}`);
             if (button) {
-                button.textContent = originalText || 'Upgrade';
+                button.textContent = `Upgrade to ${plan.name}`;
                 button.disabled = false;
             }
         }

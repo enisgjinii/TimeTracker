@@ -36,7 +36,7 @@ const getSubscriptionPlans = async (req, res) => {
         id: 'pro',
         name: 'Pro',
         price: 9.99,
-        priceId: process.env.STRIPE_PRO_PRICE_ID || 'price_pro_monthly',
+        priceId: process.env.STRIPE_PRO_PRICE_ID,
         interval: 'month',
         features: [
           'Unlimited time tracking',
@@ -55,7 +55,7 @@ const getSubscriptionPlans = async (req, res) => {
         id: 'business',
         name: 'Business',
         price: 29.99,
-        priceId: process.env.STRIPE_BUSINESS_PRICE_ID || 'price_business_monthly',
+        priceId: process.env.STRIPE_BUSINESS_PRICE_ID,
         interval: 'month',
         features: [
           'All Pro features',
@@ -92,20 +92,7 @@ const getSubscriptionPlans = async (req, res) => {
       }
     ];
 
-    // Add Stripe price IDs if available
-    if (process.env.STRIPE_PRO_PRICE_ID) {
-      const proPlan = plans.find(p => p.id === 'pro');
-      if (proPlan) {
-        proPlan.priceId = process.env.STRIPE_PRO_PRICE_ID;
-      }
-    }
-
-    if (process.env.STRIPE_BUSINESS_PRICE_ID) {
-      const businessPlan = plans.find(p => p.id === 'business');
-      if (businessPlan) {
-        businessPlan.priceId = process.env.STRIPE_BUSINESS_PRICE_ID;
-      }
-    }
+    // Price IDs are already set from environment variables
 
     res.status(200).json({ 
       plans,
