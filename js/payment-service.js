@@ -5,13 +5,23 @@
 
 class PaymentService {
     constructor() {
-        // Use production URL if deployed, otherwise localhost
-        this.apiBaseUrl = window.location.hostname === 'localhost' ? 
-            'http://localhost:3001/api' : 
-            `${window.location.origin}/api`;
+        // Detect environment and set appropriate API URL
+        let apiBaseUrl;
+        
+        // Check if we're in Electron (file:// protocol) or localhost
+        if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '') {
+            apiBaseUrl = 'http://localhost:3001/api';
+        } else {
+            // Production environment
+            apiBaseUrl = `${window.location.origin}/api`;
+        }
+        
+        this.apiBaseUrl = apiBaseUrl;
         this.stripe = null;
         console.log('💳 PaymentService: Initializing...');
         console.log('💳 PaymentService: API Base URL:', this.apiBaseUrl);
+        console.log('💳 PaymentService: Protocol:', window.location.protocol);
+        console.log('💳 PaymentService: Hostname:', window.location.hostname);
         // Initialize Stripe when needed
         this.initializeStripe();
     }

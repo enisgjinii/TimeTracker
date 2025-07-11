@@ -27,13 +27,19 @@ class PaymentUI {
             this.currentUser = user;
             if (user) {
                 this.checkSubscriptionStatus();
+                this.showPaymentUI();
             } else {
-                this.hidePaymentUI();
+                // Show payment UI even without auth for demo purposes
+                this.showPaymentUI();
             }
         });
 
         // Load subscription plans
         await this.loadSubscriptionPlans();
+        
+        // Always show payment section for testing
+        this.showPaymentSection();
+        
         console.log('🔧 PaymentUI: Initialization complete');
     }
 
@@ -50,10 +56,104 @@ class PaymentUI {
                 this.renderSubscriptionPlans();
             } else {
                 console.error('🔧 PaymentUI: Failed to load plans:', result.error);
+                // Fallback to default plans if API fails
+                this.loadDefaultPlans();
             }
         } catch (error) {
             console.error('🔧 PaymentUI: Error loading subscription plans:', error);
+            // Fallback to default plans if API fails
+            this.loadDefaultPlans();
         }
+    }
+
+    /**
+     * Load default subscription plans as fallback
+     */
+    loadDefaultPlans() {
+        console.log('🔧 PaymentUI: Loading default plans as fallback...');
+        this.plans = [
+            {
+                id: 'free',
+                name: 'Free',
+                price: 0,
+                priceId: null,
+                interval: null,
+                features: [
+                    'Basic time tracking',
+                    'Daily activity view',
+                    'Basic productivity insights',
+                    'Manual time entry',
+                    '7 days of history'
+                ],
+                limitations: [
+                    'Limited to 7 days of history',
+                    'No advanced analytics',
+                    'No team features',
+                    'No export functionality'
+                ],
+                popular: false
+            },
+            {
+                id: 'pro',
+                name: 'Pro',
+                price: 9.99,
+                priceId: 'price_pro_monthly',
+                interval: 'month',
+                features: [
+                    'Unlimited time tracking',
+                    'Advanced analytics & insights',
+                    'Productivity scoring',
+                    'Custom categories & tags',
+                    'Export data (CSV, JSON)',
+                    'Email reports',
+                    'Priority support',
+                    'Unlimited history'
+                ],
+                limitations: [],
+                popular: true
+            },
+            {
+                id: 'business',
+                name: 'Business',
+                price: 29.99,
+                priceId: 'price_business_monthly',
+                interval: 'month',
+                features: [
+                    'All Pro features',
+                    'Team management',
+                    'Team productivity insights',
+                    'Advanced reporting',
+                    'API access',
+                    'Custom integrations',
+                    'Dedicated support',
+                    'Team analytics'
+                ],
+                limitations: [],
+                popular: false
+            },
+            {
+                id: 'enterprise',
+                name: 'Enterprise',
+                price: null,
+                priceId: null,
+                interval: null,
+                features: [
+                    'All Business features',
+                    'Custom deployment',
+                    'Advanced security',
+                    'SLA guarantees',
+                    'Custom integrations',
+                    'Dedicated account manager',
+                    'Training & onboarding',
+                    'White-label options'
+                ],
+                limitations: [],
+                popular: false,
+                custom: true
+            }
+        ];
+        console.log('🔧 PaymentUI: Default plans loaded:', this.plans.length);
+        this.renderSubscriptionPlans();
     }
 
     /**
