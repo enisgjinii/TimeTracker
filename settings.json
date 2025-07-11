@@ -1,12 +1,13 @@
 {
-  "timelineIncrements": 5,
+  "timelineIncrements": 30,
   "darkMode": true,
-  "themeMode": "light",
+  "themeMode": "system",
   "useEmojis": true,
   "colorCodedEvents": true,
   "defaultView": "day",
   "enableGrouping": true,
   "groupingThreshold": 5,
+  "prioritizeWindowId": true,
   "showIcons": true,
   "categories": [],
   "appClassifications": {

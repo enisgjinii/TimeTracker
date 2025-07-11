@@ -10,30 +10,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     <style>
         :root {
             --background: hsl(0 0% 100%);
-            --foreground: hsl(0 0% 3.9%);
+            --foreground: hsl(0 0% 9%);
             --card: hsl(0 0% 100%);
-            --card-foreground: hsl(0 0% 3.9%);
+            --card-foreground: hsl(0 0% 9%);
             --popover: hsl(0 0% 100%);
-            --popover-foreground: hsl(0 0% 3.9%);
+            --popover-foreground: hsl(0 0% 9%);
             --primary: hsl(0 0% 9%);
             --primary-foreground: hsl(0 0% 98%);
-            --primary-hover: hsl(0 0% 20%);
-            --secondary: hsl(0 0% 96.1%);
+            --primary-hover: hsl(0 0% 15%);
+            --secondary: hsl(0 0% 96%);
             --secondary-foreground: hsl(0 0% 9%);
-            --muted: hsl(0 0% 96.1%);
-            --muted-foreground: hsl(0 0% 45.1%);
-            --accent: hsl(0 0% 96.1%);
+            --muted: hsl(0 0% 96%);
+            --muted-foreground: hsl(0 0% 45%);
+            --accent: hsl(0 0% 96%);
             --accent-foreground: hsl(0 0% 9%);
-            --destructive: hsl(0 84.2% 60.2%);
+            --destructive: hsl(0 84% 60%);
             --destructive-foreground: hsl(0 0% 98%);
-            --border: hsl(0 0% 89.8%);
-            --input: hsl(0 0% 89.8%);
-            --ring: hsl(0 0% 3.9%);
-            --radius: 0.5rem;
+            --border: hsl(0 0% 90%);
+            --input: hsl(0 0% 90%);
+            --ring: hsl(0 0% 9%);
+            --radius: 0.375rem;
             --success: hsl(142 76% 36%);
             --success-foreground: hsl(0 0% 98%);
             --warning: hsl(38 92% 50%);
@@ -41,26 +42,26 @@
         }
 
         .dark-mode {
-            --background: hsl(0 0% 3.9%);
+            --background: hsl(0 0% 2%);
             --foreground: hsl(0 0% 98%);
-            --card: hsl(0 0% 3.9%);
+            --card: hsl(0 0% 4%);
             --card-foreground: hsl(0 0% 98%);
-            --popover: hsl(0 0% 3.9%);
+            --popover: hsl(0 0% 4%);
             --popover-foreground: hsl(0 0% 98%);
             --primary: hsl(0 0% 98%);
-            --primary-foreground: hsl(0 0% 9%);
+            --primary-foreground: hsl(0 0% 2%);
             --primary-hover: hsl(0 0% 85%);
-            --secondary: hsl(0 0% 14.9%);
+            --secondary: hsl(0 0% 8%);
             --secondary-foreground: hsl(0 0% 98%);
-            --muted: hsl(0 0% 14.9%);
-            --muted-foreground: hsl(0 0% 63.9%);
-            --accent: hsl(0 0% 14.9%);
+            --muted: hsl(0 0% 8%);
+            --muted-foreground: hsl(0 0% 60%);
+            --accent: hsl(0 0% 8%);
             --accent-foreground: hsl(0 0% 98%);
-            --destructive: hsl(0 62.8% 30.6%);
+            --destructive: hsl(0 84% 60%);
             --destructive-foreground: hsl(0 0% 98%);
-            --border: hsl(0 0% 14.9%);
-            --input: hsl(0 0% 14.9%);
-            --ring: hsl(0 0% 83.1%);
+            --border: hsl(0 0% 12%);
+            --input: hsl(0 0% 8%);
+            --ring: hsl(0 0% 98%);
             --success: hsl(142 76% 36%);
             --success-foreground: hsl(0 0% 98%);
         }
@@ -70,6 +71,9 @@
             background-color: var(--background);
             color: var(--foreground);
             transition: background-color 0.3s, color 0.3s;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* Settings Page Styles */
@@ -99,17 +103,22 @@
             border-radius: var(--radius);
             padding: 0.5rem 0.75rem;
             font-size: 0.875rem;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: all 0.2s ease;
+            line-height: 1.5;
         }
 
         .form-control:focus, .form-select:focus {
             border-color: var(--ring);
-            box-shadow: 0 0 0 2px var(--ring);
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
             outline: none;
         }
 
         .form-control::placeholder {
             color: var(--muted-foreground);
+        }
+
+        .form-control:hover, .form-select:hover {
+            border-color: var(--muted-foreground);
         }
 
         .form-check-input {
@@ -133,18 +142,28 @@
             border-radius: var(--radius);
             padding: 0.5rem 1rem;
             font-size: 0.875rem;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            line-height: 1;
         }
 
         .btn-primary {
             background-color: var(--primary);
             border-color: var(--primary);
             color: var(--primary-foreground);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
         .btn-primary:hover {
             background-color: var(--primary-hover);
             border-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
         .btn-outline-secondary {
@@ -156,6 +175,8 @@
         .btn-outline-secondary:hover {
             background-color: var(--accent);
             color: var(--accent-foreground);
+            border-color: var(--accent);
+            transform: translateY(-1px);
         }
 
         .btn-outline-danger {
@@ -167,6 +188,7 @@
         .btn-outline-danger:hover {
             background-color: var(--destructive);
             color: var(--destructive-foreground);
+            transform: translateY(-1px);
         }
 
         .badge {
@@ -179,10 +201,13 @@
             border: 1px solid var(--border);
             color: var(--foreground);
             padding: 0.75rem 1rem;
+            transition: all 0.2s ease;
         }
 
         .list-group-item:hover {
             background-color: var(--accent);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .alert {
@@ -207,28 +232,39 @@
         }
 
         .sidebar {
-            background-color: var(--secondary);
-            width: 240px;
-            padding: 1.5rem;
+            background-color: var(--card);
+            width: 220px;
+            padding: 1rem;
             border-right: 1px solid var(--border);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
         .sidebar .nav-link {
             color: var(--muted-foreground);
             font-weight: 500;
-            padding: 0.75rem 1rem;
+            padding: 0.5rem 0.75rem;
             border-radius: var(--radius);
-            transition: background-color 0.2s, color 0.2s;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
         }
 
         .sidebar .nav-link:hover {
             color: var(--foreground);
             background-color: var(--accent);
+            transform: translateX(2px);
         }
         
         .sidebar .nav-link.active {
             color: var(--primary-foreground);
             background-color: var(--primary);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
         .sidebar .nav-link.active:hover {
@@ -238,12 +274,14 @@
         /* Timeline Styles */
         .timeline-container {
             position: relative;
-            height: 480px;
+            height: 400px;
             overflow-y: auto;
-            padding-left: 70px;
+            padding-left: 60px;
             scrollbar-width: thin;
             background-color: var(--card);
             border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
         .timeline-container::-webkit-scrollbar {
@@ -262,21 +300,27 @@
         .hour-marker {
             position: absolute;
             left: 0;
-            width: 60px;
-            padding: 0.5rem;
+            width: 50px;
+            padding: 0.25rem;
             border-top: 1px solid var(--border);
             color: var(--muted-foreground);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-align: right;
         }
 
         .current-time-marker {
             position: absolute;
-            left: 70px;
+            left: 60px;
             right: 0;
             height: 2px;
             background-color: var(--destructive);
             z-index: 10;
+            animation: timeMarker 2s ease-in-out infinite;
+        }
+
+        @keyframes timeMarker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .current-time-label {
@@ -340,23 +384,23 @@
 
         .entry {
             position: absolute;
-            border-radius: 12px;
-            padding: 0.5rem 0.8rem;
-            font-size: 0.92rem;
-            color: #fff;
-            background-color: var(--primary);
+            border-radius: var(--radius);
+            padding: 0.375rem 0.625rem;
+            font-size: 0.75rem;
+            color: var(--card-foreground);
+            background-color: var(--card);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             cursor: pointer;
-            transition: all 0.2s, box-shadow 0.2s;
+            transition: all 0.2s ease;
             z-index: 5;
             border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 6px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 4px;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
         .entry:not(:last-child) {
@@ -366,24 +410,28 @@
         .entry.focus {
             background-color: var(--primary);
             color: var(--primary-foreground);
+            border-color: var(--primary);
         }
 
         .entry.focus:hover {
             background-color: var(--primary-hover);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             z-index: 10;
+            transform: translateY(-1px);
         }
 
         .entry.distraction {
             background-color: var(--destructive);
             color: var(--destructive-foreground);
+            border-color: var(--destructive);
         }
 
         .entry.distraction:hover {
             background-color: var(--destructive);
-            opacity: 0.92;
-            box-shadow: 0 4px 16px rgba(244,67,54,0.15);
+            opacity: 0.9;
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.1), 0 2px 4px -1px rgba(239, 68, 68, 0.06);
             z-index: 10;
+            transform: translateY(-1px);
         }
 
         .entry.singleColor {
@@ -393,8 +441,9 @@
 
         .entry.singleColor:hover {
             background-color: var(--accent);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             z-index: 10;
+            transform: translateY(-1px);
         }
 
         .entry .delete-icon {
@@ -418,9 +467,209 @@
         }
 
         .app-icon {
-            width: 18px;
-            height: 18px;
-            margin-right: 0.7rem;
+            width: 16px;
+            height: 16px;
+            margin-right: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Flaticon icon styling */
+        .app-icon.fi {
+            font-size: 16px;
+            color: inherit;
+        }
+        
+        /* Productivity Widget Styles */
+        .productivity-widget {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: all 0.2s ease;
+        }
+        
+        .productivity-widget:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .widget-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--foreground);
+            font-size: 0.9rem;
+        }
+        
+        .widget-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .metric-card {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            background: var(--background);
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-card.productive {
+            border-left: 4px solid var(--success);
+        }
+        
+        .metric-card.focus {
+            border-left: 4px solid var(--primary);
+        }
+        
+        .metric-card.idle {
+            border-left: 4px solid var(--muted-foreground);
+        }
+        
+        .metric-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .metric-card.productive .metric-icon {
+            background: var(--success);
+            color: var(--success-foreground);
+        }
+        
+        .metric-card.focus .metric-icon {
+            background: var(--primary);
+            color: var(--primary-foreground);
+        }
+        
+        .metric-card.idle .metric-icon {
+            background: var(--muted-foreground);
+            color: var(--background);
+        }
+        
+        .metric-info {
+            flex: 1;
+        }
+        
+        .metric-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--foreground);
+            line-height: 1;
+        }
+        
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+        }
+        
+        .widget-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .progress-ring {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .progress-text {
+            position: absolute;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--foreground);
+        }
+        
+        .motivational-text {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--muted-foreground);
+            font-style: italic;
+            line-height: 1.4;
+        }
+        
+        /* Animation for progress ring */
+        @keyframes progressAnimation {
+            from { stroke-dashoffset: 157; }
+            to { stroke-dashoffset: var(--progress-offset); }
+        }
+        
+        #progressCircle {
+            animation: progressAnimation 1s ease-out;
+        }
+
+        /* Progress bar animation */
+        .progress-bar-animated {
+            animation: progressBar 2s ease-out;
+        }
+
+        @keyframes progressBar {
+            from { width: 0%; }
+            to { width: var(--progress-width); }
+        }
+        
+        /* Update animation */
+        .productivity-widget.updated {
+            animation: widgetUpdate 0.5s ease-out;
+        }
+        
+        @keyframes widgetUpdate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* Loading animation */
+        .loading {
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Slide in animation */
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Week and Month View Styles */
@@ -498,29 +747,34 @@
         .view-tabs {
             border-bottom: 1px solid var(--border);
             margin-bottom: 1rem;
+            background-color: var(--card);
+            border-radius: var(--radius);
+            padding: 0.25rem;
+            display: inline-flex;
         }
 
         .view-tabs .nav-link {
             border: none;
             color: var(--muted-foreground);
             position: relative;
-            padding: 0.7rem 1.5rem;
+            padding: 0.5rem 1rem;
             font-weight: 500;
+            border-radius: var(--radius);
+            transition: all 0.2s ease;
+        }
+
+        .view-tabs .nav-link:hover {
+            color: var(--foreground);
+            background-color: var(--accent);
         }
 
         .view-tabs .nav-link.active {
-            color: var(--primary);
-            background-color: transparent;
+            color: var(--primary-foreground);
+            background-color: var(--primary);
         }
 
-        .view-tabs .nav-link.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background-color: var(--primary);
+        .view-tabs .nav-link.active:hover {
+            background-color: var(--primary-hover);
         }
 
         .stat-card {
@@ -547,6 +801,31 @@
 
         .theme-toggle:hover {
             color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* Sidebar logo hover effect */
+        .sidebar-logo {
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-logo:hover {
+            background-color: var(--accent);
+            transform: translateX(2px);
+        }
+
+        .sidebar-logo i {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-logo:hover i {
+            transform: rotate(15deg);
         }
 
         .productivity-score {
@@ -766,9 +1045,39 @@
         }
 
         .btn-tracking-active {
-            animation: pulse 1.5s infinite;
-            background-color: var(--distraction);
-            border-color: var(--distraction);
+            animation: pulse 2s infinite;
+            background-color: var(--destructive);
+            border-color: var(--destructive);
+            box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            position: relative;
+        }
+
+        .btn-tracking-active::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--destructive), transparent);
+            border-radius: var(--radius);
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                transform: scale(1.02);
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
         }
 
         .custom-switch {
@@ -884,7 +1193,13 @@
 
         .settings-section {
             margin-bottom: 2rem;
+            animation: slideIn 0.5s ease-out;
         }
+
+        .settings-section:nth-child(1) { animation-delay: 0.1s; }
+        .settings-section:nth-child(2) { animation-delay: 0.2s; }
+        .settings-section:nth-child(3) { animation-delay: 0.3s; }
+        .settings-section:nth-child(4) { animation-delay: 0.4s; }
 
         .settings-section h5 {
             position: relative;
@@ -975,55 +1290,60 @@
             overflow: hidden;
             border: 1px solid var(--border);
             margin-bottom: 1rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
         .calendar-header {
             background-color: var(--card);
-            padding: 0.5rem;
+            padding: 0.75rem;
             text-align: center;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.875rem;
             color: var(--muted-foreground);
             border-bottom: 1px solid var(--border);
         }
 
         .calendar-cell {
             background-color: var(--card);
-            padding: 0.25rem;
+            padding: 0.5rem;
             min-height: 40px;
             position: relative;
             border: 1px solid var(--border);
-            font-size: 0.7rem;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease;
         }
 
         .calendar-day-cell {
             background-color: var(--card);
-            padding: 0.5rem;
+            padding: 0.75rem;
             min-height: 120px;
             position: relative;
             border: 1px solid var(--border);
-            font-size: 0.8rem;
+            font-size: 0.875rem;
+            transition: background-color 0.2s ease;
         }
 
         .calendar-event {
             background-color: var(--primary);
-            color: white;
-            padding: 0.1rem 0.25rem;
-            border-radius: 0.2rem;
-            margin-bottom: 0.1rem;
-            font-size: 0.6rem;
+            color: var(--primary-foreground);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.25rem;
+            font-size: 0.75rem;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 0.2rem;
+            gap: 0.25rem;
             max-width: 100%;
             overflow: hidden;
             transition: all 0.2s ease;
+            border: 1px solid var(--primary);
         }
 
         .calendar-event:hover {
-            transform: scale(1.02);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 5;
         }
 
         .calendar-event.focus {
@@ -1091,16 +1411,20 @@
 
         .modal-content {
             border: none;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background-color: var(--card);
+            border: 1px solid var(--border);
         }
 
         .modal-header {
             border-bottom-color: var(--border);
+            background-color: var(--card);
         }
 
         .modal-footer {
             border-top-color: var(--border);
+            background-color: var(--card);
         }
 
         .step-navigation {
@@ -1220,27 +1544,80 @@
 <body class="dark-mode">
     <div class="d-flex vh-100">
         <div class="sidebar d-flex flex-column flex-shrink-0">
-            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none" style="color: var(--foreground);">
-                <i class="fas fa-clock me-2 fs-4"></i>
-                <span class="fs-4">TimeTracker</span>
-            </a>
-            <hr style="border-color: var(--border);">
+            <div class="sidebar-logo">
+                <i class="fi fi-rr-clock fs-4"></i>
+                <span class="fs-4 fw-bold">TimeTracker</span>
+            </div>
+            <hr style="border-color: var(--border); margin: 0;">
+            
+            <!-- Productivity Summary Widget -->
+            <div class="productivity-widget mb-3">
+                <div class="widget-header">
+                    <i class="fi fi-rr-target me-2"></i>
+                    <span class="widget-title">Today's Progress</span>
+                </div>
+                <div class="widget-content">
+                    <div class="metric-card productive">
+                        <div class="metric-icon">
+                            <i class="fi fi-rr-bolt"></i>
+                        </div>
+                        <div class="metric-info">
+                            <div class="metric-value" id="productiveMinutes">0</div>
+                            <div class="metric-label">Productive</div>
+                        </div>
+                    </div>
+                    <div class="metric-card focus">
+                        <div class="metric-icon">
+                            <i class="fi fi-rr-eye"></i>
+                        </div>
+                        <div class="metric-info">
+                            <div class="metric-value" id="focusMinutes">0</div>
+                            <div class="metric-label">Focus</div>
+                        </div>
+                    </div>
+                    <div class="metric-card idle">
+                        <div class="metric-icon">
+                            <i class="fi fi-rr-coffee"></i>
+                        </div>
+                        <div class="metric-info">
+                            <div class="metric-value" id="idleMinutes">0</div>
+                            <div class="metric-label">Idle</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-footer">
+                    <div class="progress-ring">
+                        <svg width="60" height="60" viewBox="0 0 60 60">
+                            <circle cx="30" cy="30" r="25" fill="none" stroke="var(--border)" stroke-width="4"/>
+                            <circle cx="30" cy="30" r="25" fill="none" stroke="var(--success)" stroke-width="4" 
+                                    stroke-dasharray="157" stroke-dashoffset="157" id="progressCircle"/>
+                        </svg>
+                        <div class="progress-text">
+                            <span id="progressPercentage">0%</span>
+                        </div>
+                    </div>
+                    <div class="motivational-text">
+                        <span id="motivationalMessage">Start your productive day!</span>
+                    </div>
+                </div>
+            </div>
+            
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item mb-1">
                     <a href="#" class="nav-link active" id="nav-timeline" aria-current="page">
-                        <i class="fas fa-chart-line me-2"></i>
+                        <i class="fi fi-rr-list-timeline me-2"></i>
                         Timeline
                     </a>
             </li>
                 <li class="mb-1">
                     <a href="#" class="nav-link" id="nav-settings">
-                        <i class="fas fa-cog me-2"></i>
+                        <i class="fi fi-rr-settings me-2"></i>
                         Settings
                     </a>
             </li>
                 <li class="mb-1">
                     <a href="#" class="nav-link" id="nav-about">
-                        <i class="fas fa-info-circle me-2"></i>
+                        <i class="fi fi-rr-info me-2"></i>
                         About
                     </a>
             </li>
@@ -1249,15 +1626,15 @@
                 <button id="toggleTracking" class="btn btn-primary w-100">Start Tracking</button>
             </div>
         </div>
-        <div class="flex-grow-1 p-4" style="overflow-y: auto; background-color: var(--background); color: var(--foreground)">
+        <div class="flex-grow-1 p-3" style="overflow-y: auto; background: linear-gradient(135deg, var(--background) 0%, var(--card) 100%); color: var(--foreground)">
             <div id="timeline-view">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="h3">Timeline</h1>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h1 class="h4 mb-0">Timeline</h1>
                     <div class="d-flex align-items-center">
                         <div class="btn-group me-2" role="group">
-                            <button id="prevDay" class="btn btn-outline-secondary" aria-label="Previous Day"><i class="fas fa-chevron-left"></i></button>
+                            <button id="prevDay" class="btn btn-outline-secondary" aria-label="Previous Day"><i class="fi fi-rr-angle-left"></i></button>
                             <button id="todayBtn" class="btn btn-outline-secondary">Today</button>
-                            <button id="nextDay" class="btn btn-outline-secondary" aria-label="Next Day"><i class="fas fa-chevron-right"></i></button>
+                            <button id="nextDay" class="btn btn-outline-secondary" aria-label="Next Day"><i class="fi fi-rr-angle-right"></i></button>
                         </div>
                         <div class="btn-group me-2" role="group">
                             <button id="viewDay" class="btn btn-outline-secondary active" data-view="day">Day</button>
@@ -1266,7 +1643,7 @@
                         </div>
                         <h2 id="currentDateLabel" class="h5 mb-0 me-3"></h2>
                         <button id="addEntryBtn" class="btn btn-outline-secondary me-2">
-                            <i class="fas fa-plus me-2"></i>Add Entry
+                            <i class="fi fi-rr-plus me-2"></i>Add Entry
                         </button>
                     </div>
                     </div>
@@ -1281,27 +1658,27 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h1 class="h3">Settings</h1>
                     <button id="saveSettingsBtn" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Save Settings
+                        <i class="fi fi-rr-disk me-2"></i>Save Settings
                     </button>
                                 </div>
 
                 <div class="row">
                     <div class="col-md-6">
                         <div class="settings-section">
-                            <h3><i class="fas fa-palette me-2"></i>Appearance</h3>
+                            <h3><i class="fi fi-rr-palette me-2"></i>Appearance</h3>
                             <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
                             <div class="card-body">
                                     <div class="mb-3">
                                         <label class="form-label">Theme Mode</label>
                                         <div class="btn-group w-100" role="group">
                                             <button id="lightModeBtn" class="btn btn-outline-secondary">
-                                                <i class="fas fa-sun me-2"></i>Light
+                                                <i class="fi fi-rr-sun me-2"></i>Light
                                         </button>
                                             <button id="darkModeBtn" class="btn btn-outline-secondary">
-                                                <i class="fas fa-moon me-2"></i>Dark
+                                                <i class="fi fi-rr-moon me-2"></i>Dark
                                         </button>
                                             <button id="systemModeBtn" class="btn btn-outline-secondary">
-                                                <i class="fas fa-desktop me-2"></i>System
+                                                <i class="fi fi-rr-desktop me-2"></i>System
                                         </button>
                                     </div>
                                         </div>
@@ -1353,7 +1730,7 @@
                 </div>
 
                         <div class="settings-section">
-                            <h3><i class="fas fa-clock me-2"></i>Timeline Settings</h3>
+                            <h3><i class="fi fi-rr-clock me-2"></i>Timeline Settings</h3>
                             <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -1393,7 +1770,7 @@
 
                     <div class="col-md-6">
         <div class="settings-section">
-                            <h3><i class="fas fa-tags me-2"></i>Categories</h3>
+                            <h3><i class="fi fi-rr-tag me-2"></i>Categories</h3>
                             <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -1404,7 +1781,7 @@
                                         <div class="d-flex gap-2">
                                             <input type="text" id="newCategoryInput" class="form-control" placeholder="New category name">
                                             <button id="addCategoryBtn" class="btn btn-outline-secondary" aria-label="Add new category">
-                                                <i class="fas fa-plus"></i>
+                                                <i class="fi fi-rr-plus"></i>
                                             </button>
             </div>
                 </div>
@@ -1413,7 +1790,7 @@
             </div>
 
                         <div class="settings-section">
-                            <h3><i class="fas fa-desktop me-2"></i>App Classifications</h3>
+                            <h3><i class="fi fi-rr-desktop me-2"></i>App Classifications</h3>
                             <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -1427,7 +1804,7 @@
                                                 <!-- Categories will be populated here -->
                 </select>
                                             <button id="addClassificationBtn" class="btn btn-outline-secondary" aria-label="Add new app classification">
-                                                <i class="fas fa-plus"></i>
+                                                <i class="fi fi-rr-plus"></i>
                                             </button>
             </div>
         </div>
@@ -1438,22 +1815,22 @@
                         </div>
 
                 <div class="settings-section">
-                    <h3><i class="fas fa-info-circle me-2"></i>Data Management</h3>
+                    <h3><i class="fi fi-rr-info me-2"></i>Data Management</h3>
                     <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
                         <div class="card-body">
                             <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>
+                                <i class="fi fi-rr-info me-2"></i>
                                 <strong>Data Location:</strong> Your tracking data is stored locally in <code>segments.csv</code>
                             </div>
                             <div class="d-flex gap-2">
                                 <button id="exportDataBtn" class="btn btn-outline-secondary">
-                                    <i class="fas fa-download me-2"></i>Export Data
+                                    <i class="fi fi-rr-download me-2"></i>Export Data
                                 </button>
                                 <button id="importDataBtn" class="btn btn-outline-secondary">
-                                    <i class="fas fa-upload me-2"></i>Import Data
+                                    <i class="fi fi-rr-upload me-2"></i>Import Data
                                 </button>
                                 <button id="clearDataBtn" class="btn btn-outline-danger">
-                                    <i class="fas fa-trash me-2"></i>Clear All Data
+                                    <i class="fi fi-rr-trash me-2"></i>Clear All Data
                                 </button>
                             </div>
                         </div>
@@ -1480,7 +1857,7 @@
             <div class="modal-content" style="background-color: var(--card); border: 1px solid var(--border);">
                 <div class="modal-header" style="border-bottom: 1px solid var(--border);">
                     <h5 class="modal-title" id="segmentDetailsModalLabel">
-                        <i class="fas fa-info-circle me-2"></i>Entry Details
+                        <i class="fi fi-rr-info me-2"></i>Entry Details
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -1491,7 +1868,7 @@
                 </div>
                 <div class="modal-footer" style="border-top: 1px solid var(--border);">
                     <button type="button" class="btn btn-outline-danger" id="deleteEntryBtn">
-                        <i class="fas fa-trash me-2"></i>Delete Entry
+                        <i class="fi fi-rr-trash me-2"></i>Delete Entry
                     </button>
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
@@ -1505,7 +1882,7 @@
             <div class="modal-content" style="background-color: var(--card); border: 1px solid var(--border);">
                 <div class="modal-header" style="border-bottom: 1px solid var(--border);">
                     <h5 class="modal-title" id="manualEntryModalLabel">
-                        <i class="fas fa-plus me-2"></i>Add Manual Entry
+                        <i class="fi fi-rr-plus me-2"></i>Add Manual Entry
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -1544,7 +1921,7 @@
                 <div class="modal-footer" style="border-top: 1px solid var(--border);">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-primary" id="saveManualEntryBtn">
-                        <i class="fas fa-save me-2"></i>Save Entry
+                        <i class="fi fi-rr-disk me-2"></i>Save Entry
                     </button>
                 </div>
             </div>

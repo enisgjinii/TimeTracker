@@ -53,41 +53,158 @@ const getDevIcon = appName => {
   return `${base}/${normName}/${normName}-original.svg`;
 };
 
-const createAppIcon = appNameOrIconData => {
-  const img = document.createElement('img');
-  img.classList.add('app-icon');
+// Flaticon icon mapping for common applications
+const getFlaticonIcon = appName => {
+  const appNameLower = appName.toLowerCase().trim();
   
+  // Common application mappings to Flaticon icons
+  const iconMap = {
+    // Development tools
+    'visual studio code': 'fi-rr-apps',
+    'vs code': 'fi-rr-apps',
+    'code': 'fi-rr-apps',
+    'sublime text': 'fi-rr-apps',
+    'atom': 'fi-rr-apps',
+    'notepad++': 'fi-rr-apps',
+    'webstorm': 'fi-rr-apps',
+    'intellij': 'fi-rr-apps',
+    'pycharm': 'fi-rr-apps',
+    'eclipse': 'fi-rr-apps',
+    'netbeans': 'fi-rr-apps',
+    
+    // Browsers
+    'chrome': 'fi-rr-browser',
+    'firefox': 'fi-rr-browser',
+    'safari': 'fi-rr-browser',
+    'edge': 'fi-rr-browser',
+    'opera': 'fi-rr-browser',
+    'brave': 'fi-rr-browser',
+    'browser': 'fi-rr-browser',
+    
+    // Social media
+    'discord': 'fi-rr-comments',
+    'slack': 'fi-rr-comments',
+    'teams': 'fi-rr-comments',
+    'zoom': 'fi-rr-comments',
+    'skype': 'fi-rr-comments',
+    'whatsapp': 'fi-rr-comments',
+    'telegram': 'fi-rr-comments',
+    'facebook': 'fi-rr-comments',
+    'twitter': 'fi-rr-comments',
+    'instagram': 'fi-rr-comments',
+    'linkedin': 'fi-rr-comments',
+    
+    // Productivity
+    'word': 'fi-rr-document',
+    'excel': 'fi-rr-document',
+    'powerpoint': 'fi-rr-document',
+    'outlook': 'fi-rr-mail',
+    'gmail': 'fi-rr-mail',
+    'mail': 'fi-rr-mail',
+    'calendar': 'fi-rr-calendar',
+    'onenote': 'fi-rr-document',
+    'notion': 'fi-rr-document',
+    'evernote': 'fi-rr-document',
+    
+    // Media
+    'youtube': 'fi-rr-play',
+    'spotify': 'fi-rr-music',
+    'netflix': 'fi-rr-play',
+    'vimeo': 'fi-rr-play',
+    'twitch': 'fi-rr-play',
+    'music': 'fi-rr-music',
+    'video': 'fi-rr-play',
+    
+    // System
+    'calculator': 'fi-rr-calculator',
+    'settings': 'fi-rr-settings',
+    'control panel': 'fi-rr-settings',
+    'file explorer': 'fi-rr-folder',
+    'explorer': 'fi-rr-folder',
+    'terminal': 'fi-rr-terminal',
+    'cmd': 'fi-rr-terminal',
+    'powershell': 'fi-rr-terminal',
+    
+    // Games
+    'steam': 'fi-rr-gamepad',
+    'epic': 'fi-rr-gamepad',
+    'origin': 'fi-rr-gamepad',
+    'battle.net': 'fi-rr-gamepad',
+    'game': 'fi-rr-gamepad',
+    
+    // Design
+    'photoshop': 'fi-rr-picture',
+    'illustrator': 'fi-rr-picture',
+    'figma': 'fi-rr-picture',
+    'sketch': 'fi-rr-picture',
+    'canva': 'fi-rr-picture',
+    'paint': 'fi-rr-picture',
+    
+    // Development
+    'git': 'fi-rr-git',
+    'github': 'fi-rr-git',
+    'gitlab': 'fi-rr-git',
+    'bitbucket': 'fi-rr-git',
+    'docker': 'fi-rr-server',
+    'postman': 'fi-rr-api',
+    'insomnia': 'fi-rr-api',
+    
+    // Communication
+    'outlook': 'fi-rr-mail',
+    'thunderbird': 'fi-rr-mail',
+    'mail': 'fi-rr-mail',
+    'gmail': 'fi-rr-mail',
+    
+    // Default fallbacks
+    'default': 'fi-rr-apps',
+    'unknown': 'fi-rr-apps'
+  };
+  
+  // Try exact match first
+  if (iconMap[appNameLower]) {
+    return iconMap[appNameLower];
+  }
+  
+  // Try partial matches
+  for (const [key, icon] of Object.entries(iconMap)) {
+    if (appNameLower.includes(key) || key.includes(appNameLower)) {
+      return icon;
+    }
+  }
+  
+  // Return default icon
+  return iconMap.default;
+};
+
+const createAppIcon = appNameOrIconData => {
   // Skip icon loading if disabled
   if (!usrSet.showIcons) {
-    img.style.display = 'none';
-    return img;
+    const hiddenIcon = document.createElement('div');
+    hiddenIcon.style.display = 'none';
+    return hiddenIcon;
   }
   
   if (appNameOrIconData.startsWith('data:image/png;base64,')) {
+    // Use system icon (base64 data)
+    const img = document.createElement('img');
+    img.classList.add('app-icon');
     img.src = appNameOrIconData;
     img.alt = 'App Icon';
+    return img;
   } else {
-    // Fallback for old data or if icon fetching fails
+    // Use Flaticon icon
     const appName = appNameOrIconData;
-    img.alt = appName;
-    
-    // Handle manual entries
-    if (appName === 'Manual Entry') {
-      img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggM0M4LjU1MjI4IDMgOSAzLjQ0Nzc5IDkgNFY3SDhWNFY3SDdWNFM4IDMgOCAzWiIgZmlsbD0iY3VycmVudENvbG9yIi8+CjxwYXRoIGQ9Ik04IDEzQzguNTUyMjggMTMgOSAxMi41NTIzIDkgMTJWMHMyIDAgMiAwVjEyQzExIDEyLjU1MjMgMTAuNTUyMyAxMyAxMCAxM0g4WiIgZmlsbD0iY3VycmVudENvbG9yIi8+Cjwvc3ZnPgo=';
-    } else {
-      img.src = getDevIcon(appName);
-      img.onerror = function () {
-        if (this.src.includes("devicon")) {
-          this.src = `https://img.icons8.com/color/48/000000/${encodeURIComponent(appName)}.png`;
-        } else if (this.src.includes("icons8")) {
-          this.onerror = null;
-          // Use a simple default icon as data URI instead of trying to load from file
-          this.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAxNiAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iOCIgY3k9IjgiIHI9IjgiIGZpbGw9ImN1cnJlbnRDb2xvciIvPgo8L3N2Zz4K';
-        }
-      };
-    }
+    const iconElement = document.createElement('i');
+    iconElement.classList.add('app-icon', 'fi', getFlaticonIcon(appName));
+    iconElement.style.fontSize = '18px';
+    iconElement.style.width = '18px';
+    iconElement.style.height = '18px';
+    iconElement.style.display = 'flex';
+    iconElement.style.alignItems = 'center';
+    iconElement.style.justifyContent = 'center';
+    iconElement.alt = appName;
+    return iconElement;
   }
-  return img;
 };
 
 const getAppCat = appName => usrSet.appClassifications?.[appName] || "";
@@ -99,7 +216,7 @@ const popCats = () => {
     $('#categoriesList').append(`<div class="d-flex align-items-center justify-content-between p-2 rounded mb-2" style="background-color: var(--accent);">
             <span class="badge bg-secondary me-2">${cat}</span>
             <button class="btn btn-sm btn-outline-danger rm-cat" data-index="${i}" aria-label="Remove category ${cat}">
-                <i class="fas fa-times"></i>
+                <i class="fi fi-rr-cross"></i>
             </button>
         </div>`);
   });
@@ -115,7 +232,7 @@ const popAppClass = () => {
                 <strong>${app}</strong> → <em>${cat}</em>
             </div>
             <button class="btn btn-sm btn-outline-danger rm-class" data-app="${app}" aria-label="Remove classification for ${app}">
-                <i class="fas fa-times"></i>
+                <i class="fi fi-rr-cross"></i>
             </button>
         </div>`);
   }
@@ -200,7 +317,7 @@ $('#saveSettingsBtn').click(() => {
   // Show success message
   const successAlert = $(`
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-      <i class="fas fa-check-circle me-2"></i>Settings saved successfully!
+      <i class="fi fi-rr-check me-2"></i>Settings saved successfully!
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   `);
@@ -639,7 +756,7 @@ const renderDayView = async () => {
       style: 'marginLeft: auto; display: flex; gap: 0.25rem;',
       html: badgeHTML
     }), $('<i/>', {
-      class: 'fas fa-trash delete-icon',
+              class: 'fi fi-rr-trash delete-icon',
       style: 'marginLeft: 0.5rem;',
       click: (e) => {
         e.stopPropagation();
@@ -1097,12 +1214,20 @@ $(document).ready(async () => {
   
   await renderView();
   
+  // Update productivity widget
+  updateProductivityWidget();
+  
   // Update current time indicator every minute
   setInterval(() => {
     if (view === "day") {
       updateCurrentTimeIndicator();
     }
   }, 60000);
+  
+  // Update productivity widget every 5 minutes
+  setInterval(() => {
+    updateProductivityWidget();
+  }, 300000);
   
   // Initial update
   updateCurrentTimeIndicator();
@@ -1195,6 +1320,7 @@ ipcRenderer.on('active-window-data', (e, data) => {
   }
   if (Date.now() - lastSegUpdate > 5000) {
     renderView();
+    updateProductivityWidget();
     lastSegUpdate = Date.now();
   }
 });
@@ -1208,6 +1334,58 @@ function getDailyProductivitySummary(dayEvents) {
     total += (ev.end - ev.start) * (getProductivityScore(ev) / 2);
   }
   return { totalMinutes: Math.round(total / 60000), focusMinutes: Math.round(focus / 60000), idleMinutes: Math.round(idle / 60000) };
+}
+
+// Update productivity widget
+function updateProductivityWidget() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const dayEnd = new Date(today);
+  dayEnd.setHours(23, 59, 59, 999);
+  
+  const todayEvents = evs.filter(ev => 
+    ev.end >= today.getTime() && ev.start <= dayEnd.getTime()
+  );
+  
+  const summary = getDailyProductivitySummary(todayEvents);
+  
+  // Update metric values
+  $('#productiveMinutes').text(summary.totalMinutes);
+  $('#focusMinutes').text(summary.focusMinutes);
+  $('#idleMinutes').text(summary.idleMinutes);
+  
+  // Calculate progress percentage (assuming 8-hour workday = 480 minutes)
+  const maxProductiveMinutes = 480;
+  const progressPercentage = Math.min(Math.round((summary.totalMinutes / maxProductiveMinutes) * 100), 100);
+  $('#progressPercentage').text(`${progressPercentage}%`);
+  
+  // Update progress ring
+  const circumference = 157; // 2 * π * 25
+  const progressOffset = circumference - (progressPercentage / 100) * circumference;
+  $('#progressCircle').css('stroke-dashoffset', progressOffset);
+  
+  // Update motivational message
+  let motivationalMessage = '';
+  if (progressPercentage === 0) {
+    motivationalMessage = 'Start your productive day!';
+  } else if (progressPercentage < 25) {
+    motivationalMessage = 'Great start! Keep going!';
+  } else if (progressPercentage < 50) {
+    motivationalMessage = 'You\'re making progress!';
+  } else if (progressPercentage < 75) {
+    motivationalMessage = 'Excellent work today!';
+  } else if (progressPercentage < 100) {
+    motivationalMessage = 'Almost there! Amazing!';
+  } else {
+    motivationalMessage = 'Perfect! You\'re unstoppable!';
+  }
+  $('#motivationalMessage').text(motivationalMessage);
+  
+  // Add animation class for visual feedback
+  $('.productivity-widget').addClass('updated');
+  setTimeout(() => {
+    $('.productivity-widget').removeClass('updated');
+  }, 1000);
 }
 
 // Group similar window activities - prioritize Window ID grouping
@@ -1371,7 +1549,7 @@ const saveManualEntry = () => {
   // Show success message
   const successAlert = $(`
     <div class="alert alert-success alert-dismissible fade show" role="alert">
-      <i class="fas fa-check-circle me-2"></i>Manual entry added successfully!
+      <i class="fi fi-rr-check me-2"></i>Manual entry added successfully!
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   `);
@@ -1427,9 +1605,9 @@ const deleteCurrentEntry = () => {
         $('#segmentDetailsModal').modal('hide');
         
         // Show success message
-        const successAlert = $(`
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-2"></i>Time entry deleted successfully!
+          const successAlert = $(`
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fi fi-rr-check me-2"></i>Time entry deleted successfully!
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>
         `);
