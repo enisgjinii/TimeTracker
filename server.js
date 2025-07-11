@@ -43,6 +43,8 @@ app.get('/api/subscription-plans', require('./api/subscription-plans.js'));
 app.get('/api/stripe-config', require('./api/stripe-config.js'));
 app.get('/api/debug-session', require('./api/debug-session.js'));
 app.post('/api/manual-update', require('./api/manual-update.js'));
+app.get('/api/test-firebase', require('./api/test-firebase.js'));
+app.get('/api/simple-test', require('./api/simple-test.js'));
 
 // Serve the main application
 app.get('/', (req, res) => {

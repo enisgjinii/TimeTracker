@@ -17,10 +17,13 @@ const verifySubscription = async (req, res) => {
 
   // Check if Firebase is properly initialized
   if (!db || !firebaseInitialized) {
+    console.error('Firebase not initialized for subscription verification');
+    console.error('Firebase status:', { db: !!db, initialized: firebaseInitialized });
     return res.status(503).json({ 
       error: 'Firebase service unavailable',
       details: process.env.NODE_ENV === 'development' ? 
-        'Firebase credentials not configured. Please check your .env file or serviceAccountKey.json.' : undefined
+        'Firebase credentials not configured. Please check your .env file or serviceAccountKey.json.' : undefined,
+      firebaseStatus: { db: !!db, initialized: firebaseInitialized }
     });
   }
 

@@ -30,6 +30,16 @@ const manualUpdate = async (req, res) => {
   try {
     console.log('🔧 Manually updating subscription for session:', sessionId);
 
+    // Check Firebase status first
+    if (!db || !firebaseInitialized) {
+      console.error('Firebase not initialized, cannot update subscription');
+      console.error('Firebase status:', { db: !!db, initialized: firebaseInitialized });
+      return res.status(503).json({ 
+        error: 'Firebase service unavailable',
+        firebaseStatus: { db: !!db, initialized: firebaseInitialized }
+      });
+    }
+
     // Retrieve session from Stripe
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['subscription', 'customer']

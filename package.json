@@ -4,9 +4,9 @@
   "description": "Track active windows and save to JSON",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
     "server": "node server.js",
-    "dev": "concurrently \"npm run server\" \"npm run start\"",
+    "electron": "electron .",
+    "start": "concurrently \"npm:server\" \"npm:electron\"",
     "build": "echo 'Web build completed'",
     "build:electron": "electron-builder"
   },
