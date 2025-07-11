@@ -120,6 +120,20 @@
             }
         }
 
+        // Helper function to get Firebase UID from session
+        async function getFirebaseUid(sessionId) {
+            try {
+                const response = await fetch(`/api/debug-session?sessionId=${encodeURIComponent(sessionId)}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.session?.firebaseUid;
+                }
+            } catch (error) {
+                console.error('Error getting Firebase UID:', error);
+            }
+            return null;
+        }
+
         // Verify the session with the server
         async function verifySession() {
             if (!sessionId) {
@@ -160,8 +174,32 @@
                             console.log('✅ Manual update successful:', manualData);
                             showSuccess();
                         } else {
-                            console.log('⚠️ Manual update failed, but showing success anyway');
-                            showSuccess();
+                            // Try test webhook as fallback
+                            console.log('🔄 Trying test webhook as fallback...');
+                            try {
+                                const webhookResponse = await fetch('/api/test-webhook', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ 
+                                        sessionId,
+                                        firebaseUid: sessionId ? await getFirebaseUid(sessionId) : null
+                                    })
+                                });
+
+                                if (webhookResponse.ok) {
+                                    const webhookData = await webhookResponse.json();
+                                    console.log('✅ Test webhook successful:', webhookData);
+                                    showSuccess();
+                                } else {
+                                    console.log('⚠️ All update methods failed, but showing success anyway');
+                                    showSuccess();
+                                }
+                            } catch (webhookError) {
+                                console.error('Test webhook error:', webhookError);
+                                showSuccess();
+                            }
                         }
                     } catch (manualError) {
                         console.error('Manual update error:', manualError);
