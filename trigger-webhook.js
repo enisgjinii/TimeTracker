@@ -1,4 +1,4 @@
-const https = require('https');
+const http = require('http');
 
 /**
  * Trigger webhook manually after payment
@@ -21,7 +21,7 @@ async function triggerWebhook(sessionId, firebaseUid) {
   };
 
   return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
+    const req = http.request(options, (res) => {
       let data = '';
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
