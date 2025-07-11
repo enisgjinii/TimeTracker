@@ -1859,6 +1859,230 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+
+        /* About Page Styles */
+        .version-badge .badge {
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.375rem 0.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .feature-item i {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+            color: var(--primary);
+        }
+
+        .feature-item h6 {
+            font-weight: 600;
+            margin: 0;
+            color: var(--foreground);
+        }
+
+        .feature-item small {
+            color: var(--muted-foreground);
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--foreground);
+            font-size: 0.875rem;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card);
+            transition: all 0.15s ease;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            background: var(--accent);
+            transform: translateY(-1px);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--primary-foreground);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .feature-card h6 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--foreground);
+        }
+
+        .feature-card p {
+            color: var(--muted-foreground);
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card);
+            transition: background-color 0.15s ease;
+        }
+
+        .tech-item:hover {
+            background: var(--accent);
+            border-color: var(--primary);
+        }
+
+        .tech-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--primary-foreground);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .tech-info h6 {
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+            color: var(--foreground);
+        }
+
+        .tech-info small {
+            color: var(--muted-foreground);
+        }
+
+        .privacy-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .privacy-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .privacy-item i {
+            font-size: 0.875rem;
+            color: var(--success);
+        }
+
+        .privacy-item span {
+            font-size: 0.875rem;
+            color: var(--foreground);
+        }
+
+        .support-info p {
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: var(--muted-foreground);
+        }
+
+        .support-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .support-links .btn {
+            font-size: 0.8125rem;
+            padding: 0.375rem 0.75rem;
+        }
+
+        /* Dark mode specific fixes for about page */
+        .dark-mode .feature-card {
+            background: var(--card);
+            border-color: var(--border);
+        }
+
+        .dark-mode .tech-item {
+            background: var(--card);
+            border-color: var(--border);
+        }
+
+        .dark-mode .feature-item small,
+        .dark-mode .tech-info small,
+        .dark-mode .support-info p {
+            color: var(--muted-foreground);
+        }
+
+        .dark-mode .feature-item h6,
+        .dark-mode .tech-info h6,
+        .dark-mode .feature-card h6 {
+            color: var(--foreground);
+        }
+
+        .dark-mode .privacy-item span {
+            color: var(--foreground);
+        }
+
+        @media (max-width: 768px) {
+            .tech-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .support-links {
+                flex-direction: column;
+            }
+            
+            .support-links .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 
@@ -2207,14 +2431,281 @@
                         </div>
 
             <div id="about-view" class="d-none">
-                <h1 class="h3">About</h1>
-                <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
-                    <div class="card-body">
-                        <p>TimeTracker Pro - a simple app to track your time.</p>
-                        <p>Version: 1.0.0</p>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3 mb-0">About TimeTracker</h1>
+                    <div class="version-badge">
+                        <span class="badge bg-primary">v1.0.0</span>
+                    </div>
+                </div>
+
+                <!-- App Overview -->
+                <div class="row mb-4">
+                    <div class="col-lg-8">
+                        <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
+                            <div class="card-body">
+                                <h4 class="card-title mb-3">
+                                    <i class="fi fi-rr-clock me-2"></i>
+                                    TimeTracker Pro
+                                </h4>
+                                <p class="text-muted mb-3">
+                                    A powerful desktop application for tracking time spent on different applications and activities. 
+                                    Built with Electron and Firebase, TimeTracker Pro provides detailed insights into your daily 
+                                    computer usage patterns with a beautiful, modern interface.
+                                </p>
+                                
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <div class="feature-item">
+                                            <i class="fi fi-rr-target text-primary"></i>
+                                            <h6 class="mb-1">Real-time Tracking</h6>
+                                            <small class="text-muted">Automatic window detection and activity monitoring</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="feature-item">
+                                            <i class="fi fi-rr-chart-line text-primary"></i>
+                                            <h6 class="mb-1">Productivity Insights</h6>
+                                            <small class="text-muted">Detailed analytics and productivity scoring</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="feature-item">
+                                            <i class="fi fi-rr-user text-primary"></i>
+                                            <h6 class="mb-1">User Accounts</h6>
+                                            <small class="text-muted">Secure authentication with Firebase</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="feature-item">
+                                            <i class="fi fi-rr-palette text-primary"></i>
+                                            <h6 class="mb-1">Modern UI</h6>
+                                            <small class="text-muted">Clean, responsive design with dark/light themes</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="fi fi-rr-info me-2"></i>
+                                    App Information
+                                </h5>
+                                <div class="info-list">
+                                    <div class="info-item">
+                                        <span class="info-label">Version</span>
+                                        <span class="info-value">1.0.0</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Platform</span>
+                                        <span class="info-value">Electron</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Authentication</span>
+                                        <span class="info-value">Firebase</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Data Storage</span>
+                                        <span class="info-value">Local + Cloud</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Theme</span>
+                                        <span class="info-value">Dark/Light</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Features Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="fi fi-rr-star me-2"></i>
+                                    Key Features
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fi fi-rr-list-timeline"></i>
+                                            </div>
+                                            <h6>Timeline Views</h6>
+                                            <p class="text-muted small">Day, week, and month views with detailed activity breakdowns</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fi fi-rr-target"></i>
+                                            </div>
+                                            <h6>Productivity Scoring</h6>
+                                            <p class="text-muted small">Automatic scoring based on activity patterns and focus sessions</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fi fi-rr-tag"></i>
+                                            </div>
+                                            <h6>Custom Categories</h6>
+                                            <p class="text-muted small">Create and manage activity categories for better organization</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fi fi-rr-plus"></i>
+                                            </div>
+                                            <h6>Manual Entries</h6>
+                                            <p class="text-muted small">Add custom time entries for activities not captured automatically</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fi fi-rr-download"></i>
+                                            </div>
+                                            <h6>Data Export</h6>
+                                            <p class="text-muted small">Export your data in CSV format for external analysis</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fi fi-rr-palette"></i>
+                                            </div>
+                                            <h6>Theme Support</h6>
+                                            <p class="text-muted small">Toggle between light, dark, and system themes</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Tech Stack -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="fi fi-rr-code me-2"></i>
+                                    Technology Stack
+                                </h5>
+                                <div class="tech-grid">
+                                    <div class="tech-item">
+                                        <div class="tech-icon">
+                                            <i class="fi fi-rr-desktop"></i>
+                                        </div>
+                                        <div class="tech-info">
+                                            <h6>Electron</h6>
+                                            <small class="text-muted">Desktop application framework</small>
+                                        </div>
+                                    </div>
+                                    <div class="tech-item">
+                                        <div class="tech-icon">
+                                            <i class="fi fi-rr-fire"></i>
+                                        </div>
+                                        <div class="tech-info">
+                                            <h6>Firebase</h6>
+                                            <small class="text-muted">Authentication & database</small>
+                                        </div>
+                                    </div>
+                                    <div class="tech-item">
+                                        <div class="tech-icon">
+                                            <i class="fi fi-rr-palette"></i>
+                                        </div>
+                                        <div class="tech-info">
+                                            <h6>Bootstrap 5</h6>
+                                            <small class="text-muted">UI framework</small>
+                                        </div>
+                                    </div>
+                                    <div class="tech-item">
+                                        <div class="tech-icon">
+                                            <i class="fi fi-rr-chart-line"></i>
+                                        </div>
+                                        <div class="tech-info">
+                                            <h6>jQuery</h6>
+                                            <small class="text-muted">DOM manipulation</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data & Privacy -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="fi fi-rr-shield me-2"></i>
+                                    Data & Privacy
+                                </h5>
+                                <div class="privacy-info">
+                                    <div class="privacy-item">
+                                        <i class="fi fi-rr-check text-success"></i>
+                                        <span>Your data is stored locally on your device</span>
+                                    </div>
+                                    <div class="privacy-item">
+                                        <i class="fi fi-rr-check text-success"></i>
+                                        <span>Firebase authentication for secure login</span>
+                                    </div>
+                                    <div class="privacy-item">
+                                        <i class="fi fi-rr-check text-success"></i>
+                                        <span>No tracking or analytics sent to third parties</span>
+                                    </div>
+                                    <div class="privacy-item">
+                                        <i class="fi fi-rr-check text-success"></i>
+                                        <span>Export your data anytime</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card" style="background-color: var(--card); border: 1px solid var(--border);">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">
+                                    <i class="fi fi-rr-heart me-2"></i>
+                                    Support & Feedback
+                                </h5>
+                                <div class="support-info">
+                                    <p class="text-muted mb-3">
+                                        TimeTracker Pro is designed to help you understand and improve your productivity. 
+                                        We're committed to providing a great user experience.
+                                    </p>
+                                    <div class="support-links">
+                                        <a href="#" class="btn btn-outline-primary btn-sm me-2">
+                                            <i class="fi fi-rr-document me-1"></i>
+                                            Documentation
+                                        </a>
+                                        <a href="#" class="btn btn-outline-secondary btn-sm me-2">
+                                            <i class="fi fi-rr-bug me-1"></i>
+                                            Report Issue
+                                        </a>
+                                        <a href="#" class="btn btn-outline-success btn-sm">
+                                            <i class="fi fi-rr-star me-1"></i>
+                                            Rate App
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
     </div>

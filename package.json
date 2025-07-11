@@ -15,6 +15,8 @@
     "get-windows": "^9.2.0",
     "icon-extractor": "^1.0.3",
     "jquery": "^3.7.1",
-    "firebase": "^10.7.1"
+    "firebase": "^10.7.1",
+    "stripe": "^18.3.0",
+    "firebase-admin": "^13.4.0"
   }
 }
