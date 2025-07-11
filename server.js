@@ -41,6 +41,8 @@ app.post('/api/create-portal-session', require('./api/create-portal-session.js')
 app.post('/api/cancel-subscription', require('./api/cancel-subscription.js'));
 app.get('/api/subscription-plans', require('./api/subscription-plans.js'));
 app.get('/api/stripe-config', require('./api/stripe-config.js'));
+app.get('/api/debug-session', require('./api/debug-session.js'));
+app.post('/api/manual-update', require('./api/manual-update.js'));
 
 // Serve the main application
 app.get('/', (req, res) => {

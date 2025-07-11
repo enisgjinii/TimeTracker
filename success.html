@@ -128,7 +128,8 @@
             }
 
             try {
-                const response = await fetch('/api/verify-subscription', {
+                // First, try to verify the subscription
+                const response = await fetch(`/api/verify-subscription?sessionId=${encodeURIComponent(sessionId)}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -136,11 +137,37 @@
                 });
 
                 if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ Subscription verified:', data);
                     showSuccess();
                 } else {
-                    // Even if verification fails, show success since Stripe redirected here
-                    // This means the payment was successful
-                    showSuccess();
+                    const errorData = await response.json().catch(() => ({}));
+                    console.error('❌ Verification failed:', errorData);
+                    
+                    // Try manual update if verification fails
+                    console.log('🔄 Attempting manual update...');
+                    try {
+                        const manualResponse = await fetch('/api/manual-update', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ sessionId })
+                        });
+
+                        if (manualResponse.ok) {
+                            const manualData = await manualResponse.json();
+                            console.log('✅ Manual update successful:', manualData);
+                            showSuccess();
+                        } else {
+                            console.log('⚠️ Manual update failed, but showing success anyway');
+                            showSuccess();
+                        }
+                    } catch (manualError) {
+                        console.error('Manual update error:', manualError);
+                        // Show success anyway since Stripe redirected here
+                        showSuccess();
+                    }
                 }
             } catch (error) {
                 console.error('Verification error:', error);
