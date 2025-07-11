@@ -3,7 +3,7 @@
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
-module.exports = async function handler(req, res) {
+const getSubscriptionPlans = async (req, res) => {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -119,4 +119,6 @@ module.exports = async function handler(req, res) {
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
-} 
+};
+
+module.exports = getSubscriptionPlans; 

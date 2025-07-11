@@ -8,19 +8,22 @@ class PaymentService {
         this.apiBaseUrl = 'http://localhost:3000/api'; // Update with your actual API URL
         this.stripe = null;
         // Initialize Stripe when needed
+        this.initializeStripe();
     }
 
     /**
      * Initialize Stripe with publishable key
      * @param {string} publishableKey - Stripe publishable key
      */
-    async initializeStripe(publishableKey) {
+    async initializeStripe(publishableKey = null) {
         try {
             // Load Stripe.js dynamically
             const script = document.createElement('script');
             script.src = 'https://js.stripe.com/v3/';
             script.onload = () => {
-                this.stripe = Stripe(publishableKey);
+                // Use environment variable or passed key
+                const key = publishableKey || 'pk_test_your_stripe_publishable_key_here';
+                this.stripe = Stripe(key);
                 console.log('Stripe initialized successfully');
             };
             document.head.appendChild(script);

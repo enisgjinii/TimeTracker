@@ -6,6 +6,25 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Check required environment variables
+const requiredEnvVars = [
+    'STRIPE_SECRET_KEY',
+    'FIREBASE_PROJECT_ID',
+    'FIREBASE_CLIENT_EMAIL',
+    'FIREBASE_PRIVATE_KEY'
+];
+
+const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+if (missingVars.length > 0) {
+    console.error('❌ Missing required environment variables:');
+    missingVars.forEach(varName => console.error(`   - ${varName}`));
+    console.error('\n📝 Please create a .env file with the required variables.');
+    console.error('📖 See PAYMENT_SETUP.md for detailed instructions.');
+    process.exit(1);
+}
+
+console.log('✅ Environment variables loaded successfully');
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -45,7 +64,8 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    console.log(`API Base URL: http://localhost:${PORT}/api`);
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🔗 API Base URL: http://localhost:${PORT}/api`);
+    console.log(`📱 App URL: http://localhost:${PORT}`);
 }); 

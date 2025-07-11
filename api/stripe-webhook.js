@@ -4,24 +4,29 @@ const admin = require('firebase-admin');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2022-11-15' });
 
-// Initialize Firebase Admin if not already initialized
-if (!admin.apps.length) {
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-    }),
-  });
+// Initialize Firebase Admin if not already initialized and credentials are valid
+if (!admin.apps.length && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_PRIVATE_KEY !== '-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...\\n-----END PRIVATE KEY-----\\n') {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      }),
+    });
+  } catch (error) {
+    console.warn('Firebase initialization failed:', error.message);
+  }
 }
-const db = admin.firestore();
+
+const db = admin.apps.length > 0 ? admin.firestore() : null;
 
 /**
  * Handle Stripe webhook events
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
-module.exports = async function handler(req, res) {
+const stripeWebhook = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -78,7 +83,7 @@ module.exports = async function handler(req, res) {
     console.error('Webhook handler error:', error);
     res.status(500).json({ error: 'Webhook handler failed' });
   }
-}
+};
 
 /**
  * Handle checkout session completion
@@ -254,4 +259,6 @@ async function handleTrialWillEnd(subscription) {
     console.log(`Trial ending soon for user: ${firebaseUid}`);
     // You could send an email notification here
   }
-} 
+}
+
+module.exports = stripeWebhook; 

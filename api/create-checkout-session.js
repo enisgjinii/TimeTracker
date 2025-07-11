@@ -5,7 +5,7 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
-module.exports = async (req, res) => {
+const createCheckoutSession = async (req, res) => {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -74,4 +74,6 @@ module.exports = async (req, res) => {
       details: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
-}; 
+};
+
+module.exports = createCheckoutSession; 
