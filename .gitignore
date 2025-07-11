@@ -21,3 +21,4 @@ build/
 .DS_Store
 Thumbs.db
 timetracker-7da41-firebase-adminsdk-fbsvc-85d68ea226.json
+.env
