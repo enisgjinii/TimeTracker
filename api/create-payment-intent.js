@@ -10,7 +10,7 @@ if (!stripeKey || stripeKey.includes('placeholder')) {
 }
 
 const stripe = stripeKey && !stripeKey.includes('placeholder') ? 
-  require('stripe')(stripeKey) : null;
+  require('stripe')(stripeKey, { apiVersion: '2025-06-30.basil' }) : null;
 
 /**
  * Create Stripe payment intent for subscription
