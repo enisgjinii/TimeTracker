@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+require('dotenv').config();
 
 let mainWindow;
 

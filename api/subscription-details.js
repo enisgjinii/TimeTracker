@@ -13,7 +13,7 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 /**
- * Verify user subscription status
+ * Get detailed subscription information
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
@@ -45,38 +45,34 @@ module.exports = async function handler(req, res) {
 
     if (!subscription) {
       return res.status(200).json({
-        active: false,
-        status: 'no_subscription',
-        subscription: null
+        subscription: null,
+        hasSubscription: false
       });
     }
 
-    // Check if subscription is active and not expired
-    const now = new Date();
-    const isActive = subscription.active && 
-                    subscription.status === 'active' &&
-                    (!subscription.current_period_end || 
-                     new Date(subscription.current_period_end * 1000) > now);
+    // Format subscription data
+    const formattedSubscription = {
+      ...subscription,
+      current_period_end: subscription.current_period_end ? 
+        new Date(subscription.current_period_end * 1000).toISOString() : null,
+      current_period_start: subscription.current_period_start ? 
+        new Date(subscription.current_period_start * 1000).toISOString() : null,
+      created_at: subscription.created_at?.toDate?.() || subscription.created_at,
+      updated_at: subscription.updated_at?.toDate?.() || subscription.updated_at,
+      canceled_at: subscription.canceled_at?.toDate?.() || subscription.canceled_at,
+      last_payment_date: subscription.last_payment_date?.toDate?.() || subscription.last_payment_date,
+      last_payment_failed: subscription.last_payment_failed?.toDate?.() || subscription.last_payment_failed
+    };
 
     return res.status(200).json({
-      active: isActive,
-      status: subscription.status || 'unknown',
-      subscription: {
-        ...subscription,
-        current_period_end: subscription.current_period_end ? 
-          new Date(subscription.current_period_end * 1000).toISOString() : null,
-        current_period_start: subscription.current_period_start ? 
-          new Date(subscription.current_period_start * 1000).toISOString() : null,
-        created_at: subscription.created_at?.toDate?.() || subscription.created_at,
-        updated_at: subscription.updated_at?.toDate?.() || subscription.updated_at,
-        canceled_at: subscription.canceled_at?.toDate?.() || subscription.canceled_at
-      }
+      subscription: formattedSubscription,
+      hasSubscription: true
     });
 
   } catch (error) {
-    console.error('Error verifying subscription:', error);
+    console.error('Error getting subscription details:', error);
     return res.status(500).json({ 
-      error: 'Failed to verify subscription',
+      error: 'Failed to get subscription details',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
