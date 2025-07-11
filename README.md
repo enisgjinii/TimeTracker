@@ -4,6 +4,13 @@ A powerful desktop application for tracking time spent on different applications
 
 ## ✨ Features
 
+### 🔐 User Authentication
+- **Firebase Authentication**: Secure email/password sign up and sign in
+- **User Profiles**: Personal user accounts with settings persistence
+- **Password Reset**: Forgot password functionality with email recovery
+- **Session Management**: Automatic login state management
+- **Protected Routes**: App only accessible to authenticated users
+
 ### 🕒 Real-time Activity Tracking
 - **Automatic Window Detection**: Tracks active windows and applications in real-time
 - **Application Icons**: Displays actual application icons for better visual identification
@@ -38,6 +45,7 @@ A powerful desktop application for tracking time spent on different applications
 ### Prerequisites
 - Node.js (v14 or higher)
 - npm or yarn package manager
+- Firebase project (for authentication)
 
 ### Setup Instructions
 
@@ -52,7 +60,11 @@ A powerful desktop application for tracking time spent on different applications
    npm install
    ```
 
-3. **Start the application**
+3. **Configure Firebase Authentication**
+   - Follow the [Firebase Setup Guide](FIREBASE_SETUP.md)
+   - Update `js/firebase-config.js` with your Firebase credentials
+
+4. **Start the application**
    ```bash
    npm start
    ```
@@ -144,6 +156,7 @@ TimeTracker/
 
 ### Key Dependencies
 - `electron`: Desktop app framework
+- `firebase`: Authentication and database services
 - `get-windows`: Active window detection
 - `file-icon`: Application icon extraction
 - `electron-store`: Settings persistence

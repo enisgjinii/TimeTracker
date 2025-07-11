@@ -15,26 +15,26 @@
     <style>
         :root {
             --background: hsl(0 0% 100%);
-            --foreground: hsl(0 0% 9%);
+            --foreground: hsl(0 0% 3.9%);
             --card: hsl(0 0% 100%);
-            --card-foreground: hsl(0 0% 9%);
+            --card-foreground: hsl(0 0% 3.9%);
             --popover: hsl(0 0% 100%);
-            --popover-foreground: hsl(0 0% 9%);
+            --popover-foreground: hsl(0 0% 3.9%);
             --primary: hsl(0 0% 9%);
             --primary-foreground: hsl(0 0% 98%);
-            --primary-hover: hsl(0 0% 15%);
-            --secondary: hsl(0 0% 96%);
+            --primary-hover: hsl(0 0% 12%);
+            --secondary: hsl(0 0% 96.1%);
             --secondary-foreground: hsl(0 0% 9%);
-            --muted: hsl(0 0% 96%);
-            --muted-foreground: hsl(0 0% 45%);
-            --accent: hsl(0 0% 96%);
+            --muted: hsl(0 0% 96.1%);
+            --muted-foreground: hsl(0 0% 45.1%);
+            --accent: hsl(0 0% 96.1%);
             --accent-foreground: hsl(0 0% 9%);
-            --destructive: hsl(0 84% 60%);
+            --destructive: hsl(0 84.2% 60.2%);
             --destructive-foreground: hsl(0 0% 98%);
-            --border: hsl(0 0% 90%);
-            --input: hsl(0 0% 90%);
-            --ring: hsl(0 0% 9%);
-            --radius: 0.375rem;
+            --border: hsl(0 0% 89.8%);
+            --input: hsl(0 0% 89.8%);
+            --ring: hsl(0 0% 3.9%);
+            --radius: 0.5rem;
             --success: hsl(142 76% 36%);
             --success-foreground: hsl(0 0% 98%);
             --warning: hsl(38 92% 50%);
@@ -42,26 +42,26 @@
         }
 
         .dark-mode {
-            --background: hsl(0 0% 2%);
+            --background: hsl(0 0% 3.9%);
             --foreground: hsl(0 0% 98%);
-            --card: hsl(0 0% 4%);
+            --card: hsl(0 0% 3.9%);
             --card-foreground: hsl(0 0% 98%);
-            --popover: hsl(0 0% 4%);
+            --popover: hsl(0 0% 3.9%);
             --popover-foreground: hsl(0 0% 98%);
             --primary: hsl(0 0% 98%);
-            --primary-foreground: hsl(0 0% 2%);
-            --primary-hover: hsl(0 0% 85%);
-            --secondary: hsl(0 0% 8%);
+            --primary-foreground: hsl(0 0% 9%);
+            --primary-hover: hsl(0 0% 90%);
+            --secondary: hsl(0 0% 14.9%);
             --secondary-foreground: hsl(0 0% 98%);
-            --muted: hsl(0 0% 8%);
-            --muted-foreground: hsl(0 0% 60%);
-            --accent: hsl(0 0% 8%);
+            --muted: hsl(0 0% 14.9%);
+            --muted-foreground: hsl(0 0% 63.9%);
+            --accent: hsl(0 0% 14.9%);
             --accent-foreground: hsl(0 0% 98%);
-            --destructive: hsl(0 84% 60%);
+            --destructive: hsl(0 62.8% 30.6%);
             --destructive-foreground: hsl(0 0% 98%);
-            --border: hsl(0 0% 12%);
-            --input: hsl(0 0% 8%);
-            --ring: hsl(0 0% 98%);
+            --border: hsl(0 0% 14.9%);
+            --input: hsl(0 0% 14.9%);
+            --ring: hsl(0 0% 83.1%);
             --success: hsl(142 76% 36%);
             --success-foreground: hsl(0 0% 98%);
         }
@@ -232,43 +232,63 @@
         }
 
         .sidebar {
-            background-color: var(--card);
+            background: var(--background);
             width: 220px;
-            padding: 1rem;
+            padding: 0.75rem;
             border-right: 1px solid var(--border);
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
+            position: relative;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background-color: var(--muted-foreground);
+            border-radius: 3px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background-color: transparent;
         }
 
         .sidebar .nav-link {
             color: var(--muted-foreground);
             font-weight: 500;
-            padding: 0.5rem 0.75rem;
+            padding: 0.375rem 0.5rem;
             border-radius: var(--radius);
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
+            gap: 0.375rem;
+            font-size: 0.8125rem;
+            position: relative;
         }
 
         .sidebar .nav-link:hover {
             color: var(--foreground);
             background-color: var(--accent);
-            transform: translateX(2px);
         }
         
         .sidebar .nav-link.active {
             color: var(--primary-foreground);
             background-color: var(--primary);
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
         .sidebar .nav-link.active:hover {
-             background-color: var(--primary-hover);
+            background-color: var(--primary-hover);
+        }
+
+        .sidebar .nav-link i {
+            font-size: 0.875rem;
+            width: 1rem;
+            text-align: center;
         }
 
         /* Timeline Styles */
@@ -481,20 +501,13 @@
             color: inherit;
         }
         
-        /* Productivity Widget Styles */
+        /* shadcn-style Productivity Widget */
         .productivity-widget {
             background: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 0.75rem;
-            margin-bottom: 0.75rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            transition: all 0.2s ease;
-        }
-        
-        .productivity-widget:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 0.5rem;
         }
         
         .widget-header {
@@ -516,16 +529,15 @@
         .metric-card {
             display: flex;
             align-items: center;
-            padding: 0.5rem;
-            border-radius: var(--radius);
+            padding: 0.375rem;
+            border-radius: calc(var(--radius) - 2px);
             background: var(--background);
             border: 1px solid var(--border);
-            transition: all 0.2s ease;
+            transition: background-color 0.15s ease;
         }
         
         .metric-card:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background-color: var(--accent);
         }
         
         .metric-card.productive {
@@ -804,28 +816,26 @@
             transform: scale(1.1);
         }
 
-        /* Sidebar logo hover effect */
+        /* shadcn-style Sidebar Logo */
         .sidebar-logo {
-            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem;
-            border-radius: var(--radius);
             margin-bottom: 0.5rem;
-        }
-
-        .sidebar-logo:hover {
-            background-color: var(--accent);
-            transform: translateX(2px);
+            color: var(--foreground);
+            font-weight: 600;
+            font-size: 0.875rem;
         }
 
         .sidebar-logo i {
-            transition: all 0.2s ease;
+            font-size: 1rem;
+            color: var(--primary);
         }
 
-        .sidebar-logo:hover i {
-            transform: rotate(15deg);
+        .sidebar-logo span {
+            font-weight: 600;
+            font-size: 0.875rem;
         }
 
         .productivity-score {
@@ -1538,6 +1548,317 @@
                 transform: scale(1);
             }
         }
+
+        /* Authentication Styles */
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--background) 0%, var(--card) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 1rem;
+        }
+
+        .auth-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .auth-header h2 {
+            color: var(--foreground);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--muted-foreground);
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--foreground);
+            font-size: 0.875rem;
+        }
+
+        .form-group input {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background-color: var(--input);
+            color: var(--foreground);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--ring);
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: var(--muted-foreground);
+        }
+
+        .form-text {
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+            margin-top: 0.25rem;
+        }
+
+        .form-actions {
+            margin-top: 1rem;
+        }
+
+        .btn-full {
+            width: 100%;
+            justify-content: center;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+        }
+
+        .auth-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .auth-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.2s ease;
+        }
+
+        .auth-links a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background-color: var(--destructive);
+            color: var(--destructive-foreground);
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .success-message {
+            background-color: var(--success);
+            color: var(--success-foreground);
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        /* shadcn-style User Menu */
+        .user-menu {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .user-menu-button {
+            background: var(--background);
+            border: 1px solid var(--border);
+            color: var(--foreground);
+            padding: 0.375rem 0.5rem;
+            border-radius: var(--radius);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.375rem;
+            transition: all 0.15s ease;
+            width: 100%;
+            font-weight: 500;
+            font-size: 0.8125rem;
+        }
+
+        .user-menu-button:hover {
+            background-color: var(--accent);
+        }
+
+        .user-menu-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .user-menu-dropdown.show {
+            display: block;
+        }
+
+        .user-menu-item {
+            padding: 0.375rem 0.5rem;
+            color: var(--foreground);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: background-color 0.15s ease;
+            font-size: 0.8125rem;
+        }
+
+        .user-menu-item:hover {
+            background-color: var(--accent);
+            text-decoration: none;
+            color: var(--foreground);
+        }
+
+        .user-menu-item.danger {
+            color: var(--destructive);
+        }
+
+        .user-menu-item.danger:hover {
+            background-color: var(--destructive);
+            color: var(--destructive-foreground);
+        }
+
+        /* Loading spinner */
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* shadcn-style Tracking Button */
+        .tracking-control-section {
+            background: var(--background);
+            border-top: 1px solid var(--border);
+            padding-top: 0.5rem;
+        }
+
+        .tracking-button {
+            background-color: var(--primary);
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.5rem 0.75rem;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            transition: background-color 0.15s ease;
+            width: 100%;
+        }
+
+        .tracking-button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .tracking-button.btn-success {
+            background-color: var(--success);
+        }
+
+        .tracking-button.btn-danger {
+            background-color: var(--destructive);
+        }
+
+        /* shadcn-style Sidebar Sections */
+        .sidebar-section {
+            margin-bottom: 0.75rem;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: var(--muted-foreground);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.375rem;
+            padding-left: 0.25rem;
+        }
+
+        /* shadcn-style Navigation */
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        /* shadcn-style Quick Stats */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.375rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: calc(var(--radius) - 2px);
+            padding: 0.375rem;
+            text-align: center;
+            transition: background-color 0.15s ease;
+        }
+
+        .stat-item:hover {
+            background-color: var(--accent);
+        }
+
+        .stat-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--foreground);
+            margin-bottom: 0.125rem;
+        }
+
+        .stat-label {
+            font-size: 0.625rem;
+            color: var(--muted-foreground);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 
@@ -1602,29 +1923,76 @@
                 </div>
             </div>
             
-            <ul class="nav nav-pills flex-column mb-auto">
-                <li class="nav-item mb-1">
+            <!-- Quick Stats Section -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Today's Overview</div>
+                <div class="quick-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="today-hours">0h</div>
+                        <div class="stat-label">Total Time</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="today-sessions">0</div>
+                        <div class="stat-label">Sessions</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Section -->
+            <div class="sidebar-section">
+                <div class="sidebar-section-title">Navigation</div>
+                <div class="nav-section">
                     <a href="#" class="nav-link active" id="nav-timeline" aria-current="page">
-                        <i class="fi fi-rr-list-timeline me-2"></i>
+                        <i class="fi fi-rr-list-timeline"></i>
                         Timeline
                     </a>
-            </li>
-                <li class="mb-1">
                     <a href="#" class="nav-link" id="nav-settings">
-                        <i class="fi fi-rr-settings me-2"></i>
+                        <i class="fi fi-rr-settings"></i>
                         Settings
                     </a>
-            </li>
-                <li class="mb-1">
                     <a href="#" class="nav-link" id="nav-about">
-                        <i class="fi fi-rr-info me-2"></i>
+                        <i class="fi fi-rr-info"></i>
                         About
                     </a>
-            </li>
-        </ul>
-            <div class="mt-auto pt-3 pb-2" style="position:sticky;bottom:0;background:var(--secondary);z-index:100;border-top:1px solid var(--border);">
-                <button id="toggleTracking" class="btn btn-primary w-100">Start Tracking</button>
+                </div>
             </div>
+        
+        <!-- User Menu -->
+        <div class="user-menu-section mt-auto mb-3">
+            <div class="user-menu">
+                <button class="user-menu-button" id="user-menu-button">
+                    <i class="fi fi-rr-user"></i>
+                    <span class="user-info">Guest</span>
+                    <i class="fi fi-rr-angle-small-down"></i>
+                </button>
+                <div class="user-menu-dropdown" id="user-menu-dropdown">
+                    <a href="#" class="user-menu-item" id="user-profile-link">
+                        <i class="fi fi-rr-user"></i>
+                        My Profile
+                    </a>
+                    <a href="#" class="user-menu-item" id="user-settings-link">
+                        <i class="fi fi-rr-settings"></i>
+                        Preferences
+                    </a>
+                    <a href="#" class="user-menu-item" id="user-data-link">
+                        <i class="fi fi-rr-database"></i>
+                        Data & Privacy
+                    </a>
+                    <hr style="margin: 0.5rem 0; border-color: var(--border);">
+                    <a href="#" class="user-menu-item danger" id="logout-button">
+                        <i class="fi fi-rr-sign-out"></i>
+                        Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tracking-control-section mt-auto" style="position:sticky;bottom:0;z-index:100;">
+            <button id="toggleTracking" class="btn btn-primary w-100 tracking-button">
+                <i class="fi fi-rr-play me-2"></i>
+                <span class="tracking-text">Start Tracking</span>
+            </button>
+        </div>
         </div>
         <div class="flex-grow-1 p-3" style="overflow-y: auto; background: linear-gradient(135deg, var(--background) 0%, var(--card) 100%); color: var(--foreground)">
             <div id="timeline-view">
@@ -1928,6 +2296,12 @@
         </div>
     </div>
 
+    <!-- Authentication Scripts -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth-service.js"></script>
+    <script type="module" src="js/auth-ui.js"></script>
+    <script type="module" src="js/auth-init.js"></script>
+    
     <script src="renderer.js"></script>
 </body>
 

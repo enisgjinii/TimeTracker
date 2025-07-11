@@ -453,8 +453,19 @@ $('#nav-about').click(() => {
 
 $('#toggleTracking').click(() => {
   track = !track;
-  $('#toggleTracking').toggleClass('btn-success btn-danger').text(track ? "Stop Tracking" : "Start Tracking");
-  if (!track) {
+  const $button = $('#toggleTracking');
+  const $icon = $button.find('i');
+  const $text = $button.find('.tracking-text');
+  
+  if (track) {
+    $button.removeClass('btn-primary').addClass('btn-danger');
+    $icon.removeClass('fi-rr-play').addClass('fi-rr-pause');
+    $text.text('Stop Tracking');
+  } else {
+    $button.removeClass('btn-danger').addClass('btn-primary');
+    $icon.removeClass('fi-rr-pause').addClass('fi-rr-play');
+    $text.text('Start Tracking');
+    
     // When stopping tracking, save current segment if exists
     if (curSeg) {
       evs.push(curSeg);
@@ -1386,6 +1397,33 @@ function updateProductivityWidget() {
   setTimeout(() => {
     $('.productivity-widget').removeClass('updated');
   }, 1000);
+  
+  // Update quick stats
+  updateQuickStats(todayEvents);
+}
+
+// Update quick stats in sidebar
+function updateQuickStats(todayEvents) {
+  // Calculate total hours
+  const totalMinutes = todayEvents.reduce((total, ev) => {
+    return total + Math.round((ev.end - ev.start) / (1000 * 60));
+  }, 0);
+  const totalHours = Math.round(totalMinutes / 60 * 10) / 10; // Round to 1 decimal place
+  
+  // Count unique sessions (events with gaps > 5 minutes)
+  let sessionCount = 0;
+  if (todayEvents.length > 0) {
+    sessionCount = 1; // Start with first session
+    for (let i = 1; i < todayEvents.length; i++) {
+      const gap = todayEvents[i].start - todayEvents[i-1].end;
+      if (gap > 5 * 60 * 1000) { // 5 minutes gap
+        sessionCount++;
+      }
+    }
+  }
+  
+  $('#today-hours').text(totalHours + 'h');
+  $('#today-sessions').text(sessionCount);
 }
 
 // Group similar window activities - prioritize Window ID grouping
