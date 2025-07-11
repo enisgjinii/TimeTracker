@@ -16,6 +16,7 @@ const debugSession = require('./debug-session.js');
 const manualUpdate = require('./manual-update.js');
 const testFirebase = require('./test-firebase.js');
 const simpleTest = require('./simple-test.js');
+const testWebhook = require('./test-webhook.js');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.get('/debug-session', debugSession);
 app.post('/manual-update', manualUpdate);
 app.get('/test-firebase', testFirebase);
 app.get('/simple-test', simpleTest);
+app.post('/test-webhook', testWebhook);
 
 // Health check
 app.get('/health', (req, res) => {
