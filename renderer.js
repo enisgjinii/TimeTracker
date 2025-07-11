@@ -635,6 +635,14 @@ const renderDayView = async () => {
     }), $('<div/>', {
       style: 'marginLeft: auto; display: flex; gap: 0.25rem;',
       html: badgeHTML
+    }), $('<i/>', {
+      class: 'fas fa-trash delete-icon',
+      style: 'marginLeft: 0.5rem;',
+      click: (e) => {
+        e.stopPropagation();
+        currentEventForDeletion = ev;
+        deleteCurrentEntry();
+      }
     }));
     
     $timeline.append(wrapper);
@@ -770,6 +778,14 @@ const renderWeekView = async () => {
       }), $('<div/>', {
         style: 'marginLeft: auto; display: flex; gap: 0.25rem;',
         html: badgeHTML
+      }), $('<i/>', {
+        class: 'fas fa-trash delete-icon',
+        style: 'marginLeft: 0.25rem;',
+        click: (e) => {
+          e.stopPropagation();
+          currentEventForDeletion = ev;
+          deleteCurrentEntry();
+        }
       }));
       
       $timeline.append(wrapper);
@@ -891,6 +907,14 @@ const renderMonthView = async () => {
       }), $('<div/>', {
         style: 'marginLeft: auto; display: flex; gap: 0.25rem;',
         html: badgeHTML
+      }), $('<i/>', {
+        class: 'fas fa-trash delete-icon',
+        style: 'marginLeft: 0.25rem;',
+        click: (e) => {
+          e.stopPropagation();
+          currentEventForDeletion = ev;
+          deleteCurrentEntry();
+        }
       }));
       
       $timeline.append(wrapper);
@@ -914,6 +938,9 @@ const renderView = async () => {
 };
 
 function showSegDetails(details) {
+  // Store the current event for potential deletion
+  currentEventForDeletion = details;
+  
   const fmtDate = date => date.toLocaleString();
   const durMin = Math.round((details.end - details.start) / 60000);
   let content = `<strong>Title:</strong> ${details.title}<br>
@@ -1255,6 +1282,79 @@ const saveManualEntry = () => {
 // Event listeners for manual entry
 $('#addEntryBtn').click(openManualEntryModal);
 $('#saveManualEntryBtn').click(saveManualEntry);
+
+// Delete entry functionality
+let currentEventForDeletion = null;
+
+const deleteCurrentEntry = () => {
+  if (!currentEventForDeletion) {
+    console.error('No event selected for deletion');
+    return;
+  }
+  
+  const duration = Math.round((currentEventForDeletion.end - currentEventForDeletion.start) / 60000);
+  const startTime = new Date(currentEventForDeletion.start).toLocaleString();
+  const endTime = new Date(currentEventForDeletion.end).toLocaleString();
+  
+  const confirmMessage = `Are you sure you want to delete this time entry?\n\n` +
+    `Title: ${currentEventForDeletion.title}\n` +
+    `Duration: ${duration} minutes\n` +
+    `Start: ${startTime}\n` +
+    `End: ${endTime}\n\n` +
+    `This action cannot be undone.`;
+  
+  if (confirm(confirmMessage)) {
+    try {
+      // Find and remove the event from the events array
+      const eventIndex = evs.findIndex(ev => 
+        ev.title === currentEventForDeletion.title && 
+        ev.start === currentEventForDeletion.start && 
+        ev.end === currentEventForDeletion.end
+      );
+      
+      if (eventIndex !== -1) {
+        evs.splice(eventIndex, 1);
+        saveSegCSV();
+        
+        // Close the modal
+        $('#segmentDetailsModal').modal('hide');
+        
+        // Show success message
+        const successAlert = $(`
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>Time entry deleted successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        `);
+        $('#timeline-view .card-body').first().prepend(successAlert);
+        
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+          successAlert.alert('close');
+        }, 3000);
+        
+        // Refresh the timeline view
+        renderView();
+        
+        // Clear the current event
+        currentEventForDeletion = null;
+      } else {
+        alert('Error: Could not find the entry to delete.');
+      }
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+      alert('Error deleting entry: ' + error.message);
+    }
+  }
+};
+
+// Event handler for delete button
+$('#deleteEntryBtn').click(deleteCurrentEntry);
+
+// Clear current event when modal is closed
+$('#segmentDetailsModal').on('hidden.bs.modal', () => {
+  currentEventForDeletion = null;
+});
 
 // Initialize manual entry when document is ready
 $(document).ready(() => {

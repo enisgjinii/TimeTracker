@@ -397,6 +397,26 @@
             z-index: 10;
         }
 
+        .entry .delete-icon {
+            opacity: 0;
+            transition: opacity 0.2s;
+            margin-left: auto;
+            color: var(--destructive);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .entry:hover .delete-icon {
+            opacity: 1;
+        }
+
+        .entry .delete-icon:hover {
+            color: var(--destructive-foreground);
+            background-color: var(--destructive);
+            border-radius: 3px;
+            padding: 2px;
+        }
+
         .app-icon {
             width: 18px;
             height: 18px;
@@ -1374,6 +1394,9 @@
                     </div>
                 </div>
                 <div class="modal-footer" style="border-top: 1px solid var(--border);">
+                    <button type="button" class="btn btn-outline-danger" id="deleteEntryBtn">
+                        <i class="fas fa-trash me-2"></i>Delete Entry
+                    </button>
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
