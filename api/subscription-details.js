@@ -1,21 +1,4 @@
-const admin = require('firebase-admin');
-
-// Initialize Firebase Admin if not already initialized and credentials are valid
-if (!admin.apps.length && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_PRIVATE_KEY !== '-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...\\n-----END PRIVATE KEY-----\\n') {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      }),
-    });
-  } catch (error) {
-    console.warn('Firebase initialization failed:', error.message);
-  }
-}
-
-const db = admin.apps.length > 0 ? admin.firestore() : null;
+const { db, initialized: firebaseInitialized } = require('./firebase-admin');
 
 /**
  * Get detailed subscription information
@@ -33,6 +16,15 @@ const getSubscriptionDetails = async (req, res) => {
   if (!firebaseUid) {
     return res.status(400).json({ 
       error: 'firebaseUid is required' 
+    });
+  }
+
+  // Check if Firebase is properly initialized
+  if (!db || !firebaseInitialized) {
+    return res.status(503).json({ 
+      error: 'Firebase service unavailable',
+      details: process.env.NODE_ENV === 'development' ? 
+        'Firebase credentials not configured. Please check your .env file or serviceAccountKey.json.' : undefined
     });
   }
 

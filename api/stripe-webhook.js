@@ -1,25 +1,8 @@
 const { buffer } = require('micro');
 const Stripe = require('stripe');
-const admin = require('firebase-admin');
+const { db, initialized: firebaseInitialized } = require('./firebase-admin');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2022-11-15' });
-
-// Initialize Firebase Admin if not already initialized and credentials are valid
-if (!admin.apps.length && process.env.FIREBASE_PRIVATE_KEY && process.env.FIREBASE_PRIVATE_KEY !== '-----BEGIN PRIVATE KEY-----\\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC...\\n-----END PRIVATE KEY-----\\n') {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      }),
-    });
-  } catch (error) {
-    console.warn('Firebase initialization failed:', error.message);
-  }
-}
-
-const db = admin.apps.length > 0 ? admin.firestore() : null;
 
 /**
  * Handle Stripe webhook events
@@ -45,6 +28,12 @@ const stripeWebhook = async (req, res) => {
   console.log('Received webhook event:', event.type);
 
   try {
+    // Check if Firebase is available
+    if (!db || !firebaseInitialized) {
+      console.error('Firebase not initialized, cannot process webhook');
+      return res.status(503).json({ error: 'Firebase service unavailable' });
+    }
+
     switch (event.type) {
       case 'checkout.session.completed':
         await handleCheckoutSessionCompleted(event.data.object);

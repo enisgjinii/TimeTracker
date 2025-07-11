@@ -1,2 +1,22 @@
 /node_modules
 segments.csv
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Firebase service account key
+serviceAccountKey.json
+
+# Build outputs
+dist/
+build/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
