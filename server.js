@@ -52,6 +52,11 @@ app.get('/checkout.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'checkout.html'));
 });
 
+// Serve the success page
+app.get('/success', (req, res) => {
+    res.sendFile(path.join(__dirname, 'success.html'));
+});
+
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
