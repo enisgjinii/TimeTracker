@@ -63,20 +63,28 @@ const manualUpdate = async (req, res) => {
     // Update Firebase with subscription data
     const userRef = db.collection('users').doc(firebaseUid);
     
+    // Filter out undefined values to prevent Firestore errors
     const subscriptionData = {
       subscription: {
         active: true,
         status: 'active',
-        priceId: session.metadata?.priceId,
-        stripeCustomerId: session.customer,
-        stripeSubscriptionId: session.subscription,
-        current_period_start: session.current_period_start,
-        current_period_end: session.current_period_end,
+        priceId: session.metadata?.priceId || null,
+        stripeCustomerId: session.customer || null,
+        stripeSubscriptionId: session.subscription || null,
+        current_period_start: session.current_period_start || null,
+        current_period_end: session.current_period_end || null,
         created_at: new Date(),
         updated_at: new Date(),
         manually_updated: true
       }
     };
+
+    // Remove null/undefined values to prevent Firestore errors
+    Object.keys(subscriptionData.subscription).forEach(key => {
+      if (subscriptionData.subscription[key] === null || subscriptionData.subscription[key] === undefined) {
+        delete subscriptionData.subscription[key];
+      }
+    });
 
     await userRef.set(subscriptionData, { merge: true });
 

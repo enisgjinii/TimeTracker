@@ -87,19 +87,29 @@ async function handleCheckoutSessionCompleted(session) {
 
   const userRef = db.collection('users').doc(firebaseUid);
   
-  await userRef.set({
+  // Filter out undefined values to prevent Firestore errors
+  const subscriptionData = {
     subscription: {
       active: true,
       status: 'active',
-      priceId: session.metadata?.priceId,
-      stripeCustomerId: session.customer,
-      stripeSubscriptionId: session.subscription,
-      current_period_start: session.current_period_start,
-      current_period_end: session.current_period_end,
+      priceId: session.metadata?.priceId || null,
+      stripeCustomerId: session.customer || null,
+      stripeSubscriptionId: session.subscription || null,
+      current_period_start: session.current_period_start || null,
+      current_period_end: session.current_period_end || null,
       created_at: new Date(),
       updated_at: new Date()
     }
-  }, { merge: true });
+  };
+
+  // Remove null/undefined values to prevent Firestore errors
+  Object.keys(subscriptionData.subscription).forEach(key => {
+    if (subscriptionData.subscription[key] === null || subscriptionData.subscription[key] === undefined) {
+      delete subscriptionData.subscription[key];
+    }
+  });
+
+  await userRef.set(subscriptionData, { merge: true });
 
   console.log(`Subscription activated for user: ${firebaseUid}`);
 }
@@ -117,18 +127,28 @@ async function handleSubscriptionCreated(subscription) {
 
   const userRef = db.collection('users').doc(firebaseUid);
   
-  await userRef.set({
+  // Filter out undefined values to prevent Firestore errors
+  const subscriptionData = {
     subscription: {
       active: subscription.status === 'active',
       status: subscription.status,
-      stripeCustomerId: subscription.customer,
-      stripeSubscriptionId: subscription.id,
-      current_period_start: subscription.current_period_start,
-      current_period_end: subscription.current_period_end,
+      stripeCustomerId: subscription.customer || null,
+      stripeSubscriptionId: subscription.id || null,
+      current_period_start: subscription.current_period_start || null,
+      current_period_end: subscription.current_period_end || null,
       created_at: new Date(),
       updated_at: new Date()
     }
-  }, { merge: true });
+  };
+
+  // Remove null/undefined values to prevent Firestore errors
+  Object.keys(subscriptionData.subscription).forEach(key => {
+    if (subscriptionData.subscription[key] === null || subscriptionData.subscription[key] === undefined) {
+      delete subscriptionData.subscription[key];
+    }
+  });
+
+  await userRef.set(subscriptionData, { merge: true });
 
   console.log(`Subscription created for user: ${firebaseUid}`);
 }
@@ -146,17 +166,27 @@ async function handleSubscriptionUpdated(subscription) {
 
   const userRef = db.collection('users').doc(firebaseUid);
   
-  await userRef.set({
+  // Filter out undefined values to prevent Firestore errors
+  const subscriptionData = {
     subscription: {
       active: subscription.status === 'active',
       status: subscription.status,
-      stripeCustomerId: subscription.customer,
-      stripeSubscriptionId: subscription.id,
-      current_period_start: subscription.current_period_start,
-      current_period_end: subscription.current_period_end,
+      stripeCustomerId: subscription.customer || null,
+      stripeSubscriptionId: subscription.id || null,
+      current_period_start: subscription.current_period_start || null,
+      current_period_end: subscription.current_period_end || null,
       updated_at: new Date()
     }
-  }, { merge: true });
+  };
+
+  // Remove null/undefined values to prevent Firestore errors
+  Object.keys(subscriptionData.subscription).forEach(key => {
+    if (subscriptionData.subscription[key] === null || subscriptionData.subscription[key] === undefined) {
+      delete subscriptionData.subscription[key];
+    }
+  });
+
+  await userRef.set(subscriptionData, { merge: true });
 
   console.log(`Subscription updated for user: ${firebaseUid}`);
 }
@@ -174,16 +204,26 @@ async function handleSubscriptionDeleted(subscription) {
 
   const userRef = db.collection('users').doc(firebaseUid);
   
-  await userRef.set({
+  // Filter out undefined values to prevent Firestore errors
+  const subscriptionData = {
     subscription: {
       active: false,
       status: 'canceled',
-      stripeCustomerId: subscription.customer,
-      stripeSubscriptionId: subscription.id,
+      stripeCustomerId: subscription.customer || null,
+      stripeSubscriptionId: subscription.id || null,
       canceled_at: new Date(),
       updated_at: new Date()
     }
-  }, { merge: true });
+  };
+
+  // Remove null/undefined values to prevent Firestore errors
+  Object.keys(subscriptionData.subscription).forEach(key => {
+    if (subscriptionData.subscription[key] === null || subscriptionData.subscription[key] === undefined) {
+      delete subscriptionData.subscription[key];
+    }
+  });
+
+  await userRef.set(subscriptionData, { merge: true });
 
   console.log(`Subscription canceled for user: ${firebaseUid}`);
 }
