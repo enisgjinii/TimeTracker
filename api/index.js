@@ -18,6 +18,7 @@ const testFirebase = require('./test-firebase.js');
 const simpleTest = require('./simple-test.js');
 const testWebhook = require('./test-webhook.js');
 const debugEnv = require('./debug-env.js');
+const vercelTest = require('./vercel-test.js');
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.get('/test-firebase', testFirebase);
 app.get('/simple-test', simpleTest);
 app.post('/test-webhook', testWebhook);
 app.get('/debug-env', debugEnv);
+app.get('/vercel-test', vercelTest);
 
 // Health check
 app.get('/health', (req, res) => {
