@@ -5,72 +5,107 @@ const { db, initialized: firebaseInitialized } = require('./firebase-admin');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2025-06-30.basil' });
 
 /**
- * Handle Stripe webhook events
+ * Advanced log helper
+ */
+function advLog(...args) {
+  const ts = new Date().toISOString();
+  console.log(`[${ts}]`, ...args);
+}
+
+/**
+ * Handle Stripe webhook events (Vercel-friendly, advanced logging)
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
 const stripeWebhook = async (req, res) => {
+  advLog('--- Stripe Webhook Received ---');
+  advLog('Headers:', JSON.stringify(req.headers, null, 2));
+  advLog('Method:', req.method);
+
+  res.setHeader('X-Webhook-Source', 'stripe-webhook-v2');
+
   if (req.method !== 'POST') {
+    advLog('❌ Method not allowed:', req.method);
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const sig = req.headers['stripe-signature'];
-  const buf = await buffer(req);
+  // Log environment variables (mask secrets)
+  advLog('ENV:', {
+    NODE_ENV: process.env.NODE_ENV,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY ? 'SET' : 'NOT SET',
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET ? 'SET' : 'NOT SET',
+    FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
+    FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL ? 'SET' : 'NOT SET',
+    FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY ? 'SET' : 'NOT SET',
+  });
 
-  let event;
+  let buf, sig, event;
   try {
+    buf = await buffer(req);
+    advLog('Raw body buffer length:', buf.length);
+    sig = req.headers['stripe-signature'];
+    if (!sig) {
+      advLog('❌ Missing Stripe signature header');
+      return res.status(400).json({ error: 'Missing Stripe signature header' });
+    }
+    advLog('Stripe signature:', sig);
     event = stripe.webhooks.constructEvent(buf, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    advLog('✅ Webhook signature verified');
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+    advLog('❌ Webhook signature verification failed:', err.message);
+    advLog('Stack:', err.stack);
+    return res.status(400).json({ error: 'Webhook signature verification failed', details: err.message });
   }
 
-  console.log('Received webhook event:', event.type, JSON.stringify(event.data.object, null, 2));
+  advLog('Received webhook event:', event.type);
+  advLog('Event payload:', JSON.stringify(event.data.object, null, 2));
 
   try {
     // Check if Firebase is available
     if (!db || !firebaseInitialized) {
-      console.error('Firebase not initialized, cannot process webhook');
-      console.error('Firebase status:', { db: !!db, initialized: firebaseInitialized });
+      advLog('❌ Firebase not initialized, cannot process webhook');
+      advLog('Firebase status:', { db: !!db, initialized: firebaseInitialized });
       return res.status(503).json({ error: 'Firebase service unavailable' });
     }
 
     switch (event.type) {
       case 'checkout.session.completed':
-        console.log('Handling checkout.session.completed');
+        advLog('Handling checkout.session.completed');
         await handleCheckoutSessionCompleted(event.data.object);
         break;
       case 'customer.subscription.created':
-        console.log('Handling customer.subscription.created');
+        advLog('Handling customer.subscription.created');
         await handleSubscriptionCreated(event.data.object);
         break;
       case 'customer.subscription.updated':
-        console.log('Handling customer.subscription.updated');
+        advLog('Handling customer.subscription.updated');
         await handleSubscriptionUpdated(event.data.object);
         break;
       case 'customer.subscription.deleted':
-        console.log('Handling customer.subscription.deleted');
+        advLog('Handling customer.subscription.deleted');
         await handleSubscriptionDeleted(event.data.object);
         break;
       case 'invoice.payment_succeeded':
-        console.log('Handling invoice.payment_succeeded');
+        advLog('Handling invoice.payment_succeeded');
         await handleInvoicePaymentSucceeded(event.data.object);
         break;
       case 'invoice.payment_failed':
-        console.log('Handling invoice.payment_failed');
+        advLog('Handling invoice.payment_failed');
         await handleInvoicePaymentFailed(event.data.object);
         break;
       case 'customer.subscription.trial_will_end':
-        console.log('Handling customer.subscription.trial_will_end');
+        advLog('Handling customer.subscription.trial_will_end');
         await handleTrialWillEnd(event.data.object);
         break;
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        advLog(`Unhandled event type: ${event.type}`);
     }
 
-    res.json({ received: true });
+    advLog('✅ Webhook event processed successfully');
+    res.json({ received: true, event: event.type });
   } catch (error) {
-    console.error('Webhook handler error:', error);
+    advLog('❌ Webhook handler error:', error.message);
+    advLog('Stack:', error.stack);
     res.status(500).json({ error: 'Webhook handler failed', details: error.message });
   }
 };
@@ -80,16 +115,14 @@ const stripeWebhook = async (req, res) => {
  * @param {Object} session - Stripe checkout session
  */
 async function handleCheckoutSessionCompleted(session) {
-  console.log('handleCheckoutSessionCompleted called with:', JSON.stringify(session, null, 2));
+  advLog('handleCheckoutSessionCompleted called with:', JSON.stringify(session, null, 2));
   const firebaseUid = session.metadata?.firebaseUid;
   if (!firebaseUid) {
-    console.error('No firebaseUid in session metadata');
+    advLog('❌ No firebaseUid in session metadata');
     return;
   }
 
   const userRef = db.collection('users').doc(firebaseUid);
-  
-  // Filter out undefined values to prevent Firestore errors
   const subscriptionData = {
     subscription: {
       active: true,
@@ -100,22 +133,22 @@ async function handleCheckoutSessionCompleted(session) {
       current_period_start: session.current_period_start || null,
       current_period_end: session.current_period_end || null,
       created_at: new Date(),
-      updated_at: new Date()
+      updated_at: new Date(),
+      webhook_source: 'stripe-webhook-v2',
+      event_type: 'checkout.session.completed',
     }
   };
-
-  // Remove null/undefined values to prevent Firestore errors
   Object.keys(subscriptionData.subscription).forEach(key => {
     if (subscriptionData.subscription[key] === null || subscriptionData.subscription[key] === undefined) {
       delete subscriptionData.subscription[key];
     }
   });
-
   try {
     await userRef.set(subscriptionData, { merge: true });
-    console.log(`Subscription activated for user: ${firebaseUid}`, subscriptionData);
+    advLog(`✅ Subscription activated for user: ${firebaseUid}`, subscriptionData);
   } catch (err) {
-    console.error('Error updating Firestore in handleCheckoutSessionCompleted:', err);
+    advLog('❌ Error updating Firestore in handleCheckoutSessionCompleted:', err.message);
+    advLog('Stack:', err.stack);
   }
 }
 
@@ -124,10 +157,10 @@ async function handleCheckoutSessionCompleted(session) {
  * @param {Object} subscription - Stripe subscription
  */
 async function handleSubscriptionCreated(subscription) {
-  console.log('handleSubscriptionCreated called with:', JSON.stringify(subscription, null, 2));
+  advLog('handleSubscriptionCreated called with:', JSON.stringify(subscription, null, 2));
   const firebaseUid = subscription.metadata?.firebaseUid;
   if (!firebaseUid) {
-    console.error('No firebaseUid in subscription metadata');
+    advLog('❌ No firebaseUid in subscription metadata');
     return;
   }
 
@@ -143,7 +176,9 @@ async function handleSubscriptionCreated(subscription) {
       current_period_start: subscription.current_period_start || null,
       current_period_end: subscription.current_period_end || null,
       created_at: new Date(),
-      updated_at: new Date()
+      updated_at: new Date(),
+      webhook_source: 'stripe-webhook-v2',
+      event_type: 'customer.subscription.created',
     }
   };
 
@@ -156,9 +191,10 @@ async function handleSubscriptionCreated(subscription) {
 
   try {
     await userRef.set(subscriptionData, { merge: true });
-    console.log(`Subscription created for user: ${firebaseUid}`, subscriptionData);
+    advLog(`✅ Subscription created for user: ${firebaseUid}`, subscriptionData);
   } catch (err) {
-    console.error('Error updating Firestore in handleSubscriptionCreated:', err);
+    advLog('❌ Error updating Firestore in handleSubscriptionCreated:', err.message);
+    advLog('Stack:', err.stack);
   }
 }
 
@@ -167,10 +203,10 @@ async function handleSubscriptionCreated(subscription) {
  * @param {Object} subscription - Stripe subscription
  */
 async function handleSubscriptionUpdated(subscription) {
-  console.log('handleSubscriptionUpdated called with:', JSON.stringify(subscription, null, 2));
+  advLog('handleSubscriptionUpdated called with:', JSON.stringify(subscription, null, 2));
   const firebaseUid = subscription.metadata?.firebaseUid;
   if (!firebaseUid) {
-    console.error('No firebaseUid in subscription metadata');
+    advLog('❌ No firebaseUid in subscription metadata');
     return;
   }
 
@@ -185,7 +221,9 @@ async function handleSubscriptionUpdated(subscription) {
       stripeSubscriptionId: subscription.id || null,
       current_period_start: subscription.current_period_start || null,
       current_period_end: subscription.current_period_end || null,
-      updated_at: new Date()
+      updated_at: new Date(),
+      webhook_source: 'stripe-webhook-v2',
+      event_type: 'customer.subscription.updated',
     }
   };
 
@@ -198,9 +236,10 @@ async function handleSubscriptionUpdated(subscription) {
 
   try {
     await userRef.set(subscriptionData, { merge: true });
-    console.log(`Subscription updated for user: ${firebaseUid}`, subscriptionData);
+    advLog(`✅ Subscription updated for user: ${firebaseUid}`, subscriptionData);
   } catch (err) {
-    console.error('Error updating Firestore in handleSubscriptionUpdated:', err);
+    advLog('❌ Error updating Firestore in handleSubscriptionUpdated:', err.message);
+    advLog('Stack:', err.stack);
   }
 }
 
@@ -209,10 +248,10 @@ async function handleSubscriptionUpdated(subscription) {
  * @param {Object} subscription - Stripe subscription
  */
 async function handleSubscriptionDeleted(subscription) {
-  console.log('handleSubscriptionDeleted called with:', JSON.stringify(subscription, null, 2));
+  advLog('handleSubscriptionDeleted called with:', JSON.stringify(subscription, null, 2));
   const firebaseUid = subscription.metadata?.firebaseUid;
   if (!firebaseUid) {
-    console.error('No firebaseUid in subscription metadata');
+    advLog('❌ No firebaseUid in subscription metadata');
     return;
   }
 
@@ -226,7 +265,9 @@ async function handleSubscriptionDeleted(subscription) {
       stripeCustomerId: subscription.customer || null,
       stripeSubscriptionId: subscription.id || null,
       canceled_at: new Date(),
-      updated_at: new Date()
+      updated_at: new Date(),
+      webhook_source: 'stripe-webhook-v2',
+      event_type: 'customer.subscription.deleted',
     }
   };
 
@@ -239,9 +280,10 @@ async function handleSubscriptionDeleted(subscription) {
 
   try {
     await userRef.set(subscriptionData, { merge: true });
-    console.log(`Subscription canceled for user: ${firebaseUid}`, subscriptionData);
+    advLog(`✅ Subscription canceled for user: ${firebaseUid}`, subscriptionData);
   } catch (err) {
-    console.error('Error updating Firestore in handleSubscriptionDeleted:', err);
+    advLog('❌ Error updating Firestore in handleSubscriptionDeleted:', err.message);
+    advLog('Stack:', err.stack);
   }
 }
 
@@ -250,7 +292,7 @@ async function handleSubscriptionDeleted(subscription) {
  * @param {Object} invoice - Stripe invoice
  */
 async function handleInvoicePaymentSucceeded(invoice) {
-  console.log('handleInvoicePaymentSucceeded called with:', JSON.stringify(invoice, null, 2));
+  advLog('handleInvoicePaymentSucceeded called with:', JSON.stringify(invoice, null, 2));
   if (invoice.subscription) {
     const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
     const firebaseUid = subscription.metadata?.firebaseUid;
@@ -263,15 +305,18 @@ async function handleInvoicePaymentSucceeded(invoice) {
             active: true,
             status: 'active',
             last_payment_date: new Date(),
-            updated_at: new Date()
+            updated_at: new Date(),
+            webhook_source: 'stripe-webhook-v2',
+            event_type: 'invoice.payment_succeeded',
           }
         }, { merge: true });
-        console.log(`Payment succeeded for user: ${firebaseUid}`);
+        advLog(`✅ Payment succeeded for user: ${firebaseUid}`);
       } catch (err) {
-        console.error('Error updating Firestore in handleInvoicePaymentSucceeded:', err);
+        advLog('❌ Error updating Firestore in handleInvoicePaymentSucceeded:', err.message);
+        advLog('Stack:', err.stack);
       }
     } else {
-      console.error('No firebaseUid in subscription metadata for invoice.payment_succeeded');
+      advLog('❌ No firebaseUid in subscription metadata for invoice.payment_succeeded');
     }
   }
 }
@@ -281,7 +326,7 @@ async function handleInvoicePaymentSucceeded(invoice) {
  * @param {Object} invoice - Stripe invoice
  */
 async function handleInvoicePaymentFailed(invoice) {
-  console.log('handleInvoicePaymentFailed called with:', JSON.stringify(invoice, null, 2));
+  advLog('handleInvoicePaymentFailed called with:', JSON.stringify(invoice, null, 2));
   if (invoice.subscription) {
     const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
     const firebaseUid = subscription.metadata?.firebaseUid;
@@ -294,15 +339,18 @@ async function handleInvoicePaymentFailed(invoice) {
             active: false,
             status: 'past_due',
             last_payment_failed: new Date(),
-            updated_at: new Date()
+            updated_at: new Date(),
+            webhook_source: 'stripe-webhook-v2',
+            event_type: 'invoice.payment_failed',
           }
         }, { merge: true });
-        console.log(`Payment failed for user: ${firebaseUid}`);
+        advLog(`✅ Payment failed for user: ${firebaseUid}`);
       } catch (err) {
-        console.error('Error updating Firestore in handleInvoicePaymentFailed:', err);
+        advLog('❌ Error updating Firestore in handleInvoicePaymentFailed:', err.message);
+        advLog('Stack:', err.stack);
       }
     } else {
-      console.error('No firebaseUid in subscription metadata for invoice.payment_failed');
+      advLog('❌ No firebaseUid in subscription metadata for invoice.payment_failed');
     }
   }
 }
@@ -312,7 +360,7 @@ async function handleInvoicePaymentFailed(invoice) {
  * @param {Object} subscription - Stripe subscription
  */
 async function handleTrialWillEnd(subscription) {
-  console.log('handleTrialWillEnd called with:', JSON.stringify(subscription, null, 2));
+  advLog('handleTrialWillEnd called with:', JSON.stringify(subscription, null, 2));
   // You could send an email notification here
 }
 
