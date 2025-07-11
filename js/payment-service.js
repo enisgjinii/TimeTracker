@@ -33,19 +33,56 @@ class PaymentService {
     async initializeStripe(publishableKey = null) {
         try {
             console.log('💳 PaymentService: Initializing Stripe...');
+            
+            // If publishable key is provided, use it directly
+            if (publishableKey) {
+                await this.loadStripeAndInitialize(publishableKey);
+                return;
+            }
+            
+            // Otherwise, fetch from backend
+            try {
+                const response = await fetch(`${this.apiBaseUrl}/stripe-config`);
+                if (response.ok) {
+                    const config = await response.json();
+                    await this.loadStripeAndInitialize(config.publishableKey);
+                } else {
+                    throw new Error('Failed to fetch Stripe configuration');
+                }
+            } catch (error) {
+                console.error('💳 PaymentService: Failed to fetch Stripe config:', error);
+                // Fallback to placeholder for development
+                await this.loadStripeAndInitialize('pk_test_your_stripe_publishable_key_here');
+            }
+        } catch (error) {
+            console.error('💳 PaymentService: Failed to initialize Stripe:', error);
+        }
+    }
+
+    /**
+     * Load Stripe.js and initialize with publishable key
+     * @param {string} publishableKey - Stripe publishable key
+     */
+    async loadStripeAndInitialize(publishableKey) {
+        return new Promise((resolve, reject) => {
             // Load Stripe.js dynamically
             const script = document.createElement('script');
             script.src = 'https://js.stripe.com/v3/';
             script.onload = () => {
-                // Use environment variable or passed key
-                const key = publishableKey || 'pk_test_your_stripe_publishable_key_here';
-                this.stripe = Stripe(key);
-                console.log('💳 PaymentService: Stripe initialized successfully');
+                try {
+                    this.stripe = Stripe(publishableKey);
+                    console.log('💳 PaymentService: Stripe initialized successfully');
+                    resolve();
+                } catch (error) {
+                    console.error('💳 PaymentService: Failed to create Stripe instance:', error);
+                    reject(error);
+                }
+            };
+            script.onerror = () => {
+                reject(new Error('Failed to load Stripe.js'));
             };
             document.head.appendChild(script);
-        } catch (error) {
-            console.error('💳 PaymentService: Failed to initialize Stripe:', error);
-        }
+        });
     }
 
     /**
@@ -94,6 +131,16 @@ class PaymentService {
      */
     async redirectToCheckout(sessionId) {
         try {
+            // If running in Electron, open in user's default browser
+            if (window && window.process && window.process.type === 'renderer') {
+                // Electron renderer process
+                const { shell } = window.require('electron');
+                const checkoutUrl = `https://checkout.stripe.com/c/pay/${sessionId}`;
+                shell.openExternal(checkoutUrl);
+                return { success: true };
+            }
+
+            // Fallback: Use Stripe.js in browser
             if (!this.stripe) {
                 throw new Error('Stripe not initialized');
             }

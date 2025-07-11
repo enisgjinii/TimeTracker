@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3001;
 // Check required environment variables
 const requiredEnvVars = [
     'STRIPE_SECRET_KEY',
+    'STRIPE_PUBLISHABLE_KEY',
     'FIREBASE_PROJECT_ID',
     'FIREBASE_CLIENT_EMAIL',
     'FIREBASE_PRIVATE_KEY'
@@ -38,6 +39,7 @@ app.get('/api/subscription-details', require('./api/subscription-details.js'));
 app.post('/api/create-portal-session', require('./api/create-portal-session.js'));
 app.post('/api/cancel-subscription', require('./api/cancel-subscription.js'));
 app.get('/api/subscription-plans', require('./api/subscription-plans.js'));
+app.get('/api/stripe-config', require('./api/stripe-config.js'));
 
 // Serve the main application
 app.get('/', (req, res) => {
