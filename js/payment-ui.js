@@ -272,6 +272,13 @@ class PaymentUI {
             button.textContent = 'Processing...';
             button.disabled = true;
 
+            // Ensure Stripe is ready before proceeding
+            console.log('🔧 PaymentUI: Ensuring Stripe is ready for checkout...');
+            const isStripeReady = await paymentService.ensureStripeReady();
+            if (!isStripeReady) {
+                throw new Error('Failed to initialize payment system. Please refresh the page and try again.');
+            }
+
             // Create checkout session
             const result = await paymentService.createCheckoutSession(plan.priceId, this.currentUser.uid);
             

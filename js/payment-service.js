@@ -18,12 +18,16 @@ class PaymentService {
         
         this.apiBaseUrl = apiBaseUrl;
         this.stripe = null;
+        this.initializationPromise = null;
         console.log('💳 PaymentService: Initializing...');
         console.log('💳 PaymentService: API Base URL:', this.apiBaseUrl);
         console.log('💳 PaymentService: Protocol:', window.location.protocol);
         console.log('💳 PaymentService: Hostname:', window.location.hostname);
-        // Initialize Stripe when needed
-        this.initializeStripe();
+        
+        // Initialize Stripe after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            this.initializeStripe();
+        }, 100);
     }
 
     /**
@@ -31,6 +35,20 @@ class PaymentService {
      * @param {string} publishableKey - Stripe publishable key
      */
     async initializeStripe(publishableKey = null) {
+        // If already initializing, return the existing promise
+        if (this.initializationPromise) {
+            return this.initializationPromise;
+        }
+
+        this.initializationPromise = this._initializeStripe(publishableKey);
+        return this.initializationPromise;
+    }
+
+    /**
+     * Internal method to initialize Stripe
+     * @param {string} publishableKey - Stripe publishable key
+     */
+    async _initializeStripe(publishableKey = null) {
         try {
             console.log('💳 PaymentService: Initializing Stripe...');
             
@@ -56,6 +74,8 @@ class PaymentService {
             }
         } catch (error) {
             console.error('💳 PaymentService: Failed to initialize Stripe:', error);
+            this.initializationPromise = null; // Reset on error
+            throw error;
         }
     }
 
@@ -83,6 +103,33 @@ class PaymentService {
             };
             document.head.appendChild(script);
         });
+    }
+
+    /**
+     * Ensure Stripe is initialized and ready for use
+     * @returns {Promise<boolean>} - Whether Stripe is ready
+     */
+    async ensureStripeReady() {
+        if (this.stripe) {
+            return true;
+        }
+
+        try {
+            console.log('💳 PaymentService: Ensuring Stripe is ready...');
+            
+            // If initialization is already in progress, wait for it
+            if (this.initializationPromise) {
+                await this.initializationPromise;
+                return !!this.stripe;
+            }
+            
+            // Otherwise, start initialization
+            await this.initializeStripe();
+            return !!this.stripe;
+        } catch (error) {
+            console.error('💳 PaymentService: Failed to ensure Stripe is ready:', error);
+            return false;
+        }
     }
 
     /**
@@ -140,9 +187,10 @@ class PaymentService {
                 return { success: true };
             }
 
-            // Fallback: Use Stripe.js in browser
-            if (!this.stripe) {
-                throw new Error('Stripe not initialized');
+            // Ensure Stripe is initialized before proceeding
+            const isReady = await this.ensureStripeReady();
+            if (!isReady) {
+                throw new Error('Failed to initialize Stripe');
             }
 
             const { error } = await this.stripe.redirectToCheckout({
