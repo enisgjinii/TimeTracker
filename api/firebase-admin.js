@@ -28,7 +28,7 @@ const initializeFirebase = () => {
       // Try to use service account key file first
       try {
         console.log('📄 Attempting to load service account key file...');
-        const serviceAccountPath = path.join(process.cwd(), 'serviceAccountKey.json');
+        const serviceAccountPath = path.join(process.cwd(), 'config', 'serviceAccountKey.json');
         console.log('📂 Service account path:', serviceAccountPath);
         
         const serviceAccount = require(serviceAccountPath);
@@ -134,7 +134,7 @@ const initializeFirebase = () => {
     console.warn('⚠️  Firebase-dependent features will be unavailable');
     console.warn('📋 To fix this:');
     console.warn('   1. Download your Firebase service account key');
-    console.warn('   2. Save it as "serviceAccountKey.json" in the project root');
+    console.warn('   2. Save it as "serviceAccountKey.json" in the config directory');
     console.warn('   3. Or set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY environment variables');
     console.warn('   4. Make sure Firestore API is enabled in your Firebase project');
     console.warn('   5. For Vercel deployment, add these environment variables in the Vercel dashboard');
