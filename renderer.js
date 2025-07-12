@@ -3,6 +3,11 @@ const fs = require('fs');
 const path = require('path');
 window.$ = window.jQuery = require('jquery');
 
+// Import profile services
+const profileService = require('./js/profile-service.js');
+const profileUI = require('./js/profile-ui.js');
+const profileInit = require('./js/profile-init.js');
+
 const SEG_FILE = path.join(__dirname, 'segments.csv');
 const SETTINGS_FILE = path.join(__dirname, 'settings.json');
 let evs = [];
@@ -13,6 +18,201 @@ let view = "day";
 let theme = "system";
 let date = new Date();
 date.setHours(0, 0, 0, 0);
+
+// Profile system state
+let profileSystemInitialized = false;
+
+// Utility functions
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+function formatDuration(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) {
+        return `${hours}h ${minutes}m`;
+    } else {
+        return `${minutes}m`;
+    }
+}
+
+/**
+ * Initialize the profile system
+ */
+const initializeProfileSystem = async () => {
+    try {
+        // Initialize profile system
+        await profileInit.initialize();
+        profileSystemInitialized = true;
+        console.log('Profile system initialized successfully');
+        
+        // Update UI with profile data
+        updateProfileUI();
+        
+        // Setup profile-related event listeners
+        setupProfileEventListeners();
+        
+    } catch (error) {
+        console.error('Error initializing profile system:', error);
+    }
+};
+
+/**
+ * Update profile UI elements
+ */
+const updateProfileUI = () => {
+    if (!profileSystemInitialized) return;
+    
+    const profile = profileService.getProfile();
+    if (!profile) return;
+    
+    // Update user display name
+    $('.user-display-name').text(profile.displayName || 'User');
+    
+    // Update user email
+    $('.user-email').text(profile.email || '');
+    
+    // Update user avatar
+    if (profile.avatar) {
+        $('.user-avatar').html(`<img src="${profile.avatar}" alt="Profile Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`);
+    } else {
+        $('.user-avatar').html('<i class="fi fi-rr-user"></i>');
+    }
+    
+    // Update work hours indicator
+    updateWorkHoursIndicator();
+    
+    // Update productivity goals
+    updateProductivityGoalsDisplay();
+};
+
+/**
+ * Update work hours indicator
+ */
+const updateWorkHoursIndicator = () => {
+    if (!profileSystemInitialized) return;
+    
+    const isWorkHours = profileService.isWorkHours();
+    const remainingTime = profileService.getRemainingWorkTime();
+    
+    if (isWorkHours) {
+        const hours = Math.floor(remainingTime / 60);
+        const minutes = remainingTime % 60;
+        $('.work-hours-indicator').html(`
+            <span class="badge bg-success small">
+                <i class="fi fi-rr-clock me-1"></i>
+                Work Hours - ${hours}h ${minutes}m remaining
+            </span>
+        `);
+    } else {
+        $('.work-hours-indicator').html(`
+            <span class="badge bg-secondary small">
+                <i class="fi fi-rr-clock me-1"></i>
+                Outside Work Hours
+            </span>
+        `);
+    }
+};
+
+/**
+ * Update productivity goals display
+ */
+const updateProductivityGoalsDisplay = () => {
+    if (!profileSystemInitialized) return;
+    
+    const goals = profileService.getProductivityGoals();
+    
+    $('.daily-work-goal').text(`${goals.dailyWorkGoal}h`);
+    $('.weekly-work-goal').text(`${goals.weeklyWorkGoal}h`);
+    $('.focus-goal').text(goals.focusGoal);
+    $('.break-goal').text(goals.breakGoal);
+};
+
+/**
+ * Setup profile-related event listeners
+ */
+const setupProfileEventListeners = () => {
+    // User menu button
+    $('#user-menu-button').on('click', function() {
+        $('#user-menu-dropdown').toggleClass('show');
+    });
+    
+    // Close user menu when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('.user-menu').length) {
+            $('#user-menu-dropdown').removeClass('show');
+        }
+    });
+    
+    // Profile navigation links
+    $('#user-profile-link').on('click', function(e) {
+        e.preventDefault();
+        showView('settings');
+        $('#user-menu-dropdown').removeClass('show');
+    });
+    
+    $('#user-settings-link').on('click', function(e) {
+        e.preventDefault();
+        showView('settings');
+        $('#user-menu-dropdown').removeClass('show');
+    });
+    
+    $('#user-data-link').on('click', function(e) {
+        e.preventDefault();
+        showView('settings');
+        $('#user-menu-dropdown').removeClass('show');
+    });
+    
+    // Logout button
+    $('#logout-button').on('click', function(e) {
+        e.preventDefault();
+        // This should be handled by the auth service
+        console.log('Logout requested');
+        $('#user-menu-dropdown').removeClass('show');
+    });
+};
+
+/**
+ * Check if user is in work hours for productivity calculations
+ */
+const isInWorkHours = () => {
+    if (!profileSystemInitialized) return true; // Default to true if profile not loaded
+    return profileService.isWorkHours();
+};
+
+/**
+ * Get user's productivity goals
+ */
+const getUserProductivityGoals = () => {
+    if (!profileSystemInitialized) {
+        return {
+            dailyWorkGoal: 8,
+            weeklyWorkGoal: 40,
+            focusGoal: 4,
+            breakGoal: 4
+        };
+    }
+    return profileService.getProductivityGoals();
+};
+
+/**
+ * Get user's work preferences
+ */
+const getUserWorkPreferences = () => {
+    if (!profileSystemInitialized) {
+        return {
+            startTime: '09:00',
+            endTime: '17:00',
+            workDays: [1, 2, 3, 4, 5],
+            lunchBreakDuration: 60
+        };
+    }
+    return profileService.getWorkPreferences();
+};
 
 let usrSet = {
   timelineIncrements: 15,
@@ -1286,11 +1486,24 @@ function isIdle(now) {
 }
 
 function getProductivityScore(ev) {
+  // Check if we're in work hours (if profile system is available)
+  const inWorkHours = isInWorkHours();
+  
   // Simple scoring: Work/Productivity = 2, Social/Entertainment = 0, else 1
   const cat = ev.details?.category || getAppCat(ev.details?.owner?.name || ev.title);
-  if (["Work", "Productivity"].includes(cat)) return 2;
-  if (["Social", "Entertainment"].includes(cat)) return 0;
-  return 1;
+  
+  // Adjust scoring based on work hours
+  if (inWorkHours) {
+    // During work hours, be more strict about productivity
+    if (["Work", "Productivity"].includes(cat)) return 2;
+    if (["Social", "Entertainment"].includes(cat)) return 0;
+    return 1;
+  } else {
+    // Outside work hours, be more lenient
+    if (["Work", "Productivity"].includes(cat)) return 1.5;
+    if (["Social", "Entertainment"].includes(cat)) return 0.5;
+    return 1;
+  }
 }
 
 function isFocusSession(ev) {
@@ -1365,8 +1578,9 @@ function updateProductivityWidget() {
   $('#focusMinutes').text(summary.focusMinutes);
   $('#idleMinutes').text(summary.idleMinutes);
   
-  // Calculate progress percentage (assuming 8-hour workday = 480 minutes)
-  const maxProductiveMinutes = 480;
+  // Get user's productivity goals from profile system
+  const goals = getUserProductivityGoals();
+  const maxProductiveMinutes = goals.dailyWorkGoal * 60; // Convert hours to minutes
   const progressPercentage = Math.min(Math.round((summary.totalMinutes / maxProductiveMinutes) * 100), 100);
   $('#progressPercentage').text(`${progressPercentage}%`);
   
@@ -1375,7 +1589,7 @@ function updateProductivityWidget() {
   const progressOffset = circumference - (progressPercentage / 100) * circumference;
   $('#progressCircle').css('stroke-dashoffset', progressOffset);
   
-  // Update motivational message
+  // Update motivational message based on progress and goals
   let motivationalMessage = '';
   if (progressPercentage === 0) {
     motivationalMessage = 'Start your productive day!';
@@ -1400,6 +1614,11 @@ function updateProductivityWidget() {
   
   // Update quick stats
   updateQuickStats(todayEvents);
+  
+  // Update profile UI if system is initialized
+  if (profileSystemInitialized) {
+    updateProfileUI();
+  }
 }
 
 // Update quick stats in sidebar
@@ -1682,4 +1901,162 @@ $('#segmentDetailsModal').on('hidden.bs.modal', () => {
 // Initialize manual entry when document is ready
 $(document).ready(() => {
   initializeManualEntry();
+  
+  // Initialize profile system
+  initializeProfileSystem();
+  
+  // Load settings and apply them
+  loadSet();
+  applySet();
+  
+  // Initialize settings UI
+  initSetUI();
+  
+  // Load segments and render initial view
+  loadSegCSV();
+  renderView();
+  
+  // Setup periodic updates
+  setInterval(() => {
+    updateCurrentTimeIndicator();
+    updateWorkHoursIndicator(); // Update work hours indicator
+  }, 60000); // Update every minute
+  
+  // Setup theme change listeners
+  $('#lightModeBtn').click(() => setThemeMode('light'));
+  $('#darkModeBtn').click(() => setThemeMode('dark'));
+  $('#systemModeBtn').click(() => setThemeMode('system'));
+  
+  // Setup navigation
+  $('#nav-timeline').click(() => showView('timeline'));
+  $('#nav-settings').click(() => showView('settings'));
+  $('#nav-about').click(() => showView('about'));
+  
+  // Setup view buttons
+  $('#viewDay').click(() => { view = 'day'; renderView(); });
+  $('#viewWeek').click(() => { view = 'week'; renderView(); });
+  $('#viewMonth').click(() => { view = 'month'; renderView(); });
+  
+  // Setup date navigation
+  $('#prevDay').click(() => { date.setDate(date.getDate() - 1); renderView(); });
+  $('#nextDay').click(() => { date.setDate(date.getDate() + 1); renderView(); });
+  $('#todayBtn').click(() => { date = new Date(); date.setHours(0, 0, 0, 0); renderView(); });
+  
+  // Setup tracking toggle
+  $('#toggleTracking').click(() => {
+    if (track) {
+      stopTracking();
+    } else {
+      startTracking();
+    }
+  });
+  
+  // Setup settings save
+  $('#saveSettingsBtn').click(() => {
+    usrSet.timelineIncrements = parseInt($('#timelineIncrements').val());
+    usrSet.useEmojis = $('#useEmojisCheck').is(':checked');
+    usrSet.colorCodedEvents = $('#colorCodedEventsCheck').is(':checked');
+    usrSet.enableGrouping = $('#enableGroupingCheck').is(':checked');
+    usrSet.prioritizeWindowId = $('#prioritizeWindowIdCheck').is(':checked');
+    usrSet.showIcons = $('#showIconsCheck').is(':checked');
+    usrSet.defaultView = $('#defaultViewSelect').val();
+    usrSet.groupingThreshold = parseInt($('#groupingThreshold').val());
+    saveSet();
+    applySet();
+    
+    // Show success message
+    const successAlert = $(`
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fi fi-rr-check me-2"></i>Settings saved successfully!
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `);
+    $('#settings-view .card-body').first().prepend(successAlert);
+    
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+      successAlert.alert('close');
+    }, 3000);
+  });
 });
+
+/**
+ * Show different views (timeline, settings, about)
+ */
+function showView(viewName) {
+    // Hide all views
+    $('#timeline-view, #settings-view, #about-view').addClass('d-none');
+    
+    // Show selected view
+    $(`#${viewName}-view`).removeClass('d-none');
+    
+    // Update navigation
+    $('.nav-link').removeClass('active');
+    $(`#nav-${viewName}`).addClass('active');
+    
+    // Render view if timeline
+    if (viewName === 'timeline') {
+        renderView();
+    }
+}
+
+/**
+ * Start tracking user activity
+ */
+function startTracking() {
+    track = true;
+    $('#toggleTracking')
+        .removeClass('btn-primary')
+        .addClass('btn-danger btn-tracking-active')
+        .html('<i class="fi fi-rr-pause me-2"></i><span class="tracking-text">Stop Tracking</span>');
+    
+    // Show success message
+    const successAlert = $(`
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fi fi-rr-check me-2"></i>Activity tracking started!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `);
+    $('#timeline-view .card-body').first().prepend(successAlert);
+    
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+        successAlert.alert('close');
+    }, 3000);
+}
+
+/**
+ * Stop tracking user activity
+ */
+function stopTracking() {
+    track = false;
+    $('#toggleTracking')
+        .removeClass('btn-danger btn-tracking-active')
+        .addClass('btn-primary')
+        .html('<i class="fi fi-rr-play me-2"></i><span class="tracking-text">Start Tracking</span>');
+    
+    // Save current segment if exists
+    if (curSeg) {
+        curSeg.end = Date.now();
+        evs.push({ ...curSeg });
+        saveSegCSV();
+        curSeg = null;
+    }
+    
+    // Show success message
+    const successAlert = $(`
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fi fi-rr-check me-2"></i>Activity tracking stopped!
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `);
+    $('#timeline-view .card-body').first().prepend(successAlert);
+    
+    // Auto-dismiss after 3 seconds
+    setTimeout(() => {
+        successAlert.alert('close');
+    }, 3000);
+    
+    // Refresh view
+    renderView();
+}

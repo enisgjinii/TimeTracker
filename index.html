@@ -2083,6 +2083,267 @@
                 justify-content: center;
             }
         }
+
+        .profile-avatar-container {
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: var(--muted-foreground);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--foreground);
+            margin-bottom: 1rem;
+        }
+
+        .change-avatar-btn {
+            background-color: var(--primary);
+            color: var(--primary-foreground);
+            border: none;
+            border-radius: var(--radius);
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .change-avatar-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .user-info {
+            font-size: 0.875rem;
+            color: var(--foreground);
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+            margin-top: 0.25rem;
+        }
+
+        .user-timezone, .user-language {
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+            margin-top: 0.25rem;
+        }
+
+        .work-preferences {
+            margin-top: 1rem;
+        }
+
+        .work-start-time, .work-end-time {
+            margin-bottom: 0.5rem;
+        }
+
+        .work-days-checkboxes {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .work-days-checkboxes .form-check {
+            display: flex;
+            align-items: center;
+        }
+
+        .work-days-checkboxes .form-check input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+
+        .lunch-break-duration {
+            margin-bottom: 0.5rem;
+        }
+
+        .productivity-goals {
+            margin-top: 1rem;
+        }
+
+        .daily-work-goal, .weekly-work-goal {
+            margin-bottom: 0.5rem;
+        }
+
+        .focus-goal, .break-goal {
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-preferences {
+            margin-top: 1rem;
+        }
+
+        .email-notifications, .desktop-notifications, .sound-notifications, .break-reminders, .goal-alerts, .weekly-reports {
+            margin-bottom: 0.5rem;
+        }
+
+        .privacy-settings {
+            margin-top: 1rem;
+        }
+
+        .data-collection, .crash-reports, .usage-analytics, .feature-updates {
+            margin-bottom: 0.5rem;
+        }
+
+        .account-actions {
+            margin-top: 1rem;
+        }
+
+        .save-profile-btn, .export-profile-btn, .reset-profile-btn, .delete-account-btn {
+            margin-right: 0.5rem;
+        }
+
+        /* Profile Section Styles */
+        .profile-avatar-container {
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--primary-foreground);
+            margin: 0 auto 1rem;
+            border: 3px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            border-color: var(--primary);
+        }
+
+        .work-days-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .work-days-checkboxes .form-check {
+            margin: 0;
+            min-width: 60px;
+        }
+
+        .work-days-checkboxes .form-check-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .settings-description {
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+            margin-top: 0.25rem;
+        }
+
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--foreground);
+        }
+
+        .info-value {
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: var(--radius);
+            background-color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-item i {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            background-color: var(--accent);
+            transition: transform 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: var(--radius);
+            background-color: var(--accent);
+        }
+
+        .tech-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .privacy-info, .support-info {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .privacy-item, .support-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .support-links {
+            margin-top: 1rem;
+        }
+
+        .support-links .btn {
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
     </style>
 </head>
 
@@ -2185,11 +2446,42 @@
         <div class="user-menu-section mt-auto mb-3">
             <div class="user-menu">
                 <button class="user-menu-button" id="user-menu-button">
-                    <i class="fi fi-rr-user"></i>
-                    <span class="user-info">Guest</span>
+                    <div class="user-avatar me-2" style="width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); display: flex; align-items: center; justify-content: center; color: var(--primary-foreground); font-size: 0.75rem;">
+                        <i class="fi fi-rr-user"></i>
+                    </div>
+                    <span class="user-display-name">Guest</span>
                     <i class="fi fi-rr-angle-small-down"></i>
                 </button>
                 <div class="user-menu-dropdown" id="user-menu-dropdown">
+                    <div class="user-menu-header p-3 border-bottom" style="border-color: var(--border);">
+                        <div class="d-flex align-items-center">
+                            <div class="user-avatar me-3" style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-hover)); display: flex; align-items: center; justify-content: center; color: var(--primary-foreground); font-size: 1.5rem;">
+                                <i class="fi fi-rr-user"></i>
+                            </div>
+                            <div>
+                                <div class="user-display-name fw-bold">Guest</div>
+                                <div class="user-email text-muted small">guest@example.com</div>
+                                <div class="work-hours-indicator mt-1">
+                                    <span class="badge bg-secondary small">
+                                        <i class="fi fi-rr-clock me-1"></i>
+                                        Outside Work Hours
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 border-bottom" style="border-color: var(--border);">
+                        <div class="row text-center">
+                            <div class="col-6">
+                                <div class="small text-muted">Daily Goal</div>
+                                <div class="daily-work-goal fw-bold">0h</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="small text-muted">Weekly Goal</div>
+                                <div class="weekly-work-goal fw-bold">0h</div>
+                            </div>
+                        </div>
+                    </div>
                     <a href="#" class="user-menu-item" id="user-profile-link">
                         <i class="fi fi-rr-user"></i>
                         My Profile
@@ -2837,6 +3129,8 @@
     <script type="module" src="js/payment-service.js"></script>
     <script type="module" src="js/payment-ui.js"></script>
     <script type="module" src="js/payment-init.js"></script>
+    
+
     
     <script src="renderer.js"></script>
 </body>
