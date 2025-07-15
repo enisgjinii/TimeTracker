@@ -27,4 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
 // Also initialize when window loads
 window.addEventListener('load', () => {
     console.log('🚀 PaymentInit: Window loaded, payment system ready');
+});
+
+// Initialize payment system when pricing modal is opened
+document.addEventListener('DOMContentLoaded', () => {
+    const pricingModal = document.getElementById('pricingModal');
+    if (pricingModal) {
+        pricingModal.addEventListener('show.bs.modal', () => {
+            console.log('🚀 PaymentInit: Pricing modal opened, initializing payment system...');
+            paymentUI.initializeForModal();
+        });
+    }
 }); 

@@ -19,7 +19,8 @@ function createWindow() {
     import('get-windows').then(module => {
         getWindows = module;
         
-        setInterval(async () => {
+        // Handle requests for active window data
+        ipcMain.on('request-active-window', async () => {
             try {
                 if (!mainWindow || mainWindow.isDestroyed() || !getWindows) return;
                 
@@ -37,10 +38,10 @@ function createWindow() {
                 }
             } catch (error) {
                 if (mainWindow && !mainWindow.isDestroyed()) {
-                    // mainWindow.webContents.send('error', `Error fetching active window: ${error.toString()}`);
+                    console.error('Error fetching active window:', error);
                 }
             }
-        }, 1000);
+        });
 
     }).catch(err => {
         console.error("Failed to load get-windows", err);

@@ -188,6 +188,13 @@ class PaymentUI {
             }
         ];
         console.log('🔧 PaymentUI: Default plans loaded:', this.plans.length);
+        
+        // Show static plans as fallback when dynamic loading fails
+        const staticPlansContainer = document.getElementById('static-plans');
+        if (staticPlansContainer) {
+            staticPlansContainer.classList.add('show-fallback');
+        }
+        
         this.renderSubscriptionPlans();
     }
 
@@ -216,13 +223,24 @@ class PaymentUI {
     renderSubscriptionPlans() {
         console.log('🔧 PaymentUI: Rendering subscription plans...');
         const plansContainer = document.getElementById('subscription-plans');
+        const staticPlansContainer = document.getElementById('static-plans');
+        
         if (!plansContainer) {
             console.error('🔧 PaymentUI: subscription-plans container not found!');
+            // Show static plans as fallback
+            if (staticPlansContainer) {
+                staticPlansContainer.classList.add('show-fallback');
+            }
             return;
         }
 
         console.log('🔧 PaymentUI: Found plans container, rendering...');
         plansContainer.innerHTML = this.plans.map(plan => this.createPlanCard(plan)).join('');
+        
+        // Hide static plans since we have dynamic plans
+        if (staticPlansContainer) {
+            staticPlansContainer.classList.remove('show-fallback');
+        }
         
         // Add event listeners to upgrade buttons and set initial state
         this.setPlanButtonsState(paymentService.state === 'initialized');
@@ -600,6 +618,28 @@ class PaymentUI {
             this.renderSubscriptionPlans();
         } else {
             this.loadSubscriptionPlans();
+        }
+    }
+    
+    /**
+     * Initialize payment system when pricing modal is opened
+     */
+    initializeForModal() {
+        console.log('🔧 PaymentUI: Initializing for pricing modal...');
+        
+        // Ensure payment service is initialized
+        this.initializePaymentService();
+        
+        // Load and render subscription plans
+        if (this.plans.length === 0) {
+            this.loadSubscriptionPlans();
+        } else {
+            this.renderSubscriptionPlans();
+        }
+        
+        // Check subscription status if user is logged in
+        if (this.currentUser) {
+            this.checkSubscriptionStatus();
         }
     }
 }

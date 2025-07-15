@@ -1,7 +1,7 @@
 // Firebase configuration and initialization
-const { initializeApp } = require('firebase/app');
-const { getAuth } = require('firebase/auth');
-const { getFirestore } = require('firebase/firestore');
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Your Firebase configuration
 const firebaseConfig = {
@@ -22,4 +22,4 @@ const auth = getAuth(app);
 // Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
-module.exports = { auth, db, app }; 
+export { auth, db, app }; 

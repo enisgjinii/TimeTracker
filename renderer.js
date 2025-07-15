@@ -46,7 +46,7 @@ function formatDuration(seconds) {
 const initializeProfileSystem = async () => {
     try {
         // Initialize profile system
-        await profileInit.initialize();
+        await profileInit.initializeProfileSystem();
         profileSystemInitialized = true;
         console.log('Profile system initialized successfully');
         
@@ -173,6 +173,171 @@ const setupProfileEventListeners = () => {
         // This should be handled by the auth service
         console.log('Logout requested');
         $('#user-menu-dropdown').removeClass('show');
+    });
+};
+
+/**
+ * Setup pricing modal functionality
+ */
+const setupPricingModal = () => {
+    // Upgrade button in sidebar
+    $('#upgrade-btn').on('click', function() {
+        $('#pricingModal').modal('show');
+    });
+    
+    // Upgrade to Pro button
+    $('#upgrade-pro-btn').on('click', function() {
+        // Use the payment UI system if available
+        if (window.paymentUI) {
+            const proPlan = window.paymentUI.plans.find(p => p.id === 'pro');
+            if (proPlan) {
+                window.paymentUI.handleUpgrade(proPlan);
+            } else {
+                handleUpgrade('pro'); // Fallback
+            }
+        } else {
+            handleUpgrade('pro'); // Fallback
+        }
+    });
+    
+    // Upgrade to Business button
+    $('#upgrade-business-btn').on('click', function() {
+        // Use the payment UI system if available
+        if (window.paymentUI) {
+            const businessPlan = window.paymentUI.plans.find(p => p.id === 'business');
+            if (businessPlan) {
+                window.paymentUI.handleUpgrade(businessPlan);
+            } else {
+                handleUpgrade('business'); // Fallback
+            }
+        } else {
+            handleUpgrade('business'); // Fallback
+        }
+    });
+    
+    // Contact sales button
+    $('#contact-sales-btn').on('click', function() {
+        handleContactSales();
+    });
+    
+    // Update current plan display
+    updateCurrentPlanDisplay();
+};
+
+/**
+ * Handle plan upgrade
+ */
+const handleUpgrade = (plan) => {
+    console.log(`Upgrading to ${plan} plan...`);
+    
+    // Show loading state
+    $(`#upgrade-${plan}-btn`).prop('disabled', true).html('<i class="fi fi-rr-spinner fa-spin me-2"></i>Processing...');
+    
+    // Simulate upgrade process
+    setTimeout(() => {
+        // Update plan in UI
+        updateCurrentPlanDisplay(plan);
+        
+        // Show success message
+        showNotification(`Successfully upgraded to ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan!`, 'success');
+        
+        // Reset button
+        $(`#upgrade-${plan}-btn`).prop('disabled', false).html(`<i class="fi fi-rr-crown me-2"></i>Upgrade to ${plan.charAt(0).toUpperCase() + plan.slice(1)}`);
+        
+        // Close modal
+        $('#pricingModal').modal('hide');
+        
+    }, 2000);
+};
+
+/**
+ * Handle contact sales
+ */
+const handleContactSales = () => {
+    showNotification('Contact sales feature coming soon!', 'info');
+};
+
+/**
+ * Update current plan display
+ */
+const updateCurrentPlanDisplay = (plan = 'free') => {
+    const planNames = {
+        'free': 'Free Plan',
+        'pro': 'Pro Plan',
+        'business': 'Business Plan'
+    };
+    
+    const planLimits = {
+        'free': '10h',
+        'pro': 'Unlimited',
+        'business': 'Unlimited'
+    };
+    
+    // Update sidebar
+    $('#current-plan').text(planNames[plan]);
+    
+    // Update modal
+    $('#current-plan-badge').text(planNames[plan]);
+    $('#current-usage').text(`0h / ${planLimits[plan]}`);
+    
+    // Update usage bar
+    const usagePercentage = plan === 'free' ? 25 : 0;
+    $('#usage-fill').css('width', `${usagePercentage}%`);
+};
+
+/**
+ * Show notification
+ */
+const showNotification = (message, type = 'info') => {
+    const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+    const icon = type === 'success' ? 'fi-rr-check' : type === 'error' ? 'fi-rr-cross' : 'fi-rr-info';
+    
+    const notification = $(`
+        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+            <i class="fi ${icon} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `);
+    
+    // Add to page
+    $('body').append(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        notification.alert('close');
+    }, 5000);
+};
+
+/**
+ * Setup compact settings functionality
+ */
+const setupCompactSettings = () => {
+    // Theme mode buttons
+    $('.btn-compact').on('click', function() {
+        const $btn = $(this);
+        const $group = $btn.closest('.btn-group-compact');
+        
+        // Remove active class from all buttons in group
+        $group.find('.btn-compact').removeClass('active');
+        
+        // Add active class to clicked button
+        $btn.addClass('active');
+        
+        // Handle specific button actions
+        if ($btn.attr('id') === 'lightModeBtn') {
+            setThemeMode('light');
+        } else if ($btn.attr('id') === 'darkModeBtn') {
+            setThemeMode('dark');
+        } else if ($btn.attr('id') === 'systemModeBtn') {
+            setThemeMode('system');
+        }
+    });
+    
+    // Save settings button
+    $('#saveSettingsBtn').on('click', function() {
+        saveSet();
+        showNotification('Settings saved successfully!', 'success');
     });
 };
 
@@ -1347,17 +1512,28 @@ const renderMonthView = async () => {
   return monthEvents;
 };
 
+// Debounce mechanism for renderView
+let renderViewTimeout = null;
+
 const renderView = async () => {
-  console.log('renderView called, view:', view, 'date:', date);
-  loadSegCSV();
-  $dateLabel.text(date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
-  if (view === "day") {
-    await renderDayView();
-  } else if (view === "week") {
-    await renderWeekView();
-  } else if (view === "month") {
-    await renderMonthView();
+  // Clear existing timeout
+  if (renderViewTimeout) {
+    clearTimeout(renderViewTimeout);
   }
+  
+  // Debounce render calls to prevent excessive updates
+  renderViewTimeout = setTimeout(async () => {
+    console.log('renderView called, view:', view, 'date:', date);
+    loadSegCSV();
+    $dateLabel.text(date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+    if (view === "day") {
+      await renderDayView();
+    } else if (view === "week") {
+      await renderWeekView();
+    } else if (view === "month") {
+      await renderMonthView();
+    }
+  }, 100); // 100ms debounce
 };
 
 function showSegDetails(details) {
@@ -1641,8 +1817,38 @@ function updateQuickStats(todayEvents) {
     }
   }
   
+  // Calculate focus and break time
+  const focusEvents = todayEvents.filter(ev => 
+    ev.category === 'Focus' || 
+    ev.category === 'Work' || 
+    ev.details?.isFocus || 
+    ev.details?.productivityScore > 0.7
+  );
+  const breakEvents = todayEvents.filter(ev => 
+    ev.category === 'Break' || 
+    ev.category === 'Idle' || 
+    ev.details?.isIdle
+  );
+  
+  const focusMinutes = focusEvents.reduce((total, ev) => {
+    return total + Math.round((ev.end - ev.start) / (1000 * 60));
+  }, 0);
+  const breakMinutes = breakEvents.reduce((total, ev) => {
+    return total + Math.round((ev.end - ev.start) / (1000 * 60));
+  }, 0);
+  
+  const focusHours = Math.round(focusMinutes / 60 * 10) / 10;
+  const breakHours = Math.round(breakMinutes / 60 * 10) / 10;
+  
   $('#today-hours').text(totalHours + 'h');
   $('#today-sessions').text(sessionCount);
+  $('#today-focus').text(focusHours + 'h');
+  $('#today-breaks').text(breakHours + 'h');
+  
+  // Update usage text and progress bar
+  const usagePercent = Math.min((totalHours / 10) * 100, 100);
+  $('#usage-text').text(`${totalHours}h / 10h`);
+  $('#usage-fill').css('width', `${usagePercent}%`);
 }
 
 // Group similar window activities - prioritize Window ID grouping
@@ -1905,6 +2111,10 @@ $(document).ready(() => {
   // Initialize profile system
   initializeProfileSystem();
   
+  // Initialize pricing modal and compact settings
+  setupPricingModal();
+  setupCompactSettings();
+  
   // Load settings and apply them
   loadSet();
   applySet();
@@ -1921,6 +2131,34 @@ $(document).ready(() => {
     updateCurrentTimeIndicator();
     updateWorkHoursIndicator(); // Update work hours indicator
   }, 60000); // Update every minute
+  
+  // Setup activity tracking
+  setupActivityTracking();
+  
+  // Setup periodic segment saving and UI updates
+  setInterval(() => {
+    if (track && curSeg) {
+      // Update current segment end time
+      curSeg.end = new Date();
+      
+      // Save to CSV periodically
+      saveSegCSV();
+      
+      // Update quick stats without triggering full render
+      const todayEvents = evs.filter(ev => {
+        const evDate = new Date(ev.start);
+        return evDate.toDateString() === date.toDateString();
+      });
+      updateQuickStats(todayEvents);
+    }
+  }, 30000); // Update every 30 seconds
+  
+  // Update tracking status every second when tracking
+  setInterval(() => {
+    if (track) {
+      updateTrackingStatus();
+    }
+  }, 1000);
   
   // Setup theme change listeners
   $('#lightModeBtn').click(() => setThemeMode('light'));
@@ -1949,6 +2187,48 @@ $(document).ready(() => {
     } else {
       startTracking();
     }
+  });
+  
+  // Setup new sidebar buttons
+  $('#refresh-stats').click(() => {
+    updateQuickStats([]);
+    showNotification('Stats refreshed', 'info');
+  });
+  
+  $('#quick-break').click(() => {
+    if (track) {
+      // Add a break entry
+      const breakEntry = {
+        start: new Date(),
+        end: new Date(Date.now() + 5 * 60 * 1000), // 5 minute break
+        app: 'Break',
+        title: 'Quick Break',
+        category: 'Break'
+      };
+      evs.push(breakEntry);
+      saveSegCSV();
+      showNotification('Break logged', 'success');
+      renderView();
+    } else {
+      showNotification('Start tracking first', 'warning');
+    }
+  });
+  
+  $('#focus-mode').click(() => {
+    if (track) {
+      // Switch to focus mode
+      if (curSeg) {
+        curSeg.category = 'Focus';
+        curSeg.title = 'Focus Session';
+      }
+      showNotification('Focus mode activated', 'success');
+    } else {
+      showNotification('Start tracking first', 'warning');
+    }
+  });
+  
+  $('#manual-entry').click(() => {
+    $('#manualEntryModal').modal('show');
   });
   
   // Setup settings save
@@ -2005,15 +2285,32 @@ function showView(viewName) {
  */
 function startTracking() {
     track = true;
-    $('#toggleTracking')
-        .removeClass('btn-primary')
-        .addClass('btn-danger btn-tracking-active')
-        .html('<i class="fi fi-rr-pause me-2"></i><span class="tracking-text">Stop Tracking</span>');
+    curSeg = {
+        start: new Date(),
+        end: null,
+        app: 'Active Session',
+        title: 'Active Session',
+        category: 'Work',
+        details: {
+            isManual: false,
+            isFocus: false,
+            productivityScore: 1
+        }
+    };
+    
+    const trackingBtn = $('#toggleTracking');
+    trackingBtn.removeClass('btn-primary').addClass('btn-danger');
+    trackingBtn.find('.tracking-text').text('Stop Tracking');
+    trackingBtn.find('.tracking-icon').removeClass('fi-rr-play').addClass('fi-rr-stop');
+    trackingBtn.find('.tracking-pulse').show();
+    
+    // Add pulse animation
+    trackingBtn.addClass('pulse-animation');
     
     // Show success message
     const successAlert = $(`
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fi fi-rr-check me-2"></i>Activity tracking started!
+            <i class="fi fi-rr-check me-2"></i>Activity tracking started! Monitoring your activity...
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     `);
@@ -2023,6 +2320,292 @@ function startTracking() {
     setTimeout(() => {
         successAlert.alert('close');
     }, 3000);
+    
+    // Update sidebar stats and start periodic updates
+    updateQuickStats([]);
+    updateTrackingStatus();
+    
+    // Start fallback tracking if window monitoring isn't working
+    startFallbackTracking();
+}
+
+/**
+ * Fallback tracking system that works without window monitoring
+ */
+function startFallbackTracking() {
+    let lastActivity = Date.now();
+    let isIdle = false;
+    
+    // Track user activity events
+    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    activityEvents.forEach(event => {
+        document.addEventListener(event, () => {
+            if (!track) return;
+            
+            const now = Date.now();
+            lastActivity = now;
+            
+            // If user was idle, start new active session
+            if (isIdle) {
+                isIdle = false;
+                
+                // End idle session
+                if (curSeg && curSeg.category === 'Idle') {
+                    curSeg.end = new Date();
+                    evs.push({ ...curSeg });
+                }
+                
+                // Start new active session
+                curSeg = {
+                    start: new Date(),
+                    end: null,
+                    app: 'Active Session',
+                    title: 'Active Session',
+                    category: 'Work',
+                    details: {
+                        isManual: false,
+                        isFocus: false,
+                        productivityScore: 1
+                    }
+                };
+            }
+        });
+    });
+    
+    // Check for idle status every 30 seconds
+    setInterval(() => {
+        if (!track) return;
+        
+        const now = Date.now();
+        const timeSinceActivity = now - lastActivity;
+        const idleThreshold = 5 * 60 * 1000; // 5 minutes
+        
+        if (timeSinceActivity > idleThreshold && !isIdle) {
+            isIdle = true;
+            
+            // End current session
+            if (curSeg && curSeg.category !== 'Idle') {
+                curSeg.end = new Date();
+                evs.push({ ...curSeg });
+            }
+            
+            // Start idle session
+            curSeg = {
+                start: new Date(),
+                end: null,
+                app: 'Idle',
+                title: 'Idle Period',
+                category: 'Idle',
+                details: {
+                    isIdle: true,
+                    isManual: false,
+                    isFocus: false,
+                    productivityScore: 0
+                }
+            };
+        }
+    }, 30000);
+}
+
+/**
+ * Update tracking status display
+ */
+function updateTrackingStatus() {
+    if (!track) return;
+    
+    const now = new Date();
+    const duration = curSeg ? Math.floor((now - curSeg.start) / 1000) : 0;
+    const hours = Math.floor(duration / 3600);
+    const minutes = Math.floor((duration % 3600) / 60);
+    const seconds = duration % 60;
+    
+    const timeString = hours > 0 
+        ? `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+        : `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Update tracking button text with duration
+    $('#toggleTracking .tracking-text').text(`Stop Tracking (${timeString})`);
+    
+    // Update current activity display if exists
+    if (curSeg) {
+        $('#current-activity').text(curSeg.title || 'Active Session');
+    }
+}
+
+/**
+ * Setup activity tracking system
+ */
+function setupActivityTracking() {
+    let lastActivity = Date.now();
+    let idleThreshold = 5 * 60 * 1000; // 5 minutes
+    let isIdle = false;
+    let lastWindowData = null;
+    
+    // Track user activity
+    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    activityEvents.forEach(event => {
+        document.addEventListener(event, () => {
+            lastActivity = Date.now();
+            if (isIdle) {
+                isIdle = false;
+                handleUserActive();
+            }
+        });
+    });
+    
+    // Request window activity data from main process
+    function requestWindowData() {
+        if (track && window.require) {
+            const { ipcRenderer } = require('electron');
+            ipcRenderer.send('request-active-window');
+        }
+    }
+    
+    // Listen for window data from main process
+    if (window.require) {
+        const { ipcRenderer } = require('electron');
+        ipcRenderer.on('active-window-data', (event, data) => {
+            if (!track) return;
+            
+            const now = Date.now();
+            const timeSinceActivity = now - lastActivity;
+            
+            // Check if user is idle
+            if (timeSinceActivity > idleThreshold) {
+                if (!isIdle) {
+                    isIdle = true;
+                    handleUserIdle();
+                }
+                return;
+            }
+            
+            // User is active, process window data
+            if (isIdle) {
+                isIdle = false;
+                handleUserActive();
+            }
+            
+            // Update current segment with window data
+            if (curSeg) {
+                // Check if window changed
+                if (lastWindowData && lastWindowData.title !== data.title) {
+                    // End current segment
+                    curSeg.end = new Date();
+                    evs.push({ ...curSeg });
+                    
+                    // Start new segment
+                    curSeg = {
+                        start: new Date(),
+                        end: null,
+                        app: data.owner?.name || 'Unknown',
+                        title: data.title || 'Unknown Window',
+                        category: getAppCategory(data.owner?.name || data.title),
+                        details: {
+                            owner: data.owner,
+                            bounds: data.bounds,
+                            id: data.id,
+                            url: data.url,
+                            memoryUsage: data.memoryUsage,
+                            isFocus: false,
+                            productivityScore: 0
+                        }
+                    };
+                } else {
+                    // Update current segment
+                    curSeg.end = new Date();
+                    curSeg.app = data.owner?.name || 'Unknown';
+                    curSeg.title = data.title || 'Unknown Window';
+                    curSeg.category = getAppCategory(data.owner?.name || data.title);
+                    curSeg.details = {
+                        owner: data.owner,
+                        bounds: data.bounds,
+                        id: data.id,
+                        url: data.url,
+                        memoryUsage: data.memoryUsage,
+                        isFocus: false,
+                        productivityScore: getProductivityScore(curSeg)
+                    };
+                }
+                
+                lastWindowData = data;
+            }
+        });
+    }
+    
+    // Request window data periodically when tracking
+    setInterval(() => {
+        if (track) {
+            requestWindowData();
+        }
+    }, 10000); // Every 10 seconds
+    
+    // Check for idle status every 30 seconds
+    setInterval(() => {
+        const now = Date.now();
+        const timeSinceActivity = now - lastActivity;
+        
+        if (timeSinceActivity > idleThreshold && !isIdle && track) {
+            isIdle = true;
+            handleUserIdle();
+        }
+    }, 30000);
+    
+    // Handle user becoming active
+    function handleUserActive() {
+        if (track && curSeg) {
+            // End idle period and start new active session
+            if (curSeg.category === 'Idle') {
+                curSeg.end = new Date();
+                evs.push({ ...curSeg });
+                
+                // Start new active session
+                curSeg = {
+                    start: new Date(),
+                    end: null,
+                    app: 'Active Session',
+                    title: 'Active Session',
+                    category: 'Work'
+                };
+            }
+        }
+    }
+    
+    // Handle user becoming idle
+    function handleUserIdle() {
+        if (track && curSeg && curSeg.category !== 'Idle') {
+            // End current session and start idle period
+            curSeg.end = new Date();
+            evs.push({ ...curSeg });
+            
+            // Start idle session
+            curSeg = {
+                start: new Date(),
+                end: null,
+                app: 'Idle',
+                title: 'Idle Period',
+                category: 'Idle'
+            };
+        }
+    }
+    
+    // Helper function to categorize applications
+    function getAppCategory(appName) {
+        if (!appName) return 'Unknown';
+        
+        const workApps = ['chrome', 'firefox', 'safari', 'edge', 'code', 'visual studio', 'intellij', 'webstorm', 'sublime', 'atom', 'notepad++', 'excel', 'word', 'powerpoint', 'outlook', 'teams', 'slack', 'discord', 'zoom', 'skype'];
+        const socialApps = ['facebook', 'instagram', 'twitter', 'tiktok', 'youtube', 'netflix', 'spotify', 'twitch', 'reddit'];
+        const productivityApps = ['notion', 'trello', 'asana', 'jira', 'confluence', 'figma', 'adobe', 'photoshop', 'illustrator'];
+        
+        const lowerAppName = appName.toLowerCase();
+        
+        if (workApps.some(app => lowerAppName.includes(app))) return 'Work';
+        if (socialApps.some(app => lowerAppName.includes(app))) return 'Social';
+        if (productivityApps.some(app => lowerAppName.includes(app))) return 'Productivity';
+        
+        return 'Other';
+    }
 }
 
 /**
@@ -2030,14 +2613,17 @@ function startTracking() {
  */
 function stopTracking() {
     track = false;
-    $('#toggleTracking')
-        .removeClass('btn-danger btn-tracking-active')
-        .addClass('btn-primary')
-        .html('<i class="fi fi-rr-play me-2"></i><span class="tracking-text">Start Tracking</span>');
+    
+    const trackingBtn = $('#toggleTracking');
+    trackingBtn.removeClass('btn-danger').addClass('btn-primary');
+    trackingBtn.find('.tracking-text').text('Start Tracking');
+    trackingBtn.find('.tracking-icon').removeClass('fi-rr-stop').addClass('fi-rr-play');
+    trackingBtn.find('.tracking-pulse').hide();
+    trackingBtn.removeClass('pulse-animation');
     
     // Save current segment if exists
     if (curSeg) {
-        curSeg.end = Date.now();
+        curSeg.end = new Date();
         evs.push({ ...curSeg });
         saveSegCSV();
         curSeg = null;
@@ -2057,6 +2643,7 @@ function stopTracking() {
         successAlert.alert('close');
     }, 3000);
     
-    // Refresh view
+    // Refresh view and update stats
     renderView();
+    updateQuickStats([]);
 }
