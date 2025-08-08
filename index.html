@@ -11,7 +11,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <link rel="stylesheet" href="components/enhanced-styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
     <style>
         :root {
             --background: hsl(0 0% 100%);
@@ -3892,10 +3894,11 @@
     <script type="module" src="js/payment-service.js"></script>
     <script type="module" src="js/payment-ui.js"></script>
     <script type="module" src="js/payment-init.js"></script>
-    
-
-    
+    <script src="components/shadcn-components.js" defer></script>
+    <script src="components/enhanced-dashboard.js" defer></script>
+    <!-- Load renderer before enhanced-features to allow augmentation; include only once -->
     <script src="renderer.js"></script>
+    <script src="components/enhanced-features.js" defer></script>
 </body>
 
 </html>

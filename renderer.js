@@ -785,61 +785,7 @@ function setThemeMode(mode) {
   applySet();
 }
 
-$('#nav-timeline').click(() => {
-    $('#timeline-view').removeClass('d-none');
-    $('#settings-view').addClass('d-none');
-    $('#about-view').addClass('d-none');
-    $('.nav-link').removeClass('active');
-    $('#nav-timeline').addClass('active');
-});
-
-$('#nav-settings').click(() => {
-    $('#timeline-view').addClass('d-none');
-    $('#settings-view').removeClass('d-none');
-    $('#about-view').addClass('d-none');
-    $('.nav-link').removeClass('active');
-    $('#nav-settings').addClass('active');
-    
-    // Populate category select for app classifications
-    $('#newCategorySelect').empty();
-    $('#newCategorySelect').append('<option value="">Select category...</option>');
-    usrSet.categories.forEach(cat => {
-        $('#newCategorySelect').append(`<option value="${cat}">${cat}</option>`);
-    });
-});
-
-$('#nav-about').click(() => {
-    $('#timeline-view').addClass('d-none');
-    $('#settings-view').addClass('d-none');
-    $('#about-view').removeClass('d-none');
-    $('.nav-link').removeClass('active');
-    $('#nav-about').addClass('active');
-});
-
-$('#toggleTracking').click(() => {
-  track = !track;
-  const $button = $('#toggleTracking');
-  const $icon = $button.find('i');
-  const $text = $button.find('.tracking-text');
-  
-  if (track) {
-    $button.removeClass('btn-primary').addClass('btn-danger');
-    $icon.removeClass('fi-rr-play').addClass('fi-rr-pause');
-    $text.text('Stop Tracking');
-  } else {
-    $button.removeClass('btn-danger').addClass('btn-primary');
-    $icon.removeClass('fi-rr-pause').addClass('fi-rr-play');
-    $text.text('Start Tracking');
-    
-    // When stopping tracking, save current segment if exists
-    if (curSeg) {
-      evs.push(curSeg);
-      saveSegCSV();
-      curSeg = null;
-    }
-    renderView();
-  }
-});
+// Navigation and tracking click handlers are centralized later to avoid duplicates
 
 $('#prevDay').click(() => { 
   if (view === "day") {
@@ -1686,44 +1632,7 @@ function isFocusSession(ev) {
   return (ev.end - ev.start) >= FOCUS_THRESHOLD && getProductivityScore(ev) === 2;
 }
 
-// Patch the ipcRenderer event handler for advanced logic
-ipcRenderer.on('active-window-data', (e, data) => {
-  if (!track) return;
-  const now = Date.now();
-  if (isIdle(now)) {
-    // Insert idle segment if user was idle
-    if (curSeg) {
-      curSeg.end = lastActivityTime;
-      evs.push({ ...curSeg });
-      evs.push({
-        title: 'Idle',
-        start: lastActivityTime,
-        end: now,
-        details: { isIdle: true, owner: { name: 'Idle' }, category: 'Idle' }
-      });
-      saveSegCSV();
-      curSeg = null;
-    }
-  }
-  lastActivityTime = now;
-  if (!curSeg) {
-    curSeg = { title: data.title, start: now, end: now, details: data };
-  } else if (curSeg.title === data.title) {
-    curSeg.end = now;
-  } else {
-    // Mark focus session if applicable
-    if (isFocusSession(curSeg)) curSeg.details.isFocus = true;
-    curSeg.details.productivityScore = getProductivityScore(curSeg);
-    evs.push(curSeg);
-    saveSegCSV();
-    curSeg = { title: data.title, start: now, end: now, details: data };
-  }
-  if (Date.now() - lastSegUpdate > 5000) {
-    renderView();
-    updateProductivityWidget();
-    lastSegUpdate = Date.now();
-  }
-});
+// Active window data handling is centralized in setupActivityTracking()
 
 // Add analytics function for trends
 function getDailyProductivitySummary(dayEvents) {
@@ -2165,29 +2074,23 @@ $(document).ready(() => {
   $('#darkModeBtn').click(() => setThemeMode('dark'));
   $('#systemModeBtn').click(() => setThemeMode('system'));
   
-  // Setup navigation
-  $('#nav-timeline').click(() => showView('timeline'));
-  $('#nav-settings').click(() => showView('settings'));
-  $('#nav-about').click(() => showView('about'));
+  // Setup navigation (dedupe handlers)
+  $('#nav-timeline').off('click').on('click', (e) => { e.preventDefault(); showView('timeline'); });
+  $('#nav-settings').off('click').on('click', (e) => { e.preventDefault(); showView('settings'); });
+  $('#nav-about').off('click').on('click', (e) => { e.preventDefault(); showView('about'); });
   
   // Setup view buttons
-  $('#viewDay').click(() => { view = 'day'; renderView(); });
-  $('#viewWeek').click(() => { view = 'week'; renderView(); });
-  $('#viewMonth').click(() => { view = 'month'; renderView(); });
+  $('#viewDay').off('click').on('click', () => { view = 'day'; renderView(); });
+  $('#viewWeek').off('click').on('click', () => { view = 'week'; renderView(); });
+  $('#viewMonth').off('click').on('click', () => { view = 'month'; renderView(); });
   
   // Setup date navigation
-  $('#prevDay').click(() => { date.setDate(date.getDate() - 1); renderView(); });
-  $('#nextDay').click(() => { date.setDate(date.getDate() + 1); renderView(); });
-  $('#todayBtn').click(() => { date = new Date(); date.setHours(0, 0, 0, 0); renderView(); });
+  $('#prevDay').off('click').on('click', () => { date.setDate(date.getDate() - 1); renderView(); });
+  $('#nextDay').off('click').on('click', () => { date.setDate(date.getDate() + 1); renderView(); });
+  $('#todayBtn').off('click').on('click', () => { date = new Date(); date.setHours(0, 0, 0, 0); renderView(); });
   
   // Setup tracking toggle
-  $('#toggleTracking').click(() => {
-    if (track) {
-      stopTracking();
-    } else {
-      startTracking();
-    }
-  });
+  $('#toggleTracking').off('click').on('click', () => { track ? stopTracking() : startTracking(); });
   
   // Setup new sidebar buttons
   $('#refresh-stats').click(() => {

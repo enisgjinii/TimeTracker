@@ -37,36 +37,68 @@ class EnhancedFeatures {
 
     // Initialize all event handlers
     initializeEventHandlers() {
-        // Navigation handlers
-        $('#nav-dashboard').click(() => this.showView('dashboard'));
-        $('#nav-timeline').click(() => this.showView('timeline'));
-        $('#nav-analytics').click(() => this.showView('analytics'));
-        $('#nav-pomodoro').click(() => this.showView('pomodoro'));
-        $('#nav-goals').click(() => this.showView('goals'));
-        $('#nav-settings').click(() => this.showView('settings'));
-        $('#nav-about').click(() => this.showView('about'));
+        // Helpers that don't require jQuery
+        const bindClickIfExists = (selector, handler) => {
+            const elements = document.querySelectorAll(selector);
+            if (!elements || elements.length === 0) return;
+            const hasJquery = typeof window !== 'undefined' && typeof window.$ !== 'undefined';
+            if (hasJquery) {
+                try { window.$(selector).off('click'); } catch (_) {}
+                try { window.$(selector).on('click', (e) => { e.preventDefault(); handler(); }); } catch (_) {}
+            } else {
+                elements.forEach((el) => {
+                    el.addEventListener('click', (e) => { e.preventDefault(); handler(); });
+                });
+            }
+        };
+
+        bindClickIfExists('#nav-dashboard', () => this.showView('dashboard'));
+        bindClickIfExists('#nav-timeline', () => this.showView('timeline'));
+        bindClickIfExists('#nav-analytics', () => this.showView('analytics'));
+        bindClickIfExists('#nav-pomodoro', () => this.showView('pomodoro'));
+        bindClickIfExists('#nav-goals', () => this.showView('goals'));
+        bindClickIfExists('#nav-settings', () => this.showView('settings'));
+        bindClickIfExists('#nav-about', () => this.showView('about'));
 
         // Dashboard handlers
         $('#refreshDashboard').click(() => this.refreshDashboard());
         $('#exportReport').click(() => this.exportReport());
 
-        // Pomodoro handlers
-        $('#pomodoroStart').click(() => this.startPomodoro());
-        $('#pomodoroPause').click(() => this.pausePomodoro());
-        $('#pomodoroReset').click(() => this.resetPomodoro());
+        // Pomodoro handlers (optional controls)
+        bindClickIfExists('#pomodoroStart', () => this.startPomodoro());
+        bindClickIfExists('#pomodoroPause', () => this.pausePomodoro());
+        bindClickIfExists('#pomodoroReset', () => this.resetPomodoro());
 
         // Goals handlers
         $('#addGoalBtn').click(() => this.showAddGoalModal());
 
         // Analytics period handlers
-        $('[data-period]').click((e) => {
-            $('[data-period]').removeClass('active');
-            $(e.target).addClass('active');
-            this.updateAnalytics($(e.target).data('period'));
-        });
+        const periodButtons = document.querySelectorAll('[data-period]');
+        if (periodButtons && periodButtons.length > 0) {
+            periodButtons.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('[data-period]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    const period = btn.getAttribute('data-period');
+                    this.updateAnalytics(period);
+                });
+            });
+        }
 
         // Quick goal handlers
         window.createQuickGoal = (type, target) => this.createQuickGoal(type, target);
+
+        // Sidebar quick actions
+        bindClickIfExists('#quick-break', () => this.quickBreak());
+        bindClickIfExists('#focus-mode', () => this.focusMode());
+        bindClickIfExists('#manual-entry', () => this.openManualEntry());
+
+        // Manual entry modal actions
+        bindClickIfExists('#saveManualEntryBtn', () => this.saveManualEntry());
+
+        // Upgrade/pricing modal open
+        bindClickIfExists('#upgrade-btn', () => this.showSubscriptionModal());
     }
 
     // Initialize compact sidebar functionality
@@ -77,8 +109,11 @@ class EnhancedFeatures {
         // Initialize session tracking
         this.updateSessionStatus();
         
-        // Add subscription management handler
-        $('#manage-subscription').click(() => this.showSubscriptionModal());
+        // Add subscription management handler (sidebar upgrade button)
+        const upgradeBtn = document.getElementById('upgrade-btn');
+        if (upgradeBtn) {
+            upgradeBtn.addEventListener('click', () => this.showSubscriptionModal());
+        }
         
         // Add profile menu handler
         $('#profile-menu').click(() => this.showProfileMenu());
@@ -123,16 +158,30 @@ class EnhancedFeatures {
     // Update session status
     updateSessionStatus() {
         const isTracking = typeof track !== 'undefined' ? track : false; // Use global tracking state
-        const statusDot = document.querySelector('.status-dot');
-        const statusText = document.querySelector('.status-text');
-        
-        if (statusDot && statusText) {
+        const trackingBtn = document.getElementById('toggleTracking');
+        const trackingPulse = document.querySelector('#toggleTracking .tracking-pulse');
+        const trackingIcon = document.querySelector('#toggleTracking .tracking-icon');
+        const trackingText = document.querySelector('#toggleTracking .tracking-text');
+
+        if (trackingBtn) {
             if (isTracking) {
-                statusDot.classList.add('active');
-                statusText.textContent = 'Active Session';
+                trackingBtn.classList.remove('btn-primary');
+                trackingBtn.classList.add('btn-danger');
+                if (trackingIcon) {
+                    trackingIcon.classList.remove('fi-rr-play');
+                    trackingIcon.classList.add('fi-rr-pause');
+                }
+                if (trackingText) trackingText.textContent = 'Stop Tracking';
+                if (trackingPulse) trackingPulse.style.display = 'block';
             } else {
-                statusDot.classList.remove('active');
-                statusText.textContent = 'Ready to Track';
+                trackingBtn.classList.remove('btn-danger');
+                trackingBtn.classList.add('btn-primary');
+                if (trackingIcon) {
+                    trackingIcon.classList.remove('fi-rr-pause');
+                    trackingIcon.classList.add('fi-rr-play');
+                }
+                if (trackingText) trackingText.textContent = 'Start Tracking';
+                if (trackingPulse) trackingPulse.style.display = 'none';
             }
         }
     }
@@ -178,17 +227,12 @@ class EnhancedFeatures {
     updateSubscriptionStatus() {
         const usagePercentage = (this.subscription.hoursUsed / this.subscription.hoursLimit) * 100;
         
-        // Update usage bar
-        const usageProgressEl = document.getElementById('usage-progress');
-        if (usageProgressEl) {
-            usageProgressEl.style.width = `${usagePercentage}%`;
-        }
-        
-        // Update usage text
-        const usageCurrentEl = document.getElementById('usage-current');
-        const usageLimitEl = document.getElementById('usage-limit');
-        if (usageCurrentEl) usageCurrentEl.textContent = this.subscription.hoursUsed;
-        if (usageLimitEl) usageLimitEl.textContent = this.subscription.hoursLimit;
+        // Update usage bar/text (match existing DOM #usage-fill and #usage-text)
+        const usageFillEl = document.getElementById('usage-fill');
+        if (usageFillEl) usageFillEl.style.width = `${usagePercentage}%`;
+
+        const usageTextEl = document.getElementById('usage-text');
+        if (usageTextEl) usageTextEl.textContent = `${this.subscription.hoursUsed}h / ${this.subscription.hoursLimit}h`;
         
         // Update plan display
         const planNames = {
@@ -197,49 +241,34 @@ class EnhancedFeatures {
             enterprise: 'Enterprise Plan'
         };
         const currentPlanEl = document.getElementById('current-plan');
-        if (currentPlanEl) {
-            currentPlanEl.textContent = planNames[this.subscription.plan];
-        }
+        if (currentPlanEl) currentPlanEl.textContent = planNames[this.subscription.plan];
         
         // Change color based on usage
-        if (usageProgressEl) {
+        if (usageFillEl) {
             if (usagePercentage > 90) {
-                usageProgressEl.style.background = 'linear-gradient(90deg, var(--destructive) 0%, var(--destructive) 100%)';
+                usageFillEl.style.background = 'linear-gradient(90deg, var(--destructive) 0%, var(--destructive) 100%)';
             } else if (usagePercentage > 70) {
-                usageProgressEl.style.background = 'linear-gradient(90deg, var(--warning) 0%, var(--destructive) 100%)';
+                usageFillEl.style.background = 'linear-gradient(90deg, var(--warning) 0%, var(--destructive) 100%)';
             } else {
-                usageProgressEl.style.background = 'linear-gradient(90deg, var(--success) 0%, var(--warning) 70%, var(--destructive) 100%)';
+                usageFillEl.style.background = 'linear-gradient(90deg, var(--success) 0%, var(--warning) 70%, var(--destructive) 100%)';
             }
         }
     }
 
     // Show subscription modal
     showSubscriptionModal() {
-        // Update modal content with current subscription data
-        const elements = {
-            'current-plan-name': this.getSubscriptionPlanName(),
-            'current-plan-description': this.getSubscriptionPlanDescription(),
-            'current-plan-badge': this.subscription.plan.toUpperCase(),
-            'hours-used': this.subscription.hoursUsed,
-            'projects-used': this.subscription.projectsUsed,
-            'exports-used': this.subscription.exportsUsed
-        };
+        // Ensure payment section renders inside pricing modal
+        if (typeof window.showPaymentSection === 'function') {
+            try { window.showPaymentSection(); } catch (_) {}
+        }
 
-        Object.entries(elements).forEach(([id, value]) => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = value;
-        });
-        
-        // Update plan buttons
-        this.updatePlanButtons();
-        
-        // Show modal
-        const modalEl = document.getElementById('subscriptionModal');
+        // Open pricing modal (matches index.html #pricingModal)
+        const modalEl = document.getElementById('pricingModal');
         if (modalEl && typeof bootstrap !== 'undefined') {
             const modal = new bootstrap.Modal(modalEl);
             modal.show();
         }
-        
+
         this.dashboard.createNotification('Subscription management opened', 'info');
     }
 
@@ -369,19 +398,16 @@ class EnhancedFeatures {
         const trackingBtn = document.getElementById('toggleTracking');
         if (!trackingBtn) return;
 
-        const trackingIcon = trackingBtn.querySelector('.tracking-icon i');
-        const trackingAction = trackingBtn.querySelector('.action');
-        const trackingStatus = trackingBtn.querySelector('.status');
-        
+        const trackingIcon = trackingBtn.querySelector('.tracking-icon');
+        const trackingText = trackingBtn.querySelector('.tracking-text');
         const isTracking = typeof track !== 'undefined' ? track : false;
-        
+
         if (isTracking) {
             if (trackingIcon) {
                 trackingIcon.classList.remove('fi-rr-play');
                 trackingIcon.classList.add('fi-rr-pause');
             }
-            if (trackingAction) trackingAction.textContent = 'Stop Tracking';
-            if (trackingStatus) trackingStatus.textContent = 'Recording activity...';
+            if (trackingText) trackingText.textContent = 'Stop Tracking';
             trackingBtn.classList.remove('btn-primary');
             trackingBtn.classList.add('btn-danger');
         } else {
@@ -389,11 +415,50 @@ class EnhancedFeatures {
                 trackingIcon.classList.remove('fi-rr-pause');
                 trackingIcon.classList.add('fi-rr-play');
             }
-            if (trackingAction) trackingAction.textContent = 'Start Tracking';
-            if (trackingStatus) trackingStatus.textContent = 'Ready to begin';
+            if (trackingText) trackingText.textContent = 'Start Tracking';
             trackingBtn.classList.remove('btn-danger');
             trackingBtn.classList.add('btn-primary');
         }
+    }
+
+    // Quick actions (lightweight behavior to avoid coupling deeply with renderer internals)
+    quickBreak() {
+        // Pause tracking if active
+        if (typeof track !== 'undefined' && track) {
+            track = false;
+            this.enhanceTrackingButton();
+            this.updateSessionStatus();
+        }
+        this.dashboard.createNotification('Break started', 'info');
+    }
+
+    focusMode() {
+        // Resume/start tracking
+        if (typeof track !== 'undefined' && !track) {
+            track = true;
+            this.enhanceTrackingButton();
+            this.updateSessionStatus();
+            this.startSessionTracking();
+        }
+        this.dashboard.createNotification('Focus mode enabled', 'success');
+    }
+
+    openManualEntry() {
+        const modalEl = document.getElementById('manualEntryModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    }
+
+    saveManualEntry() {
+        // Minimal UX feedback; actual persistence handled elsewhere in app
+        const modalEl = document.getElementById('manualEntryModal');
+        if (modalEl && typeof bootstrap !== 'undefined') {
+            const instance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            instance.hide();
+        }
+        this.dashboard.createNotification('Manual entry saved', 'success');
     }
 
     // Show specific view

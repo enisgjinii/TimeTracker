@@ -15,6 +15,11 @@ function createWindow() {
     });
     mainWindow.loadFile('index.html');
 
+    // Open DevTools only in development
+    if (process.env.NODE_ENV !== 'production') {
+        try { mainWindow.webContents.openDevTools({ mode: 'detach' }); } catch (_) {}
+    }
+
     let getWindows;
     import('get-windows').then(module => {
         getWindows = module;
@@ -34,7 +39,9 @@ function createWindow() {
                         console.error('Could not get file icon:', iconError);
                         data.icon = null; // Send null if icon fetching fails
                     }
-                    mainWindow.webContents.send('active-window-data', data);
+                    if (mainWindow && !mainWindow.isDestroyed()) {
+                        mainWindow.webContents.send('active-window-data', data);
+                    }
                 }
             } catch (error) {
                 if (mainWindow && !mainWindow.isDestroyed()) {
