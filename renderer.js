@@ -1749,10 +1749,11 @@ function updateQuickStats(todayEvents) {
   const focusHours = Math.round(focusMinutes / 60 * 10) / 10;
   const breakHours = Math.round(breakMinutes / 60 * 10) / 10;
   
-  $('#today-hours').text(totalHours + 'h');
-  $('#today-sessions').text(sessionCount);
-  $('#today-focus').text(focusHours + 'h');
-  $('#today-breaks').text(breakHours + 'h');
+  // Stats cards removed - these elements no longer exist
+  // $('#today-hours').text(totalHours + 'h');
+  // $('#today-sessions').text(sessionCount);
+  // $('#today-focus').text(focusHours + 'h');
+  // $('#today-breaks').text(breakHours + 'h');
   
   // Update usage text and progress bar
   const usagePercent = Math.min((totalHours / 10) * 100, 100);
@@ -2174,7 +2175,7 @@ function showView(viewName) {
     $(`#${viewName}-view`).removeClass('d-none');
     
     // Update navigation
-    $('.nav-link').removeClass('active');
+    $('.nav-item').removeClass('active');
     $(`#nav-${viewName}`).addClass('active');
     
     // Render view if timeline

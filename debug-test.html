@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug localStorage</title>
+</head>
+<body>
+    <h1>localStorage Debug Test</h1>
+    <div id="output"></div>
+
+    <script>
+        const output = document.getElementById('output');
+
+        function log(message) {
+            output.innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+
+        // Check if localStorage is available
+        if (typeof(Storage) !== "undefined") {
+            log("localStorage is available");
+
+            // Check current sessions data
+            const sessionsData = localStorage.getItem('sessions');
+            log("Current sessions data: " + sessionsData);
+
+            if (sessionsData) {
+                try {
+                    const sessions = JSON.parse(sessionsData);
+                    log("Parsed sessions: " + JSON.stringify(sessions, null, 2));
+                    log("Sessions length: " + sessions.length);
+                } catch (e) {
+                    log("Error parsing sessions: " + e.message);
+                }
+            } else {
+                log("No sessions data found in localStorage");
+            }
+
+            // Test setting some sample data
+            const sampleSessions = [
+                {
+                    id: Date.now(),
+                    type: 'work',
+                    startTime: new Date(Date.now() - 3600000), // 1 hour ago
+                    endTime: new Date(Date.now() - 1800000), // 30 minutes ago
+                    duration: 1800000, // 30 minutes in milliseconds
+                    app: 'Sample App'
+                }
+            ];
+
+            localStorage.setItem('sessions', JSON.stringify(sampleSessions));
+            log("Set sample sessions data: " + JSON.stringify(sampleSessions, null, 2));
+
+            // Verify it was set
+            const verifyData = localStorage.getItem('sessions');
+            log("Verified sessions data: " + verifyData);
+
+        } else {
+            log("localStorage is not available");
+        }
+    </script>
+</body>
+</html>

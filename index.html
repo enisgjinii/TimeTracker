@@ -233,80 +233,660 @@
             filter: invert(1);
         }
 
-        .sidebar {
-            background: var(--background);
-            width: 200px;
-            padding: 0.5rem;
-            border-right: 1px solid var(--border);
+        /* Compact Shadcn-inspired Sidebar */
+        .modern-sidebar {
+            width: 240px;
+            min-width: 240px;
+            max-width: 280px;
+            background: #ffffff;
+            border-right: 1px solid hsl(214, 32%, 91%);
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
             position: relative;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            transition: width 0.2s ease;
+        }
+
+        /* Responsive breakpoints */
+        @media (max-width: 1200px) {
+            .modern-sidebar {
+                width: 220px;
+                min-width: 220px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .modern-sidebar {
+                width: 200px;
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modern-sidebar {
+                width: 190px;
+                min-width: 190px;
+                max-width: 190px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .modern-sidebar {
+                width: 170px;
+                min-width: 170px;
+                max-width: 170px;
+            }
+        }
+
+        .sidebar-container {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: 100vh;
             overflow-y: auto;
             scrollbar-width: thin;
         }
 
-        .sidebar::-webkit-scrollbar {
+        .sidebar-container::-webkit-scrollbar {
             width: 4px;
         }
 
-        .sidebar::-webkit-scrollbar-thumb {
-            background-color: var(--muted-foreground);
+        .sidebar-container::-webkit-scrollbar-track {
+            background: hsl(210, 40%, 96%);
+        }
+
+        .sidebar-container::-webkit-scrollbar-thumb {
+            background: hsl(210, 40%, 80%);
             border-radius: 2px;
         }
 
-        .sidebar::-webkit-scrollbar-track {
-            background-color: transparent;
+        .sidebar-container::-webkit-scrollbar-thumb:hover {
+            background: hsl(210, 40%, 70%);
         }
 
-        .sidebar .nav-link {
-            color: var(--muted-foreground);
-            font-weight: 500;
-            padding: 0.5rem 0.75rem;
-            border-radius: var(--radius);
-            transition: all 0.15s ease;
-            text-decoration: none;
+        /* Responsive container padding */
+        @media (max-width: 768px) {
+            .sidebar-container {
+                padding: 0.75rem;
+                gap: 0.875rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar-container {
+                padding: 0.625rem;
+                gap: 0.75rem;
+            }
+        }
+
+        /* Brand Section */
+        .sidebar-brand {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            position: relative;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid hsl(214, 32%, 91%);
+            margin-bottom: 0.25rem;
         }
 
-        .sidebar .nav-link:hover {
-            color: var(--foreground);
-            background-color: var(--accent);
-        }
-        
-        .sidebar .nav-link.active {
-            color: var(--primary-foreground);
-            background-color: var(--primary);
-        }
-
-        .sidebar .nav-link.active:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .sidebar .nav-link i {
+        .brand-icon {
+            width: 32px;
+            height: 32px;
+            background: hsl(217, 32%, 17%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             font-size: 1rem;
-            width: 1.25rem;
-            text-align: center;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            flex-shrink: 0;
+            border: 1px solid hsl(217, 32%, 17%);
         }
 
-        /* Compact Sidebar Components */
-        .sidebar-header {
-            padding: 0.75rem 0.5rem;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 0.5rem;
+        /* Responsive brand section */
+        @media (max-width: 768px) {
+            .sidebar-brand {
+                gap: 0.625rem;
+                padding-bottom: 0.625rem;
+            }
+
+            .brand-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
         }
 
-        .brand-logo {
+        @media (max-width: 576px) {
+            .sidebar-brand {
+                gap: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            .brand-icon {
+                width: 24px;
+                height: 24px;
+                font-size: 0.8rem;
+            }
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: hsl(222, 84%, 5%);
+            line-height: 1.3;
+            letter-spacing: -0.025em;
+        }
+
+        .brand-subtitle {
+            font-size: 0.7rem;
+            color: hsl(215, 16%, 47%);
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+
+        /* Responsive brand text */
+        @media (max-width: 768px) {
+            .brand-title {
+                font-size: 0.9rem;
+            }
+
+            .brand-subtitle {
+                font-size: 0.65rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .brand-title {
+                font-size: 0.85rem;
+            }
+
+            .brand-subtitle {
+                font-size: 0.625rem;
+            }
+        }
+
+
+        /* Subscription Card */
+        .subscription-card {
+            background: white;
+            border-radius: 8px;
+            padding: 0.875rem;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            border: 1px solid hsl(214, 32%, 91%);
+        }
+
+        /* Responsive subscription card */
+        @media (max-width: 768px) {
+            .subscription-card {
+                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .subscription-card {
+                padding: 0.625rem;
+            }
+        }
+
+        .subscription-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .subscription-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: hsl(215, 16%, 47%);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            color: hsl(215, 16%, 47%);
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 0.375rem;
+            border-radius: 6px;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            color: var(--foreground);
+            justify-content: center;
         }
+
+        .refresh-btn:hover {
+            background: hsl(210, 40%, 96%);
+            color: hsl(222, 84%, 5%);
+        }
+
+        .subscription-badge {
+            background: hsl(142, 71%, 45%);
+            color: white;
+            padding: 0.25rem 0.625rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 0.75rem;
+            width: fit-content;
+        }
+
+        .usage-bar {
+            width: 100%;
+            height: 4px;
+            background: hsl(214, 32%, 91%);
+            border-radius: 2px;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        .usage-fill {
+            height: 100%;
+            background: hsl(142, 71%, 45%);
+            border-radius: 2px;
+            width: 25%;
+            transition: width 0.2s ease;
+        }
+
+        .usage-text {
+            font-size: 0.625rem;
+            color: hsl(215, 16%, 47%);
+            text-align: center;
+            margin-bottom: 0.75rem;
+            font-weight: 400;
+        }
+
+        .upgrade-btn {
+            width: 100%;
+            background: hsl(221, 83%, 53%);
+            border: none;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.375rem;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .upgrade-btn:hover {
+            background: hsl(224, 76%, 48%);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.625rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative;
+            margin-bottom: 0.125rem;
+        }
+
+        .nav-item:hover {
+            background: hsl(210, 40%, 96%);
+        }
+
+        .nav-item.active {
+            background: hsl(221, 83%, 53%);
+            color: white;
+        }
+
+        /* Responsive navigation items */
+        @media (max-width: 768px) {
+            .nav-item {
+                padding: 0.625rem 0.75rem;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .nav-item {
+                padding: 0.5rem 0.625rem;
+                gap: 0.5rem;
+            }
+        }
+
+        .nav-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+        }
+
+        .nav-item:not(.active) .nav-icon {
+            background: hsl(210, 40%, 96%);
+            color: hsl(215, 16%, 47%);
+        }
+
+        .nav-item.active .nav-icon {
+            background: hsl(210, 40%, 98%);
+            color: hsl(221, 83%, 53%);
+        }
+
+        .nav-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+        }
+
+        .nav-item:not(.active) .nav-label {
+            color: hsl(222, 84%, 5%);
+        }
+
+        .nav-item.active .nav-label {
+            color: white;
+        }
+
+        .nav-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+            display: none;
+        }
+
+        .nav-indicator.active {
+            display: block;
+        }
+
+        /* User Profile */
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            border: 1px solid hsl(214, 32%, 91%);
+            margin-bottom: 0.25rem;
+        }
+
+        /* Responsive user profile */
+        @media (max-width: 768px) {
+            .user-profile {
+                padding: 0.75rem;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .user-profile {
+                padding: 0.625rem;
+                gap: 0.5rem;
+            }
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: hsl(221, 83%, 53%);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: hsl(222, 84%, 5%);
+            margin-bottom: 0.125rem;
+            letter-spacing: -0.01em;
+        }
+
+        .user-status {
+            font-size: 0.7rem;
+            color: hsl(142, 71%, 45%);
+            font-weight: 400;
+        }
+
+        .user-menu-btn {
+            background: none;
+            border: none;
+            color: hsl(215, 16%, 47%);
+            font-size: 0.875rem;
+            cursor: pointer;
+            padding: 0.375rem;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-menu-btn:hover {
+            background: hsl(210, 40%, 96%);
+            color: hsl(222, 84%, 5%);
+        }
+
+        /* Tracking Control */
+        .tracking-control {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .tracking-btn {
+            background: hsl(142, 71%, 45%);
+            border: none;
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .tracking-btn:hover {
+            background: hsl(142, 69%, 42%);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .tracking-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive tracking button */
+        @media (max-width: 768px) {
+            .tracking-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tracking-btn {
+                padding: 0.625rem 0.875rem;
+                font-size: 0.85rem;
+                gap: 0.5rem;
+            }
+        }
+
+        .tracking-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tracking-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            animation: pulse 3s infinite;
+            display: none;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.05); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 0.375rem;
+        }
+
+        .quick-btn {
+            flex: 1;
+            background: white;
+            border: 1px solid hsl(214, 32%, 91%);
+            color: hsl(215, 16%, 47%);
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        }
+
+        .quick-btn:hover {
+            background: hsl(210, 40%, 96%);
+            color: hsl(222, 84%, 5%);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+        }
+
+        /* Responsive quick buttons */
+        @media (max-width: 768px) {
+            .quick-btn {
+                padding: 0.5rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .quick-btn {
+                padding: 0.45rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Dark mode adjustments - shadcn-inspired */
+        .dark-mode .modern-sidebar {
+            background: hsl(224, 71%, 4%);
+            border-right: 1px solid hsl(215, 28%, 17%);
+        }
+
+        .dark-mode .subscription-card,
+        .dark-mode .user-profile {
+            background: hsl(224, 71%, 4%);
+            border-color: hsl(215, 28%, 17%);
+        }
+
+        .dark-mode .sidebar-brand {
+            border-bottom-color: hsl(215, 28%, 17%);
+        }
+
+        .dark-mode .brand-title {
+            color: hsl(210, 20%, 98%);
+        }
+
+        .dark-mode .brand-subtitle {
+            color: hsl(215, 16%, 65%);
+        }
+
+        .dark-mode .stat-value,
+        .dark-mode .user-name {
+            color: hsl(210, 20%, 98%);
+        }
+
+        .dark-mode .stat-label,
+        .dark-mode .subscription-label,
+        .dark-mode .usage-text,
+        .dark-mode .nav-item:not(.active) .nav-label {
+            color: hsl(215, 16%, 65%);
+        }
+
+        .dark-mode .user-status {
+            color: hsl(142, 71%, 45%);
+        }
+
+        .dark-mode .nav-item:hover {
+            background: hsl(215, 28%, 17%);
+        }
+
+        .dark-mode .nav-item.active {
+            background: hsl(221, 83%, 53%);
+        }
+
+        .dark-mode .quick-btn {
+            background: hsl(224, 71%, 4%);
+            border-color: hsl(215, 28%, 17%);
+            color: hsl(215, 16%, 65%);
+        }
+
+        .dark-mode .quick-btn:hover {
+            background: hsl(215, 28%, 17%);
+            color: hsl(210, 20%, 98%);
+        }
+
 
         .brand-logo i {
             font-size: 1.25rem;
@@ -3173,160 +3753,104 @@
 <body class="dark-mode">
     <div class="container-fluid vh-100">
         <div class="row h-100">
-            <!-- Sidebar -->
-            <nav class="col-auto col-md-3 col-lg-2 d-md-block bg-light sidebar collapse p-0 h-100 border-end shadow-sm" id="sidebarMenu">
-                <div class="position-sticky d-flex flex-column h-100">
-                    <!-- Brand Header -->
-                    <div class="sidebar-header p-3 border-bottom bg-gradient">
-                        <div class="brand-logo d-flex align-items-center gap-2">
-                            <i class="fi fi-rr-clock fs-4 text-primary"></i>
-                            <span class="fw-bold fs-6">TimeTracker Pro</span>
+            <!-- Modern Sidebar -->
+            <nav class="modern-sidebar" id="sidebarMenu">
+                <div class="sidebar-container">
+                    <!-- Compact Brand Header -->
+                    <div class="sidebar-brand">
+                        <div class="brand-icon">
+                            <i class="fi fi-rr-clock"></i>
                         </div>
-                        <div class="mt-2">
-                            <small class="text-muted">Productivity Analytics</small>
+                        <div class="brand-text">
+                            <span class="brand-title">TimeTracker</span>
+                            <span class="brand-subtitle">Pro</span>
                         </div>
                     </div>
-                    
-                    <!-- Quick Stats -->
-                    <div class="sidebar-section p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="mb-0 fw-semibold text-uppercase small">Today's Stats</h6>
-                            <button class="btn btn-sm btn-outline-secondary" id="refresh-stats" title="Refresh Stats">
+
+
+                    <!-- Subscription Status -->
+                    <div class="subscription-card">
+                        <div class="subscription-header">
+                            <span class="subscription-label">Current Plan</span>
+                            <button class="refresh-btn" id="refresh-stats" title="Refresh Stats">
                                 <i class="fi fi-rr-refresh"></i>
                             </button>
                         </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <div class="card border-0 bg-primary bg-opacity-10 text-center p-2 h-100">
-                                    <div class="stat-value fw-bold text-primary" id="today-hours">0h</div>
-                                    <div class="stat-label small text-muted">Total Time</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="card border-0 bg-success bg-opacity-10 text-center p-2 h-100">
-                                    <div class="stat-value fw-bold text-success" id="today-sessions">0</div>
-                                    <div class="stat-label small text-muted">Sessions</div>
-                                </div>
-                            </div>
+                        <div class="subscription-badge" id="current-plan">Free Plan</div>
+                        <div class="usage-bar">
+                            <div class="usage-fill" id="usage-fill"></div>
                         </div>
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <div class="card border-0 bg-info bg-opacity-10 text-center p-2 h-100">
-                                    <div class="stat-value fw-bold text-info" id="today-focus">0h</div>
-                                    <div class="stat-label small text-muted">Focus</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="card border-0 bg-warning bg-opacity-10 text-center p-2 h-100">
-                                    <div class="stat-value fw-bold text-warning" id="today-breaks">0h</div>
-                                    <div class="stat-label small text-muted">Breaks</div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="usage-text" id="usage-text">0h / 10h</div>
+                        <button class="upgrade-btn" id="upgrade-btn">
+                            <i class="fi fi-rr-arrow-up"></i>
+                            <span>Upgrade</span>
+                        </button>
                     </div>
-                    
-                    <!-- Subscription Status -->
-                    <div class="sidebar-section p-3">
-                        <div class="card border-0 bg-light position-relative">
-                            <div class="card-body p-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <h6 class="mb-1 small fw-semibold">Current Plan</h6>
-                                        <span class="badge bg-primary" id="current-plan">Free Plan</span>
-                                    </div>
-                                    <button class="btn btn-sm btn-outline-primary" id="upgrade-btn" title="Upgrade Plan">
-                                        <i class="fi fi-rr-arrow-up"></i>
-                                    </button>
-                                </div>
-                                <div class="mb-2">
-                                    <div class="d-flex justify-content-between small text-muted mb-1">
-                                        <span>Usage</span>
-                                        <span id="usage-text">0h / 10h</span>
-                                    </div>
-                                    <div class="progress" style="height: 6px;">
-                                        <div class="progress-bar bg-success" id="usage-fill" style="width: 25%"></div>
-                                    </div>
-                                </div>
+
+                    <!-- Navigation Menu -->
+                    <div class="nav-menu">
+                        <div class="nav-item active" id="nav-timeline">
+                            <div class="nav-icon">
+                                <i class="fi fi-rr-list-timeline"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-label">Timeline</span>
+                                <div class="nav-indicator active"></div>
+                            </div>
+                        </div>
+                        <div class="nav-item" id="nav-settings">
+                            <div class="nav-icon">
+                                <i class="fi fi-rr-settings"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-label">Settings</span>
+                            </div>
+                        </div>
+                        <div class="nav-item" id="nav-about">
+                            <div class="nav-icon">
+                                <i class="fi fi-rr-info"></i>
+                            </div>
+                            <div class="nav-content">
+                                <span class="nav-label">About</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Navigation -->
-                    <div class="sidebar-section p-3 flex-grow-1">
-                        <h6 class="mb-3 fw-semibold text-uppercase small">Navigation</h6>
-                        <ul class="nav nav-pills flex-column gap-1">
-                            <li class="nav-item">
-                                <a href="#" class="nav-link active d-flex align-items-center gap-2 py-2" id="nav-timeline">
-                                    <i class="fi fi-rr-list-timeline"></i>
-                                    <span>Timeline</span>
-                                    <span class="badge bg-secondary ms-auto">Live</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link d-flex align-items-center gap-2 py-2" id="nav-settings">
-                                    <i class="fi fi-rr-settings"></i>
-                                    <span>Settings</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link d-flex align-items-center gap-2 py-2" id="nav-about">
-                                    <i class="fi fi-rr-info"></i>
-                                    <span>About</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <!-- User Menu -->
-                    <div class="user-menu-section p-3 border-top mt-auto">
-                        <div class="dropdown">
-                            <button class="btn btn-light w-100 d-flex align-items-center gap-2 text-start" id="user-menu-button" data-bs-toggle="dropdown">
-                                <div class="user-avatar rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                    <i class="fi fi-rr-user text-white small"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="user-display-name fw-semibold small">Guest</div>
-                                    <div class="user-status text-muted small">Online</div>
-                                </div>
-                                <i class="fi fi-rr-angle-small-down"></i>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end w-100" id="user-menu-dropdown">
-                                <li><h6 class="dropdown-header">Profile</h6></li>
-                                <li><a class="dropdown-item d-flex align-items-center gap-2" href="#" id="user-profile-link">
-                                    <i class="fi fi-rr-user"></i>My Profile
-                                </a></li>
-                                <li><a class="dropdown-item d-flex align-items-center gap-2" href="#" id="user-settings-link">
-                                    <i class="fi fi-rr-settings"></i>Preferences
-                                </a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="#" id="logout-button">
-                                    <i class="fi fi-rr-sign-out"></i>Sign Out
-                                </a></li>
-                            </ul>
+
+                    <!-- User Profile -->
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            <i class="fi fi-rr-user"></i>
                         </div>
+                        <div class="user-info">
+                            <div class="user-name" id="user-display-name">Guest</div>
+                            <div class="user-status" id="user-status">Online</div>
+                        </div>
+                        <button class="user-menu-btn" id="user-menu-button">
+                            <i class="fi fi-rr-menu-dots"></i>
+                        </button>
                     </div>
-                    
+
                     <!-- Tracking Control -->
-                    <div class="tracking-control-section p-3 border-top">
-                        <div class="d-flex flex-column gap-2">
-                            <button id="toggleTracking" class="btn btn-primary btn-lg tracking-button w-100 position-relative overflow-hidden">
-                                <div class="d-flex align-items-center justify-content-center gap-2">
-                                    <i class="fi fi-rr-play tracking-icon"></i>
-                                    <span class="tracking-text fw-semibold">Start Tracking</span>
-                                </div>
-                                <div class="tracking-pulse position-absolute top-50 start-50 translate-middle" style="display: none;"></div>
-                            </button>
-                            <div class="d-flex gap-1">
-                                <button class="btn btn-outline-secondary btn-sm flex-fill" id="quick-break" title="Quick Break">
-                                    <i class="fi fi-rr-coffee"></i>
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm flex-fill" id="focus-mode" title="Focus Mode">
-                                    <i class="fi fi-rr-target"></i>
-                                </button>
-                                <button class="btn btn-outline-secondary btn-sm flex-fill" id="manual-entry" title="Manual Entry">
-                                    <i class="fi fi-rr-plus"></i>
-                                </button>
+                    <div class="tracking-control">
+                        <button id="toggleTracking" class="tracking-btn">
+                            <div class="tracking-icon">
+                                <i class="fi fi-rr-play"></i>
                             </div>
+                            <span class="tracking-text">Start Tracking</span>
+                            <div class="tracking-pulse"></div>
+                        </button>
+
+                        <!-- Quick Action Buttons -->
+                        <div class="quick-actions">
+                            <button class="quick-btn" id="quick-break" title="Quick Break">
+                                <i class="fi fi-rr-coffee"></i>
+                            </button>
+                            <button class="quick-btn" id="focus-mode" title="Focus Mode">
+                                <i class="fi fi-rr-target"></i>
+                            </button>
+                            <button class="quick-btn" id="manual-entry" title="Manual Entry">
+                                <i class="fi fi-rr-plus"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
