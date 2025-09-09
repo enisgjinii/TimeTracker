@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Drawer,
@@ -90,44 +90,66 @@ const Sidebar = memo(({ currentView, setCurrentView }) => {
 
   const drawerContent = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Brand Header */}
-      <Box sx={{ p: 3, borderBottom: '1px solid rgba(0, 0, 0, 0.12)' }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Avatar sx={{ bgcolor: 'primary.main', width: 40, height: 40 }}>
-            <Schedule />
-          </Avatar>
+      {/* Shadcn-inspired Brand Header */}
+      <Box sx={{ p: 4, borderBottom: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+          <Box sx={{
+            width: 48,
+            height: 48,
+            borderRadius: 8,
+            bgcolor: 'primary.main',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Schedule sx={{ color: 'primary.contrastText', fontSize: 24 }} />
+          </Box>
           <Box>
-            <Typography variant="h6" fontWeight={600}>
+            <Typography variant="h5" fontWeight={600} sx={{ color: 'text.primary', mb: 0.5 }}>
               TimeTracker
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
               Productivity Analytics
             </Typography>
           </Box>
         </Box>
       </Box>
 
-      {/* Compact Stats */}
-      <Box sx={{ px: 2, py: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-            Today's Progress
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Box sx={{ flex: 1, textAlign: 'center', p: 1, bgcolor: 'background.paper', borderRadius: 1 }}>
-            <Typography variant="body2" fontWeight={600}>
+      {/* Shadcn-inspired Stats */}
+      <Box sx={{ px: 4, py: 2 }}>
+        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500, mb: 2 }}>
+          Today's Progress
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <Box sx={{
+            flex: 1,
+            textAlign: 'center',
+            p: 2,
+            bgcolor: 'grey.50',
+            borderRadius: 6,
+            border: '1px solid',
+            borderColor: 'divider'
+          }}>
+            <Typography variant="h6" fontWeight={600} sx={{ color: 'text.primary', mb: 0.5 }}>
               {Math.floor(stats.totalTime / 60)}h {stats.totalTime % 60}m
             </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Time
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+              Total Time
             </Typography>
           </Box>
-          <Box sx={{ flex: 1, textAlign: 'center', p: 1, bgcolor: 'background.paper', borderRadius: 1 }}>
-            <Typography variant="body2" fontWeight={600}>
+          <Box sx={{
+            flex: 1,
+            textAlign: 'center',
+            p: 2,
+            bgcolor: 'grey.50',
+            borderRadius: 6,
+            border: '1px solid',
+            borderColor: 'divider'
+          }}>
+            <Typography variant="h6" fontWeight={600} sx={{ color: 'text.primary', mb: 0.5 }}>
               {stats.sessions}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
               Sessions
             </Typography>
           </Box>
@@ -136,104 +158,157 @@ const Sidebar = memo(({ currentView, setCurrentView }) => {
 
       <Divider />
 
-      {/* Navigation Menu */}
-      <List sx={{ flex: 1, px: 2 }}>
-        <ListItem disablePadding sx={{ mb: 1 }}>
-          <ListItemButton
-            selected={currentView === 'timeline'}
-            onClick={() => handleNavigation('timeline', '/')}
-            sx={{
-              borderRadius: 2,
-              '&.Mui-selected': {
-                bgcolor: 'primary.light',
-                '&:hover': { bgcolor: 'primary.light' }
-              }
-            }}
-          >
-            <ListItemIcon>
-              <TimelineIcon color={currentView === 'timeline' ? 'primary' : 'inherit'} />
-            </ListItemIcon>
-            <ListItemText primary="Timeline" />
-          </ListItemButton>
-        </ListItem>
+      {/* Shadcn-inspired Navigation Menu */}
+      <Box sx={{ flex: 1, px: 4, py: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Box sx={{
+            p: 2,
+            borderRadius: 6,
+            cursor: 'pointer',
+            bgcolor: currentView === 'timeline' ? 'grey.100' : 'transparent',
+            border: '1px solid',
+            borderColor: currentView === 'timeline' ? 'primary.main' : 'transparent',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              bgcolor: 'grey.50',
+              borderColor: 'divider'
+            }
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <TimelineIcon sx={{
+                color: currentView === 'timeline' ? 'primary.main' : 'text.secondary',
+                fontSize: 20
+              }} />
+              <Typography variant="body2" fontWeight={500} sx={{
+                color: currentView === 'timeline' ? 'primary.main' : 'text.primary'
+              }}>
+                Timeline
+              </Typography>
+            </Box>
+          </Box>
 
-        <ListItem disablePadding sx={{ mb: 1 }}>
-          <ListItemButton
-            selected={currentView === 'settings'}
-            onClick={() => handleNavigation('settings', '/settings')}
-            sx={{
-              borderRadius: 2,
-              '&.Mui-selected': {
-                bgcolor: 'primary.light',
-                '&:hover': { bgcolor: 'primary.light' }
-              }
-            }}
-          >
-            <ListItemIcon>
-              <SettingsIcon color={currentView === 'settings' ? 'primary' : 'inherit'} />
-            </ListItemIcon>
-            <ListItemText primary="Settings" />
-          </ListItemButton>
-        </ListItem>
+          <Box sx={{
+            p: 2,
+            borderRadius: 6,
+            cursor: 'pointer',
+            bgcolor: currentView === 'settings' ? 'grey.100' : 'transparent',
+            border: '1px solid',
+            borderColor: currentView === 'settings' ? 'primary.main' : 'transparent',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              bgcolor: 'grey.50',
+              borderColor: 'divider'
+            }
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <SettingsIcon sx={{
+                color: currentView === 'settings' ? 'primary.main' : 'text.secondary',
+                fontSize: 20
+              }} />
+              <Typography variant="body2" fontWeight={500} sx={{
+                color: currentView === 'settings' ? 'primary.main' : 'text.primary'
+              }}>
+                Settings
+              </Typography>
+            </Box>
+          </Box>
 
-        <ListItem disablePadding>
-          <ListItemButton
-            selected={currentView === 'about'}
-            onClick={() => handleNavigation('about', '/about')}
-            sx={{
-              borderRadius: 2,
-              '&.Mui-selected': {
-                bgcolor: 'primary.light',
-                '&:hover': { bgcolor: 'primary.light' }
-              }
-            }}
-          >
-            <ListItemIcon>
-              <InfoIcon color={currentView === 'about' ? 'primary' : 'inherit'} />
-            </ListItemIcon>
-            <ListItemText primary="About" />
-          </ListItemButton>
-        </ListItem>
-      </List>
-
-      <Divider />
-
-      {/* Theme Switcher - Compact */}
-      <Box sx={{ px: 2, py: 1 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
-            Theme
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="caption" color="text.secondary">
-              {isDark ? 'Dark' : 'Light'}
-            </Typography>
-            <Switch
-              checked={isDark}
-              onChange={toggleTheme}
-              color="primary"
-              size="small"
-              sx={{ transform: 'scale(0.8)' }}
-            />
+          <Box sx={{
+            p: 2,
+            borderRadius: 6,
+            cursor: 'pointer',
+            bgcolor: currentView === 'about' ? 'grey.100' : 'transparent',
+            border: '1px solid',
+            borderColor: currentView === 'about' ? 'primary.main' : 'transparent',
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              bgcolor: 'grey.50',
+              borderColor: 'divider'
+            }
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+              <InfoIcon sx={{
+                color: currentView === 'about' ? 'primary.main' : 'text.secondary',
+                fontSize: 20
+              }} />
+              <Typography variant="body2" fontWeight={500} sx={{
+                color: currentView === 'about' ? 'primary.main' : 'text.primary'
+              }}>
+                About
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </Box>
 
       <Divider />
 
-      {/* User Profile */}
-      <Box sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Avatar sx={{ width: 32, height: 32 }}>
-            <Person />
-          </Avatar>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography variant="body2" fontWeight={500}>
-              Guest User
+      {/* Shadcn-inspired Theme Switcher */}
+      <Box sx={{ px: 4, py: 2 }}>
+        <Box sx={{
+          p: 2,
+          borderRadius: 6,
+          border: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="body2" fontWeight={500} sx={{ color: 'text.primary' }}>
+              Theme
             </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Online
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                {isDark ? 'Dark' : 'Light'}
+              </Typography>
+              <Switch
+                checked={isDark}
+                onChange={toggleTheme}
+                color="primary"
+                size="small"
+                sx={{
+                  '& .MuiSwitch-switchBase.Mui-checked': {
+                    color: 'primary.main',
+                    '&:hover': {
+                      bgcolor: 'primary.main',
+                      opacity: 0.8
+                    }
+                  }
+                }}
+              />
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Shadcn-inspired User Profile */}
+      <Box sx={{ px: 4, py: 3 }}>
+        <Box sx={{
+          p: 3,
+          borderRadius: 8,
+          border: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+            <Box sx={{
+              width: 40,
+              height: 40,
+              borderRadius: 6,
+              bgcolor: 'primary.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <Person sx={{ color: 'primary.contrastText', fontSize: 20 }} />
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="body2" fontWeight={600} sx={{ color: 'text.primary', mb: 0.5 }}>
+                Guest User
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                Online
+              </Typography>
+            </Box>
           </Box>
         </Box>
       </Box>

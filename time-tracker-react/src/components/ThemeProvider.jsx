@@ -19,87 +19,111 @@ const createAppTheme = (mode) => createTheme({
     mode,
     ...(mode === 'light'
       ? {
-          // Light theme - clean and minimal
+          // Light theme - clean and minimal (shadcn-inspired)
           primary: {
-            main: '#0f172a', // slate-900
-            light: '#334155', // slate-700
-            dark: '#020617', // slate-950
+            main: '#000000', // Pure black for primary
+            light: '#404040', // gray-700
+            dark: '#000000', // Pure black
           },
           secondary: {
-            main: '#64748b', // slate-500
-            light: '#94a3b8', // slate-400
-            dark: '#475569', // slate-600
+            main: '#6b7280', // gray-500
+            light: '#9ca3af', // gray-400
+            dark: '#374151', // gray-700
           },
           background: {
             default: '#ffffff',
-            paper: '#f8fafc', // slate-50
+            paper: '#fafafa', // Very light gray
           },
           text: {
-            primary: '#0f172a', // slate-900
-            secondary: '#64748b', // slate-500
+            primary: '#000000', // Pure black
+            secondary: '#6b7280', // gray-500
           },
-          divider: '#e2e8f0', // slate-200
+          divider: '#e5e7eb', // gray-200
           success: {
-            main: '#059669', // emerald-600
-            light: '#10b981', // emerald-500
-            dark: '#047857', // emerald-700
+            main: '#16a34a', // green-600
+            light: '#22c55e', // green-500
+            dark: '#15803d', // green-700
           },
           warning: {
-            main: '#d97706', // amber-600
-            light: '#f59e0b', // amber-500
-            dark: '#b45309', // amber-700
+            main: '#ca8a04', // yellow-600
+            light: '#eab308', // yellow-500
+            dark: '#a16207', // yellow-700
           },
           info: {
-            main: '#0284c7', // sky-600
-            light: '#0ea5e9', // sky-500
-            dark: '#0369a1', // sky-700
+            main: '#2563eb', // blue-600
+            light: '#3b82f6', // blue-500
+            dark: '#1d4ed8', // blue-700
           },
           error: {
             main: '#dc2626', // red-600
             light: '#ef4444', // red-500
             dark: '#b91c1c', // red-700
           },
+          grey: {
+            50: '#f9fafb',
+            100: '#f3f4f6',
+            200: '#e5e7eb',
+            300: '#d1d5db',
+            400: '#9ca3af',
+            500: '#6b7280',
+            600: '#4b5563',
+            700: '#374151',
+            800: '#1f2937',
+            900: '#111827',
+          },
         }
       : {
-          // Dark theme - sophisticated and clean
+          // Dark theme - sophisticated and clean (shadcn-inspired)
           primary: {
-            main: '#f1f5f9', // slate-100
-            light: '#e2e8f0', // slate-200
-            dark: '#cbd5e1', // slate-300
+            main: '#ffffff', // Pure white
+            light: '#f9fafb', // gray-50
+            dark: '#e5e7eb', // gray-200
           },
           secondary: {
-            main: '#94a3b8', // slate-400
-            light: '#cbd5e1', // slate-300
-            dark: '#64748b', // slate-500
+            main: '#9ca3af', // gray-400
+            light: '#d1d5db', // gray-300
+            dark: '#6b7280', // gray-500
           },
           background: {
-            default: '#0f172a', // slate-900
-            paper: '#1e293b', // slate-800
+            default: '#000000', // Pure black
+            paper: '#0a0a0a', // Very dark gray
           },
           text: {
-            primary: '#f1f5f9', // slate-100
-            secondary: '#94a3b8', // slate-400
+            primary: '#ffffff', // Pure white
+            secondary: '#9ca3af', // gray-400
           },
-          divider: '#334155', // slate-700
+          divider: '#374151', // gray-700
           success: {
-            main: '#10b981', // emerald-500
-            light: '#34d399', // emerald-400
-            dark: '#059669', // emerald-600
+            main: '#22c55e', // green-500
+            light: '#4ade80', // green-400
+            dark: '#16a34a', // green-600
           },
           warning: {
-            main: '#f59e0b', // amber-500
-            light: '#fbbf24', // amber-400
-            dark: '#d97706', // amber-600
+            main: '#eab308', // yellow-500
+            light: '#facc15', // yellow-400
+            dark: '#ca8a04', // yellow-600
           },
           info: {
-            main: '#0ea5e9', // sky-500
-            light: '#38bdf8', // sky-400
-            dark: '#0284c7', // sky-600
+            main: '#3b82f6', // blue-500
+            light: '#60a5fa', // blue-400
+            dark: '#2563eb', // blue-600
           },
           error: {
             main: '#ef4444', // red-500
             light: '#f87171', // red-400
             dark: '#dc2626', // red-600
+          },
+          grey: {
+            50: '#f9fafb',
+            100: '#f3f4f6',
+            200: '#e5e7eb',
+            300: '#d1d5db',
+            400: '#9ca3af',
+            500: '#6b7280',
+            600: '#4b5563',
+            700: '#374151',
+            800: '#1f2937',
+            900: '#111827',
           },
         }
     ),
@@ -176,47 +200,59 @@ const createAppTheme = (mode) => createTheme({
           textTransform: 'none',
           borderRadius: 6,
           fontWeight: 500,
-          padding: '8px 16px',
+          padding: '6px 12px',
+          fontSize: '0.875rem',
+          lineHeight: 1.5,
           boxShadow: 'none',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+          border: '1px solid transparent',
           '&:hover': {
-            boxShadow: mode === 'light'
-              ? '0 1px 3px rgba(0, 0, 0, 0.1)'
-              : '0 1px 3px rgba(0, 0, 0, 0.3)',
+            boxShadow: 'none',
           },
         },
         contained: {
-          boxShadow: mode === 'light'
-            ? '0 1px 3px rgba(0, 0, 0, 0.1)'
-            : '0 1px 3px rgba(0, 0, 0, 0.3)',
+          backgroundColor: mode === 'light' ? '#000000' : '#ffffff',
+          color: mode === 'light' ? '#ffffff' : '#000000',
           '&:hover': {
-            boxShadow: mode === 'light'
-              ? '0 2px 8px rgba(0, 0, 0, 0.15)'
-              : '0 2px 8px rgba(0, 0, 0, 0.4)',
+            backgroundColor: mode === 'light' ? '#262626' : '#f5f5f5',
           },
         },
         outlined: {
-          borderWidth: 1,
+          borderColor: mode === 'light' ? '#d1d5db' : '#4b5563',
+          color: mode === 'light' ? '#374151' : '#d1d5db',
           '&:hover': {
-            borderWidth: 1,
-            backgroundColor: mode === 'light' ? '#f8fafc' : '#334155',
+            borderColor: mode === 'light' ? '#9ca3af' : '#6b7280',
+            backgroundColor: mode === 'light' ? '#f9fafb' : '#1f2937',
           },
+        },
+        text: {
+          color: mode === 'light' ? '#374151' : '#d1d5db',
+          '&:hover': {
+            backgroundColor: mode === 'light' ? '#f3f4f6' : '#1f2937',
+          },
+        },
+        sizeSmall: {
+          padding: '4px 8px',
+          fontSize: '0.8125rem',
+        },
+        sizeLarge: {
+          padding: '8px 16px',
+          fontSize: '0.9375rem',
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 6,
-          border: `1px solid ${mode === 'light' ? '#e2e8f0' : '#334155'}`,
-          boxShadow: mode === 'light'
-            ? '0 1px 3px rgba(0, 0, 0, 0.05)'
-            : '0 1px 3px rgba(0, 0, 0, 0.15)',
-          backgroundColor: mode === 'light' ? '#ffffff' : '#1e293b',
-          transition: 'all 0.15s ease',
+          borderRadius: 8,
+          border: `1px solid ${mode === 'light' ? '#e5e7eb' : '#374151'}`,
+          boxShadow: 'none',
+          backgroundColor: mode === 'light' ? '#ffffff' : '#0a0a0a',
+          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
             boxShadow: mode === 'light'
-              ? '0 4px 12px rgba(0, 0, 0, 0.08)'
-              : '0 4px 12px rgba(0, 0, 0, 0.2)',
+              ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+              : '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
           },
         },
       },
@@ -240,10 +276,25 @@ const createAppTheme = (mode) => createTheme({
         root: {
           borderRadius: 6,
           fontWeight: 500,
+          fontSize: '0.8125rem',
+          height: 26,
+          '& .MuiChip-label': {
+            padding: '0 8px',
+          },
         },
         filled: {
-          backgroundColor: mode === 'light' ? '#f1f5f9' : '#334155',
-          color: mode === 'light' ? '#475569' : '#cbd5e1',
+          backgroundColor: mode === 'light' ? '#f3f4f6' : '#1f2937',
+          color: mode === 'light' ? '#374151' : '#d1d5db',
+          '&:hover': {
+            backgroundColor: mode === 'light' ? '#e5e7eb' : '#374151',
+          },
+        },
+        outlined: {
+          borderColor: mode === 'light' ? '#d1d5db' : '#4b5563',
+          color: mode === 'light' ? '#374151' : '#d1d5db',
+          '&:hover': {
+            backgroundColor: mode === 'light' ? '#f9fafb' : '#1f2937',
+          },
         },
       },
     },
@@ -252,17 +303,21 @@ const createAppTheme = (mode) => createTheme({
         root: {
           '& .MuiOutlinedInput-root': {
             borderRadius: 6,
-            backgroundColor: mode === 'light' ? '#ffffff' : '#1e293b',
+            backgroundColor: mode === 'light' ? '#ffffff' : '#0a0a0a',
             '& fieldset': {
-              borderColor: mode === 'light' ? '#cbd5e1' : '#475569',
+              borderColor: mode === 'light' ? '#d1d5db' : '#4b5563',
             },
             '&:hover fieldset': {
-              borderColor: mode === 'light' ? '#94a3b8' : '#64748b',
+              borderColor: mode === 'light' ? '#9ca3af' : '#6b7280',
             },
             '&.Mui-focused fieldset': {
-              borderColor: mode === 'light' ? '#0f172a' : '#f1f5f9',
-              borderWidth: 1,
+              borderColor: mode === 'light' ? '#000000' : '#ffffff',
+              borderWidth: 2,
             },
+          },
+          '& .MuiOutlinedInput-input': {
+            padding: '8px 12px',
+            fontSize: '0.875rem',
           },
         },
       },

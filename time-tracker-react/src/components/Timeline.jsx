@@ -185,60 +185,9 @@ const Timeline = memo(() => {
     };
   }, [loadSessions, trackingState.isTracking, trackingState.currentSession]);
 
-  const formatTime = (date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
 
-  const formatDuration = (seconds) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
 
-    if (hours > 0) {
-      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    } else {
-      return `${minutes}:${secs.toString().padStart(2, '0')}`;
-    }
-  };
 
-  const formatLiveDuration = (seconds) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    } else if (minutes > 0) {
-      return `${minutes}m ${seconds % 60}s`;
-    } else {
-      return `${seconds}s`;
-    }
-  };
-
-  const getActivityIcon = (type) => {
-    switch (type) {
-      case 'work':
-        return <PlayArrow sx={{ color: 'success.main' }} />;
-      case 'break':
-        return <Coffee sx={{ color: 'warning.main' }} />;
-      case 'focus':
-        return <CenterFocusStrong sx={{ color: 'info.main' }} />;
-      default:
-        return <AccessTime sx={{ color: 'text.secondary' }} />;
-    }
-  };
-
-  const getActivityColor = (type) => {
-    switch (type) {
-      case 'work':
-        return 'success';
-      case 'break':
-        return 'warning';
-      case 'focus':
-        return 'info';
-      default:
-        return 'default';
-    }
-  };
 
   // Memoized formatters for performance
   const formatTime = useCallback((date) => {
@@ -323,89 +272,92 @@ const Timeline = memo(() => {
   );
 
   if (isLoading) {
-    return <TimelineSkeleton />;
+    return (<TimelineSkeleton />);
   }
 
   return (
     <Fade in={!isLoading} timeout={300}>
       <Box sx={{ maxWidth: 900, mx: 'auto', p: 3 }}>
-        {/* Enhanced Compact Header */}
+        {/* Shadcn-inspired Header */}
         <Box sx={{
-          mb: 3,
+          mb: 4,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          p: 3,
-          borderRadius: 2,
+          p: 4,
+          borderRadius: 8,
           bgcolor: 'background.paper',
           border: '1px solid',
           borderColor: 'divider',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
         }}>
           <Box>
-            <Typography variant="h5" fontWeight={600} sx={{ mb: 0.5, color: 'text.primary' }}>
+            <Typography variant="h4" fontWeight={600} sx={{ mb: 1, color: 'text.primary' }}>
               Timeline
             </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {currentDate.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+              {currentDate.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
             </Typography>
           </Box>
 
-          {/* Enhanced Compact Stats */}
+          {/* Shadcn-style Stats Cards */}
           <Box sx={{ display: 'flex', gap: 3 }}>
             <Box sx={{
               textAlign: 'center',
-              p: 1.5,
-              borderRadius: 1,
+              p: 2,
+              borderRadius: 6,
               bgcolor: 'grey.50',
-              minWidth: 70
+              minWidth: 80,
+              border: '1px solid',
+              borderColor: 'divider'
             }}>
-              <Typography variant="h6" fontWeight={600} sx={{ color: 'primary.main' }}>
+              <Typography variant="h5" fontWeight={600} sx={{ color: 'text.primary', mb: 0.5 }}>
                 {liveStats.sessions}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                 Sessions
               </Typography>
             </Box>
             <Box sx={{
               textAlign: 'center',
-              p: 1.5,
-              borderRadius: 1,
+              p: 2,
+              borderRadius: 6,
               bgcolor: 'grey.50',
-              minWidth: 70
+              minWidth: 80,
+              border: '1px solid',
+              borderColor: 'divider'
             }}>
-              <Typography variant="h6" fontWeight={600} sx={{ color: 'success.main' }}>
+              <Typography variant="h5" fontWeight={600} sx={{ color: 'text.primary', mb: 0.5 }}>
                 {Math.floor(liveStats.totalTime / 60)}h {liveStats.totalTime % 60}m
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Total
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                Total Time
               </Typography>
             </Box>
             {trackingState.isTracking && (
               <Box sx={{
                 textAlign: 'center',
-                p: 1.5,
-                borderRadius: 1,
+                p: 2,
+                borderRadius: 6,
                 bgcolor: 'success.light',
-                border: '1px solid',
+                border: '2px solid',
                 borderColor: 'success.main',
-                minWidth: 70,
+                minWidth: 80,
                 position: 'relative'
               }}>
                 <Box sx={{
                   position: 'absolute',
-                  top: 6,
-                  right: 6,
-                  width: 6,
-                  height: 6,
+                  top: 8,
+                  right: 8,
+                  width: 8,
+                  height: 8,
                   bgcolor: 'success.main',
                   borderRadius: '50%',
                   animation: 'pulse 2s infinite'
                 }} />
-                <Typography variant="h6" fontWeight={600} sx={{ color: 'success.dark' }}>
+                <Typography variant="h5" fontWeight={600} sx={{ color: 'success.dark', mb: 0.5 }}>
                   {formatLiveDuration(liveStats.currentSessionTime)}
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                   Active
                 </Typography>
               </Box>
@@ -413,111 +365,91 @@ const Timeline = memo(() => {
           </Box>
         </Box>
 
-      {/* Enhanced Current Time Indicator */}
+      {/* Shadcn-inspired Current Time Indicator */}
       <Box sx={{
         mb: 3,
-        p: 3,
-        bgcolor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        borderRadius: 2,
+        p: 4,
+        bgcolor: 'background.paper',
+        borderRadius: 8,
+        border: '1px solid',
+        borderColor: 'divider',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 2,
-        position: 'relative',
-        overflow: 'hidden',
-        boxShadow: '0 4px 12px rgba(102, 126, 234, 0.15)'
+        gap: 3,
       }}>
         <Box sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          bgcolor: 'rgba(255, 255, 255, 0.1)',
-          backdropFilter: 'blur(20px)'
-        }} />
-        <Box sx={{
-          position: 'absolute',
-          top: -20,
-          right: -20,
-          width: 80,
-          height: 80,
-          borderRadius: '50%',
-          bgcolor: 'rgba(255, 255, 255, 0.1)'
-        }} />
-        <AccessTime sx={{ fontSize: 24, zIndex: 1 }} />
-        <Box sx={{ zIndex: 1, textAlign: 'center' }}>
-          <Typography variant="h4" fontWeight={700} sx={{ mb: 0.5 }}>
-            {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </Typography>
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>
-            {currentTime.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}
-          </Typography>
+          display: 'flex',
+          alignItems: 'center',
+          gap: 2,
+          p: 2,
+          borderRadius: 6,
+          bgcolor: 'grey.50',
+          border: '1px solid',
+          borderColor: 'divider'
+        }}>
+          <AccessTime sx={{ fontSize: 20, color: 'text.secondary' }} />
+          <Box>
+            <Typography variant="h4" fontWeight={600} sx={{ color: 'text.primary', lineHeight: 1.2 }}>
+              {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
+              {currentTime.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })}
+            </Typography>
+          </Box>
         </Box>
       </Box>
 
-      {/* Enhanced Active Session Banner */}
+      {/* Shadcn-inspired Active Session Banner */}
       {trackingState.isTracking && trackingState.currentSession && (
-        <Fade in={true} timeout={500}>
+        <Fade in={true} timeout={300}>
           <Box sx={{
             mb: 3,
-            p: 3,
-            bgcolor: 'success.main',
-            color: 'white',
-            borderRadius: 2,
+            p: 4,
+            bgcolor: 'success.light',
+            borderRadius: 8,
+            border: '2px solid',
+            borderColor: 'success.main',
             display: 'flex',
             alignItems: 'center',
             gap: 3,
             position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
-            border: '1px solid rgba(255, 255, 255, 0.1)'
           }}>
-            <Box sx={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              width: 100,
-              height: 100,
-              bgcolor: 'rgba(255, 255, 255, 0.1)',
-              borderRadius: '50%',
-              transform: 'translate(30px, -30px)'
-            }} />
             <Box sx={{
               width: 12,
               height: 12,
-              bgcolor: 'white',
+              bgcolor: 'success.main',
               borderRadius: '50%',
-              animation: 'pulse 1.5s ease-in-out infinite',
-              zIndex: 1
+              animation: 'pulse 2s infinite',
             }} />
-            <Box sx={{ flex: 1, zIndex: 1 }}>
-              <Typography variant="h6" fontWeight={600} sx={{ mb: 0.5 }}>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="h6" fontWeight={600} sx={{ mb: 1, color: 'success.dark' }}>
                 Currently Tracking
               </Typography>
-              <Typography variant="body1" sx={{ mb: 0.5 }}>
+              <Typography variant="body1" sx={{ mb: 0.5, color: 'text.primary' }}>
                 <strong>{trackingState.currentApp || 'Unknown App'}</strong>
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+              <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
                 {formatLiveDuration(liveStats.currentSessionTime)} • Started {formatTime(new Date(trackingState.currentSession.startTime))}
               </Typography>
               {trackingState.currentSession.windowTitle && (
-                <Typography variant="body2" sx={{ opacity: 0.8, mt: 0.5, fontStyle: 'italic' }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic', mt: 0.5 }}>
                   "{trackingState.currentSession.windowTitle}"
                 </Typography>
               )}
             </Box>
             <Box sx={{
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
-              gap: 1,
-              zIndex: 1
+              gap: 0.5
             }}>
-              <Typography variant="h4" fontWeight={700}>
+              <Typography variant="h4" fontWeight={700} sx={{ color: 'success.dark' }}>
                 {formatLiveDuration(liveStats.currentSessionTime)}
               </Typography>
-              <CircularProgress size={24} sx={{ color: 'rgba(255, 255, 255, 0.3)' }} />
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
+                Active Session
+              </Typography>
             </Box>
           </Box>
         </Fade>
@@ -635,7 +567,10 @@ const Timeline = memo(() => {
         </Stack>
       </Box>
     </Box>
+    </Fade>
   );
-};
+});
+
+Timeline.displayName = 'Timeline';
 
 export default Timeline;
